@@ -1,0 +1,41 @@
+# CODEOWNERS
+#
+# Requests review from the owners of matching files when a PR touches them.
+# Docs: https://docs.github.com/articles/about-code-owners
+#
+# Rules:
+#   - .gitignore-style patterns map paths to owners.
+#   - The LAST matching rule wins, so keep broad defaults first and specific
+#     paths later.
+#   - Owners need write access. Prefer teams (@org/team) over individuals so any
+#     member can unblock a PR.
+#
+# The repo is solo today, so @aswini-kumar-11 owns everything. Replace it with
+# a real GitHub account or team as the org grows.
+
+# Default owner for everything not matched below.
+* @aswini-kumar-11
+
+# Documentation
+*.md @aswini-kumar-11
+/docs/ @aswini-kumar-11
+
+# Applications
+/apps/web/** @aswini-kumar-11
+/apps/docs/** @aswini-kumar-11
+
+# Shared packages
+/packages/ui/** @aswini-kumar-11
+/packages/eslint-config/** @aswini-kumar-11
+/packages/typescript-config/** @aswini-kumar-11
+
+# CI, automation, and repository governance
+/.github/** @aswini-kumar-11
+/package.json @aswini-kumar-11
+/pnpm-workspace.yaml @aswini-kumar-11
+/pnpm-lock.yaml @aswini-kumar-11
+/turbo.json @aswini-kumar-11
+
+# Legal and security
+/LICENSE @aswini-kumar-11
+/SECURITY.md @aswini-kumar-11

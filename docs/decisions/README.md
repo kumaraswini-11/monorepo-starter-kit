@@ -19,6 +19,8 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 | [0006](0006-contributing-security-docs.md)         | Community-oriented CONTRIBUTING & SECURITY from templates                | Accepted | 2026-07-12 |
 | [0007](0007-base-ui-over-radix.md)                 | Use Base UI (over Radix) for component primitives                        | Accepted | 2026-07-12 |
 | [0008](0008-no-publishconfig-internal-packages.md) | No publishConfig on internal packages (npm publish ≠ repo/license)       | Accepted | 2026-07-12 |
+| [0009](0009-github-automation-and-governance.md)   | GitHub automation & governance (CI, CODEOWNERS, PR template, Dependabot) | Accepted | 2026-07-12 |
 
 See also [../references.md](../references.md) for the sources behind these
-decisions.
+decisions, and [../future-improvements.md](../future-improvements.md) for the
+deliberately-deferred backlog.

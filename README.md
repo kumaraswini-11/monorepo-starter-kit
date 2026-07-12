@@ -119,6 +119,8 @@ import { Button } from "@workspace/ui/components/button";
   technical and process choices.
 - **[References](docs/references.md)** — curated tools, templates, and docs used
   to build this repo.
+- **[Future improvements](docs/future-improvements.md)** — consciously deferred
+  items to revisit as the project grows.
 
 ## Contributing
 
