@@ -23,6 +23,7 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 | [0010](0010-import-ordering.md)                    | Import ordering via `@ianvs/prettier-plugin-sort-imports`                | Accepted | 2026-07-12 |
 | [0011](0011-project-mcp-servers.md)                | Project MCP servers (github, context7, shadcn, next-devtools)            | Accepted | 2026-07-12 |
 | [0012](0012-agents-md-single-source.md)            | AGENTS.md is the single source of truth; CLAUDE.md imports it            | Accepted | 2026-07-12 |
+| [0013](0013-vendored-ui-lint-exception.md)         | Relax `react-hooks/set-state-in-effect` for vendored shadcn components   | Accepted | 2026-07-12 |
 
 See also [../references.md](../references.md) for the sources behind these
 decisions, and [../future-improvements.md](../future-improvements.md) for the
