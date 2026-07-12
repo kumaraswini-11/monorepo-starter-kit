@@ -1,0 +1,18 @@
+# Normalize line endings to LF on commit and checkout.
+# With core.autocrlf=true this prevents CRLF/LF churn across OSes and keeps
+# Prettier (endOfLine: "lf") stable on Windows.
+* text=auto eol=lf
+
+# Lockfiles: keep LF, and collapse in diffs / mark as generated.
+pnpm-lock.yaml -diff linguist-generated
+
+# Binary assets (never modify line endings).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
