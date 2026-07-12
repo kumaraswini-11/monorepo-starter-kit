@@ -9,7 +9,14 @@ node_modules
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-.claude
+# Claude Code — commit shared config (skills, agents, rules, settings.json),
+# ignore personal/local overrides
+.claude/*
+!.claude/skills/
+!.claude/agents/
+!.claude/rules/
+!.claude/settings.json
+.claude/settings.local.json
 
 # testing
 coverage
