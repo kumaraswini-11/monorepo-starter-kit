@@ -2,6 +2,13 @@ packages:
   - "apps/*"
   - "packages/*"
 
+# Supply-chain hardening: delay installing just-published versions so a
+# compromised release has time to be caught and pulled. This is pnpm 11's
+# default (1 day = 1440 min); set explicitly here for pnpm 10.
+# REMOVE after upgrading to pnpm 11, where it is on by default
+# (see docs/future-improvements.md).
+minimumReleaseAge: 1440
+
 catalog:
   # React & framework
   react: 19.2.7

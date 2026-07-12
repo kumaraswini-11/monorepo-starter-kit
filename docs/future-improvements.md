@@ -63,7 +63,14 @@ See [decisions/0004](decisions/0004-defer-typescript-7.md).
 - **TypeScript 7** — adopt when typescript-eslint supports it (~7.1).
 - **ESLint 10** — adopt when `eslint-plugin-react` / `eslint-config-next` declare
   support.
-- **pnpm 11** — evaluate (currently pinned to pnpm 10 via `packageManager`).
+- **pnpm 11** — adopt for its security-by-default (`minimumReleaseAge`,
+  `blockExoticSubdeps`, `strictDepBuilds` all default-on). **Requires Node ≥ 22.13**,
+  so bump `engines` and `@types/node` to `^22` in the same change. Attempted
+  2026-07-12 but blocked in the Windows dev env: Corepack could not write its shim
+  (`EPERM` on `C:\Program Files\nodejs`, needs admin) and pnpm's self-managed
+  pnpm-11 launcher failed. Do it where Corepack can activate (an elevated
+  `corepack enable`, or a repaired Node/Corepack install), then bump
+  `packageManager` → `pnpm@11`, re-install, verify, and commit.
 
 ## Production readiness (when this backs a real product)
 
