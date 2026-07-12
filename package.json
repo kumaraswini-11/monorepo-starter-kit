@@ -1,12 +1,13 @@
 {
-  "name": "fe-starter-kit",
+  "name": "monorepo-starter-kit",
   "version": "0.0.1",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "turbo format",
+    "format": "prettier --write --cache .",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
