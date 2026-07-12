@@ -10,11 +10,14 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "format": {
-      "dependsOn": ["^format"]
-    },
     "typecheck": {
       "dependsOn": ["^typecheck"]
+    },
+    "//#format": {
+      "cache": false
+    },
+    "test": {
+      "dependsOn": ["build"]
     },
     "dev": {
       "cache": false,
