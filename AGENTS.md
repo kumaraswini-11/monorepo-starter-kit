@@ -56,6 +56,13 @@ Before treating a change as done, run
   be inlined. Never inline a version for something two packages share.
 - **Supply chain:** new packages sit behind `minimumReleaseAge`; prefer widely-used,
   maintained deps and justify additions. Don't disable the cooldown.
+- **Dependency weight:** judge a dep by _where it runs_. Dev tooling (devDeps)
+  never ships — weigh it on maintenance + supply-chain, not size. Client runtime
+  deps are the only place bundle size matters — prefer small/tree-shakeable, keep
+  server-only where possible, and lazy-load heavy ones (`next/dynamic`, e.g.
+  charts). Source components (shadcn) are free until imported; unused code costs
+  nothing (tree-shaking + per-route code-splitting). Keep the catalog fresh with
+  `pnpm deps:check` (taze) — Dependabot doesn't track catalog entries.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
 - **Record notable decisions as ADRs** in `docs/decisions/` (copy the existing
   `NNNN-title.md` format and update the index). Log deferred work in

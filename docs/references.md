@@ -39,6 +39,19 @@ use case. Add new links under the relevant section (or make a new one).
 
 - Settings (`allowBuilds`, the pnpm 10.26+/11 replacement for
   `onlyBuiltDependencies`) — <https://pnpm.io/settings>
+- Catalogs — <https://pnpm.io/catalogs>
+
+## Dependency & catalog maintenance
+
+- **taze** (adopted) — checks/bumps dependency versions across the workspace,
+  **including pnpm catalog entries**, which Dependabot does _not_ track. That gap
+  is why we added it. Run `pnpm deps:check` (`taze -r`) to see what's outdated;
+  add `-w` to write the bumps, or `taze major` to include majors —
+  <https://github.com/antfu-collective/taze>
+- **`codemod pnpm/catalog`** (not needed yet) — automatically _moves_ a dependency
+  shared across multiple packages into the catalog; run it when the repo grows and
+  deps become shared, instead of editing `pnpm-workspace.yaml` by hand —
+  <https://app.codemod.com/registry/pnpm/catalog>
 
 ## ESLint / TypeScript versions
 
