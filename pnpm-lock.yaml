@@ -4,6 +4,45 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@tailwindcss/postcss':
+      specifier: ^4
+      version: 4.3.0
+    '@types/node':
+      specifier: ^20
+      version: 20.19.41
+    '@types/react':
+      specifier: ^19
+      version: 19.2.15
+    '@types/react-dom':
+      specifier: ^19
+      version: 19.2.3
+    eslint:
+      specifier: ^9
+      version: 9.39.4
+    lucide-react:
+      specifier: ^1.24.0
+      version: 1.24.0
+    next:
+      specifier: 16.2.10
+      version: 16.2.10
+    next-themes:
+      specifier: ^0.4.6
+      version: 0.4.6
+    react:
+      specifier: 19.2.7
+      version: 19.2.7
+    react-dom:
+      specifier: 19.2.7
+      version: 19.2.7
+    tailwindcss:
+      specifier: ^4
+      version: 4.3.0
+    typescript:
+      specifier: ^5
+      version: 5.9.3
+
 importers:
 
   .:
@@ -24,7 +63,7 @@ importers:
         specifier: ^2.9.18
         version: 2.10.4
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.9.3
 
   apps/web:
@@ -33,32 +72,32 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       lucide-react:
-        specifier: ^1.24.0
+        specifier: 'catalog:'
         version: 1.24.0(react@19.2.7)
       next:
-        specifier: 16.2.10
+        specifier: 'catalog:'
         version: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next-themes:
-        specifier: ^0.4.6
+        specifier: 'catalog:'
         version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: 19.2.7
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: 19.2.7
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@tailwindcss/postcss':
-        specifier: ^4
+        specifier: 'catalog:'
         version: 4.3.0
       '@types/node':
-        specifier: ^20
+        specifier: 'catalog:'
         version: 20.19.41
       '@types/react':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.15
       '@types/react-dom':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.15)
       '@workspace/eslint-config':
         specifier: workspace:^
@@ -67,10 +106,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/typescript-config
       eslint:
-        specifier: ^9
+        specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/eslint-config:
@@ -88,7 +127,7 @@ importers:
         specifier: ^8.60.0
         version: 8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
       eslint:
-        specifier: ^9
+        specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
       eslint-config-prettier:
         specifier: ^10.1.8
@@ -109,7 +148,7 @@ importers:
         specifier: ^17.6.0
         version: 17.6.0
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.60.0
@@ -129,16 +168,16 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       lucide-react:
-        specifier: ^1.24.0
+        specifier: 'catalog:'
         version: 1.24.0(react@19.2.7)
       next-themes:
-        specifier: ^0.4.6
+        specifier: 'catalog:'
         version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: 19.2.7
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: 19.2.7
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       shadcn:
         specifier: ^4.13.0
@@ -154,19 +193,19 @@ importers:
         version: 4.4.3
     devDependencies:
       '@tailwindcss/postcss':
-        specifier: ^4
+        specifier: 'catalog:'
         version: 4.3.0
       '@turbo/gen':
         specifier: ^2.9.15
         version: 2.9.15(@types/node@20.19.41)
       '@types/node':
-        specifier: ^20
+        specifier: 'catalog:'
         version: 20.19.41
       '@types/react':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.15
       '@types/react-dom':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.15)
       '@workspace/eslint-config':
         specifier: workspace:*
@@ -175,13 +214,13 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       eslint:
-        specifier: ^9
+        specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
       tailwindcss:
-        specifier: ^4
+        specifier: 'catalog:'
         version: 4.3.0
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.9.3
 
 packages:

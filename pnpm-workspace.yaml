@@ -2,6 +2,24 @@ packages:
   - "apps/*"
   - "packages/*"
 
+catalog:
+  # React & framework
+  react: 19.2.7
+  react-dom: 19.2.7
+  next: 16.2.10
+  next-themes: ^0.4.6
+  "@types/react": ^19
+  "@types/react-dom": ^19
+  # Shared libraries
+  lucide-react: ^1.24.0
+  # Language & lint tooling
+  typescript: ^5
+  eslint: ^9
+  "@types/node": ^20
+  # Tailwind
+  tailwindcss: ^4
+  "@tailwindcss/postcss": ^4
+
 allowBuilds:
   sharp: true
   unrs-resolver: true
