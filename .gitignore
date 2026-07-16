@@ -12,7 +12,6 @@ node_modules
 # Claude Code — commit shared config (skills, agents, rules, settings.json),
 # ignore personal/local overrides
 .claude/*
-!.claude/skills/
 !.claude/agents/
 !.claude/rules/
 !.claude/settings.json

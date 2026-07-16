@@ -5,3 +5,8 @@ node_modules/
 coverage/
 pnpm-lock.yaml
 .pnpm-store/
+
+# Managed agent skills — vendored/generated; reformatting would break skills-lock hashes
+.agents/skills/
+.claude/skills/
+skills-lock.json
