@@ -1,4 +1,4 @@
-# 0011. Project MCP servers (github, context7, shadcn, next-devtools)
+# 0011. Project MCP servers (github, context7, shadcn, next-devtools, better-auth)
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
@@ -44,3 +44,17 @@ Commit a root `.mcp.json` with four servers:
 - Windows: npx-based servers may need a `cmd /c` wrapper on older Claude Code
   versions; the committed file stays cross-platform, so that belongs in a local
   override, not here.
+
+## Update — 2026-07-16: added `better-auth` (fifth server)
+
+Once authentication became a core focus (see
+[0016](0016-authentication-strategy.md)), we added a fifth server to `.mcp.json`:
+
+| Server        | Transport   | Why                                                                                               |
+| ------------- | ----------- | ------------------------------------------------------------------------------------------------- |
+| `better-auth` | remote HTTP | First-party Better Auth docs / examples / setup MCP (`mcp.inkeep.com`, keyless) for our auth core |
+
+It **overlaps `context7`**'s docs retrieval, but is the authoritative,
+auth-specific source. Keyless remote HTTP, so the same no-secrets, trust-gated
+posture above applies. Drop it if the redundancy isn't worth the extra tool
+surface.

@@ -21,7 +21,7 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 | [0008](0008-no-publishconfig-internal-packages.md) | No publishConfig on internal packages (npm publish ≠ repo/license)           | Accepted | 2026-07-12 |
 | [0009](0009-github-automation-and-governance.md)   | GitHub automation & governance (CI, CODEOWNERS, PR template, Dependabot)     | Accepted | 2026-07-12 |
 | [0010](0010-import-ordering.md)                    | Import ordering via `@ianvs/prettier-plugin-sort-imports`                    | Accepted | 2026-07-12 |
-| [0011](0011-project-mcp-servers.md)                | Project MCP servers (github, context7, shadcn, next-devtools)                | Accepted | 2026-07-12 |
+| [0011](0011-project-mcp-servers.md)                | Project MCP servers (github, context7, shadcn, next-devtools, better-auth)   | Accepted | 2026-07-12 |
 | [0012](0012-agents-md-single-source.md)            | AGENTS.md is the single source of truth; CLAUDE.md imports it                | Accepted | 2026-07-12 |
 | [0013](0013-vendored-ui-lint-exception.md)         | Relax `react-hooks/set-state-in-effect` for vendored shadcn components       | Accepted | 2026-07-12 |
 | [0014](0014-base-ui-adoption.md)                   | Base UI adoption — a11y (jsx-a11y), composition, RTL, forms audit            | Accepted | 2026-07-13 |
