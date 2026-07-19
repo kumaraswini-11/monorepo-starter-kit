@@ -23,6 +23,6 @@
     "globals": "^17.7.0",
     "eslint-plugin-turbo": "^2.10.5",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.60.0"
+    "typescript-eslint": "^8.64.0"
   }
 }
