@@ -22,7 +22,7 @@ catalog:
   # Language & lint tooling
   typescript: ^5
   eslint: ^9
-  "@types/node": ^20
+  "@types/node": ^26
   # Tailwind
   tailwindcss: ^4
   "@tailwindcss/postcss": ^4
