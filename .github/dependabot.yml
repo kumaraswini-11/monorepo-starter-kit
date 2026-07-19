@@ -1,14 +1,42 @@
 version: 2
+
+# Noise + supply-chain policy:
+# - GROUP minor/patch bumps into a single PR per ecosystem (less churn); MAJOR
+#   bumps stay ungrouped so each gets its own PR and individual review.
+# - COOLDOWN lets just-published versions age before a PR is even opened — the
+#   same "give a compromised release time to be caught and pulled" rationale as
+#   pnpm `minimumReleaseAge` (pnpm-workspace.yaml); majors wait the longest.
 updates:
   # Keep the SHA-pinned GitHub Actions current (and patch action advisories).
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      github-actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
 
-  # Keep npm/pnpm dependencies current — including the exact-pinned next/react.
+  # Keep npm/pnpm dependencies current.
+  # NOTE: catalog entries (next, react, tailwind, …) use `catalog:` in
+  # package.json, which Dependabot cannot read — those are kept fresh with taze
+  # (`pnpm deps:check`). Dependabot here covers inlined package-level deps.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    cooldown:
+      default-days: 3
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      npm-minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]

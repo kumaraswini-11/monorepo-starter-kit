@@ -30,8 +30,12 @@ should grow into documented; teams-over-individuals is the target.
 **PR template — `.github/pull_request_template.md`:** kept minimal (summary +
 checklist).
 
-**Dependabot — `.github/dependabot.yml`:** `github-actions` + `npm`, weekly — keeps
-the SHA-pinned actions and the exact-pinned `next`/`react` current.
+**Dependabot — `.github/dependabot.yml`:** `github-actions` + `npm` (the `npm`
+ecosystem covers pnpm — Dependabot auto-detects `pnpm-lock.yaml`), weekly.
+Minor/patch bumps are **grouped** into one PR per ecosystem to cut noise; **major**
+bumps stay ungrouped for individual review. A **cooldown** lets new releases age
+before a PR opens (majors 30d), mirroring the pnpm `minimumReleaseAge` supply-chain
+posture (`pnpm-workspace.yaml`).
 
 ## Consequences
 
@@ -42,3 +46,12 @@ the SHA-pinned actions and the exact-pinned `next`/`react` current.
 - Deferred CI / DX / security enhancements (testing, ticket linking, OpenSSF
   Scorecard, etc.) are consolidated in
   [../future-improvements.md](../future-improvements.md).
+- **Division of labor:** Dependabot covers GitHub Actions + root/inlined npm deps;
+  **catalog** entries (`next`, `react`, Tailwind, …) are kept fresh by **taze**
+  (`pnpm deps:check`), since Dependabot can't read `catalog:` refs and its
+  workspace-package coverage for pnpm monorepos is limited.
+- Dependabot **security _updates_** aren't available for pnpm (version updates
+  only); **Dependabot alerts** should be enabled in repo Settings for vulnerability
+  visibility (the report-only `pnpm audit --prod` CI step is the backstop).
+- _Refined 2026-07-20:_ added Dependabot update **grouping** + release **cooldown**
+  (rationale in the `.github/dependabot.yml` comments).
