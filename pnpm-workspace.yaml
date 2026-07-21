@@ -21,7 +21,7 @@ catalog:
   lucide-react: ^1.24.0
   # Language & lint tooling
   typescript: ^5
-  eslint: ^9
+  eslint: ^10
   "@types/node": ^20
   # Tailwind
   tailwindcss: ^4
