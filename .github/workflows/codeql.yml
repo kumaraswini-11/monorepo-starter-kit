@@ -1,0 +1,53 @@
+name: CodeQL
+
+# Static security + quality analysis (CodeQL) — free for public repositories.
+# This is the free path to "code quality on every PR": the `security-and-quality`
+# query suite adds maintainability/reliability checks on top of the security set.
+# (The paid GitHub Code Quality product is deliberately deferred — see ADR 0017.)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly re-scan catches newly published advisories in code that hasn't
+    # changed. Off-peak, off the top of the hour to dodge the scheduler rush.
+    - cron: "27 4 * * 1"
+
+# Cancel superseded runs on the same ref (saves CI minutes).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (JavaScript/TypeScript)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Least privilege: CodeQL needs to read the code and write results to the
+    # Security tab; nothing else.
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Checkout
+        # SHA-pinned per repo convention (human version in the trailing comment);
+        # Dependabot (github-actions) keeps it current.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@fb4bfd79bfa826ce96c90727ff8833835ba8aad0 # v3
+        with:
+          # One language covers the whole TS/JS monorepo. No compiled languages
+          # here, so `build-mode: none` (CodeQL analyzes source directly).
+          languages: javascript-typescript
+          build-mode: none
+          queries: security-and-quality
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@fb4bfd79bfa826ce96c90727ff8833835ba8aad0 # v3
+        with:
+          category: "/language:javascript-typescript"
