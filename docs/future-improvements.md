@@ -18,8 +18,9 @@ already built.
 - **Preview deployments** — a per-PR preview (Vercel or similar).
 - **Release automation** — Changesets for versioning + changelogs, _if_ any package
   is ever published.
-- **Deeper security scanning** — OpenSSF Scorecard, CodeQL, and
-  `dependency-review-action` on PRs (free on public repos).
+- **Deeper security scanning** — OpenSSF Scorecard and `dependency-review-action`
+  on PRs (free on public repos). _CodeQL is now enabled — see
+  [decisions/0017](decisions/0017-branch-protection-and-codeql.md)._
 - **Workflow lockfile** — adopt GitHub's upcoming `dependencies:` block (2026
   roadmap) to pin transitive action SHAs once it is GA.
 
@@ -38,9 +39,11 @@ already built.
 
 ## Repository governance (GitHub settings — after first push)
 
-- **Branch protection / ruleset on `main`** — require a PR, require the CI check to
-  pass, require Code Owner review, disallow force-push. **This is what makes CI +
-  CODEOWNERS actually gate.**
+- **Branch protection / ruleset on `main`** — policy defined in
+  [decisions/0017](decisions/0017-branch-protection-and-codeql.md) (require a PR,
+  require CI + CodeQL checks, disallow force-push/deletion); enable it in
+  **Settings → Rules → Rulesets**. Raise required approvals 0 → 1+ and enforce Code
+  Owner review as the team grows.
 - Set **`main` as the default branch** on GitHub.
 - Replace the CODEOWNERS placeholder owner with real **teams** as they form.
 - Consider **required signed commits**.
