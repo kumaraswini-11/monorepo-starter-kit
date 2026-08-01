@@ -2,7 +2,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 
 import "@workspace/ui/globals.css";
 
-import { TooltipProvider } from "@workspace/ui/components/tooltip";
+import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { ThemeProvider } from "@/components/theme-provider";

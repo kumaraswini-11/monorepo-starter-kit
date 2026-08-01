@@ -43,6 +43,10 @@ claim. Time-sensitive: anchored to **Storybook 10.x, mid-2026**.
    behind SSO) is deferred to deploy time (Phase 4).**
 6. **Reject the lighter alternatives** (Ladle, Histoire) — they'd sacrifice the
    exact features we want (a11y, visual regression, ecosystem).
+7. **Component-library structure:** vendored shadcn primitives live in
+   `packages/ui/src/components/shadcn/`; custom / composed components go at the
+   `components/` top level. Keeps the vendored/custom split obvious and stops
+   co-located stories from cluttering the flat folder — see below.
 
 ## Verified findings (from the R&D)
 
@@ -69,6 +73,38 @@ claim. Time-sensitive: anchored to **Storybook 10.x, mid-2026**.
 - The Vercel design-system template uses `apps/docs` for this — but it's
   npm-publish-oriented (tsup + Changesets), the opposite of our source-only private
   package, so it's a **placement precedent, not a drop-in architecture**.
+
+### Component-library structure — shadcn vs custom (done 2026-08-01)
+
+To keep the library legible **before** stories land next to components, the ~51
+vendored shadcn primitives were moved from the flat `packages/ui/src/components/`
+into a dedicated **`components/shadcn/`** subfolder; **custom / composed components
+go at the `components/` top level** from now on.
+
+**Why:**
+
+- **Clear vendored-vs-custom split** — you instantly know what is CLI-regenerated
+  (don't hand-edit) versus authored in-house.
+- **Avoids a Storybook mess** — co-located `*.stories.tsx` sit beside the
+  components they document. Keeping vendored primitives in their own folder stops
+  the flat directory from becoming a wall of mixed source + story files, and makes
+  it natural to story **custom components first** (the vendored primitives are
+  already documented upstream by shadcn).
+
+**What it touched (commit `67cddab`):**
+
+- Moved the 51 primitives into `src/components/shadcn/`.
+- Rewrote every cross-import and app consumer to `@workspace/ui/components/shadcn/*`.
+  **Required** — the `exports` wildcard resolves by _exact path_, so a moved file
+  must have its import path updated or the build breaks.
+- Updated the shadcn CLI **`ui` alias** in **both** `components.json`
+  (`@workspace/ui/components` → `@workspace/ui/components/shadcn`) so a future
+  `npx shadcn add <x>` lands the new primitive **in `shadcn/`, not the root
+  `components/`**. This is CLI-only config — **no runtime/build impact** — purely to
+  keep new primitives in the right folder going forward.
+- **No change needed** to the package `exports` wildcard (`./components/*` already
+  resolves the nested path) or Tailwind's recursive `@source "../**/*.{ts,tsx}"`.
+- Verified: `format`, `lint`, `typecheck`, `build` all pass.
 
 ### The Vite concern — resolved (dev-only, zero app-bundle impact)
 

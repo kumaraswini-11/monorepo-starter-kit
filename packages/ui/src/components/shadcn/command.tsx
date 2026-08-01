@@ -10,11 +10,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@workspace/ui/components/dialog";
+} from "@workspace/ui/components/shadcn/dialog";
 import {
   InputGroup,
   InputGroupAddon,
-} from "@workspace/ui/components/input-group";
+} from "@workspace/ui/components/shadcn/input-group";
 import { cn } from "@workspace/ui/lib/utils";
 
 function Command({
