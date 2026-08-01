@@ -28,7 +28,7 @@ jobs:
         # Third-party actions are pinned to a full commit SHA (supply-chain
         # hardening); the trailing comment tracks the human-readable version,
         # and Dependabot (.github/dependabot.yml) keeps both current.
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # This job never pushes, so don't leave the token in .git/config.
           persist-credentials: false
