@@ -24,6 +24,16 @@ already built.
 - **Workflow lockfile** — adopt GitHub's upcoming `dependencies:` block (2026
   roadmap) to pin transitive action SHAs once it is GA.
 
+## Storybook
+
+- **a11y — fix baseline, then enforce.** a11y runs in **report mode**
+  (`test: "todo"`) in `apps/storybook`; flip to `test: "error"` (hard-fail) once
+  findings are fixed. Known finding: the shadcn **`destructive`** button variant
+  fails WCAG AA color-contrast — **3.98:1 vs 4.5:1** (`text-destructive` on
+  `bg-destructive/10`).
+- The addon trim decision, Chromatic (Phase 3), and publishing (Phase 4) are
+  tracked in [decisions/0018](decisions/0018-storybook-and-visual-testing.md).
+
 ## Pull requests & developer experience
 
 - **Ticket linking (Linear / Jira / …)** — connect PRs to issues:

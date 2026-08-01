@@ -1,6 +1,6 @@
 # 0018. Adopt Storybook (phased) for the UI library; visual testing deferred
 
-- **Status:** Accepted (strategy) — Phase 0/1 to execute after this ADR is approved
+- **Status:** Accepted — Phases 0-2 done; Phase 3 (Chromatic) / Phase 4 (publish) deferred
 - **Date:** 2026-08-01
 
 ## Context
@@ -239,6 +239,27 @@ gallery stories.
 `@storybook/addon-mcp`. Real footprint (lockfile grew ~90 KB; a ~150 MB Playwright
 browser via the vitest addon). The **trim-to-Phase-1-essentials decision is still
 open** (Phase 2/3 pieces).
+
+## Implementation notes — Phase 2 (done, 2026-08-01)
+
+Interaction + a11y testing wired and verified green (Windows, browser-mode):
+
+- **Runner:** `@storybook/addon-vitest` browser mode (Playwright **chromium**,
+  headless) via `apps/storybook/vitest.config.ts`; `pnpm --filter storybook test`
+  runs every story as a test (render smoke test + `play` functions + a11y).
+- **Interaction test:** a `play` function on the Button story asserts the `onClick`
+  `fn()` spy fires on click (`storybook/test` — `userEvent` + `expect`).
+- **a11y:** `addon-a11y` (axe) runs on every story, kept in **report mode**
+  (`preview.tsx` → `a11y.test: "todo"`): violations surface in the a11y panel and
+  the test report but don't fail the build yet.
+- **Finding (reported, not failed):** enabling a11y immediately caught a real WCAG
+  **AA color-contrast** failure in the vendored shadcn **`destructive`** variant —
+  **3.98:1 vs 4.5:1** (`text-destructive` on `bg-destructive/10`). Logged in
+  `future-improvements.md`; fixing the baseline then flipping a11y to `"error"`
+  (hard-fail) is the deferred follow-up.
+- **Why report-mode first:** a11y gating on an existing component library is adopted
+  incrementally — report → fix findings → enforce — so setup isn't blocked on
+  fixing every existing issue at once.
 
 ## Sources
 
