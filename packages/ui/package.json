@@ -30,6 +30,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@storybook/nextjs-vite": "^10.5.5",
+    "storybook": "^10.5.5",
     "@tailwindcss/postcss": "catalog:",
     "@turbo/gen": "^2.10.5",
     "@types/node": "catalog:",
