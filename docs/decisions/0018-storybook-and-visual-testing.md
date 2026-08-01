@@ -195,8 +195,9 @@ design system.
 - Which of the 51 components are storyable now vs RSC-blocked.
 - Chromatic's SOC-2-only, cloud-hosted model vs a self-hosted alternative — the
   Phase-3/4 compliance call.
-- Exact Tailwind v4 + `nextjs-vite` wiring and light/dark preview switching (not
-  covered by a verified claim — validate during Phase 1).
+- ✅ _Resolved (Phase 1):_ Tailwind v4 + `nextjs-vite` needs the
+  **`@tailwindcss/vite`** plugin (Storybook's auto PostCSS handling was **not**
+  enough) — see Implementation notes. Light/dark preview switching is still TODO.
 
 ## Consequences
 
@@ -204,7 +205,40 @@ design system.
   first (local Storybook), heavier pieces (visual regression, hosting) only when
   justified.
 - Node engines tighten to `>=20.19` (a Storybook requirement).
-- Nothing is installed until Phase 1 is approved after this ADR.
+- Nothing is installed until Phase 1 is approved after this ADR. _(Phase 0-1 has
+  since been executed — see Implementation notes below.)_
+
+## Implementation notes — Phase 0-1 (done, 2026-08-01)
+
+Executed and verified green (typecheck + lint + build + `storybook build`):
+
+- **App:** dedicated `apps/storybook`, scaffolded via `create storybook` →
+  Storybook **10.5** on **`@storybook/nextjs-vite`**; `engines.node` → `>=20.19`.
+- **Stories:** co-located in `packages/ui` (glob → `packages/ui/src/**/*.stories.*`).
+- **Turbo:** `build:storybook` caches `storybook-static/`; `*.stories.*`/`*.mdx`
+  excluded from the app `build` inputs so story edits don't bust the app cache.
+- **Telemetry:** disabled (`core.disableTelemetry`).
+
+**Key finding — Tailwind v4 wiring (resolves an open question).** Storybook's
+automatic PostCSS handling did **not** compile Tailwind v4: `@import "tailwindcss"`
+and `tw-animate-css`'s `@utility`/`@theme` reached LightningCSS **uncompiled** →
+components rendered **unstyled** with "Unknown at rule" warnings. Fix: add the
+official **`@tailwindcss/vite`** plugin via `viteFinal` in `.storybook/main.ts`
+(version aligned through the pnpm catalog). This is the required Tailwind-v4-on-Vite
+path.
+
+**Story conventions (audited against the official Storybook docs):** CSF3 with
+`satisfies Meta` / `StoryObj`; **args-driven** with `onClick: fn()` for actions;
+**manual `argTypes` (`select`)** for CVA `variant`/`size` (auto-inference can't read
+CVA), with the option arrays `satisfies`-checked against the component's prop types
+so they can't silently drift; a `Default` Controls playground + `Variants`/`Sizes`
+gallery stories.
+
+**Still retained (trim pending):** the full `create storybook` stack —
+`@storybook/addon-vitest` + `vitest` + `playwright`, `@chromatic-com/storybook`,
+`@storybook/addon-mcp`. Real footprint (lockfile grew ~90 KB; a ~150 MB Playwright
+browser via the vitest addon). The **trim-to-Phase-1-essentials decision is still
+open** (Phase 2/3 pieces).
 
 ## Sources
 
