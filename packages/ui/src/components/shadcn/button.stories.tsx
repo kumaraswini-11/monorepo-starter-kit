@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { Button } from "@workspace/ui/components/shadcn/button";
 
@@ -61,6 +61,14 @@ type Story = StoryObj<typeof meta>;
 
 /** The default button — use the Controls panel to try any variant × size. */
 export const Default: Story = {};
+
+/** Interaction test: clicking the button fires its `onClick` handler. */
+export const ClicksFireOnClick: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onClick).toHaveBeenCalled();
+  },
+};
 
 /** Every visual variant at a glance. */
 export const Variants: Story = {
