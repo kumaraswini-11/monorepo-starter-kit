@@ -63,6 +63,16 @@ Before treating a change as done, run
   charts). Source components (shadcn) are free until imported; unused code costs
   nothing (tree-shaking + per-route code-splitting). Keep the catalog fresh with
   `pnpm deps:check` (taze) — Dependabot doesn't track catalog entries.
+- **Dependency updates (Dependabot / taze / manual) — verify, never blind-merge.**
+  Treat every version bump as a change to check, not trust. Before merging:
+  **(1)** confirm whether our code needs changes and that it's **compatible** — read
+  the package's **official changelog / release notes** for breaking changes
+  (mandatory for majors; minor/patch are SemVer-safe but still verified); **(2)** run
+  the full gate (`pnpm format && lint && typecheck && build`, plus
+  `pnpm --filter storybook build:storybook` if UI-affecting) — green is the
+  compatibility proof; **(3)** for a major, follow the migration guide and add an ADR
+  if it changes how we work. `taze` also reorders/tightens manifests — **audit its
+  diff** before committing.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
 - **Record notable decisions as ADRs** in `docs/decisions/` (copy the existing
   `NNNN-title.md` format and update the index). Log deferred work in
