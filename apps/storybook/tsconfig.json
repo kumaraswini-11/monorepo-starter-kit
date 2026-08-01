@@ -1,0 +1,4 @@
+{
+  "extends": "@workspace/typescript-config/react-library.json",
+  "include": [".storybook", "vitest.config.ts", "vitest.shims.d.ts"]
+}

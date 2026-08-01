@@ -3,6 +3,7 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   root: true,
+
   ignorePatterns: [
     "**/node_modules/**",
     "**/.next/**",
@@ -10,4 +11,6 @@ module.exports = {
     "**/.turbo/**",
     "**/coverage/**",
   ],
+
+  extends: ["plugin:storybook/recommended"],
 };
