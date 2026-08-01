@@ -4,6 +4,9 @@
 > React 19, Tailwind CSS v4, and shadcn/ui, wired together with Turborepo and
 > pnpm.
 
+[![CI](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/codeql.yml/badge.svg)](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/codeql.yml)
+
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-149ECA?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)

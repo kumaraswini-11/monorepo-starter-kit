@@ -43,3 +43,16 @@ into this repo.
   records in `.plan/`, validated + visualized by a Go CLI + Claude plugin.
   Interesting durable agent-planning idea; parked (early — v0.2.0, niche) until we
   want structured agent planning.
+
+## README & docs tooling
+
+- [shieldcn — README Studio](https://shieldcn.dev/studio) — a Figma-style visual
+  README builder: shadcn/ui-styled badges, header banners, download charts, and
+  sponsor/contributor grids, exported as GitHub-flavored Markdown with adaptive
+  light/dark `<picture>` markup (base: <https://shieldcn.dev>, docs:
+  <https://shieldcn.dev/docs>). Evaluated 2026-07 — **not adopted**: most of its
+  value is open-source _marketing_ (npm / stars / downloads / sponsors), which
+  doesn't fit a private/proprietary product, and it adds a third-party image-host
+  dependency versus our native GitHub CI/CodeQL status badges. Kept for reference —
+  handy if `packages/ui` ever ships as a public design system, or for a personal /
+  OSS project.
