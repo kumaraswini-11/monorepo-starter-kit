@@ -18,10 +18,10 @@
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "taze": "^19.16.0",
-    "turbo": "^2.9.18",
+    "turbo": "^2.10.7",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@10.34.5",
   "engines": {
     "node": ">=20.19"
   }

@@ -15,18 +15,18 @@ catalog:
   react-dom: 19.2.8
   next: 16.2.10
   next-themes: ^0.4.6
-  "@types/react": ^19
-  "@types/react-dom": ^19
+  "@types/react": ^19.2.18
+  "@types/react-dom": ^19.2.4
   # Shared libraries
-  lucide-react: ^1.24.0
+  lucide-react: ^1.28.0
   # Language & lint tooling
-  typescript: ^5
-  eslint: ^9
-  "@types/node": ^20
+  typescript: ^5.9.3
+  eslint: ^9.39.5
+  "@types/node": ^20.19.43
   # Tailwind
-  tailwindcss: ^4
-  "@tailwindcss/postcss": ^4
-  "@tailwindcss/vite": ^4
+  tailwindcss: ^4.3.3
+  "@tailwindcss/postcss": ^4.3.3
+  "@tailwindcss/vite": ^4.3.3
 
 allowBuilds:
   sharp: true
