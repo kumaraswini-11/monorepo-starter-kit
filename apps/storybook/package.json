@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",
+    "@tailwindcss/vite": "catalog:",
     "typescript": "catalog:",
     "storybook": "^10.5.5",
     "@storybook/nextjs-vite": "^10.5.5",

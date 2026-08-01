@@ -26,6 +26,7 @@ catalog:
   # Tailwind
   tailwindcss: ^4
   "@tailwindcss/postcss": ^4
+  "@tailwindcss/vite": ^4
 
 allowBuilds:
   sharp: true
