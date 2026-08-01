@@ -28,6 +28,7 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 | [0015](0015-web-security-headers.md)               | Web security headers baseline + deferred strict CSP                          | Accepted | 2026-07-13 |
 | [0016](0016-authentication-strategy.md)            | Authentication strategy — adopt Better Auth (self-hosted), not roll-your-own | Accepted | 2026-07-16 |
 | [0017](0017-branch-protection-and-codeql.md)       | Branch protection (PR-only main) + CodeQL scanning; defer paid Code Quality  | Accepted | 2026-07-20 |
+| [0018](0018-storybook-and-visual-testing.md)       | Adopt Storybook (phased) for the UI library; visual testing deferred         | Accepted | 2026-08-01 |
 
 See also [../references.md](../references.md) for the sources behind these
 decisions, and [../future-improvements.md](../future-improvements.md) for the
