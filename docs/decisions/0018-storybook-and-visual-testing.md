@@ -252,10 +252,12 @@ Interaction + a11y testing wired and verified green (Windows, browser-mode):
 - **a11y:** `addon-a11y` (axe) runs on every story, kept in **report mode**
   (`preview.tsx` → `a11y.test: "todo"`): violations surface in the a11y panel and
   the test report but don't fail the build yet.
-- **Finding (reported, not failed):** enabling a11y immediately caught a real WCAG
-  **AA color-contrast** failure in the vendored shadcn **`destructive`** variant —
-  **3.98:1 vs 4.5:1** (`text-destructive` on `bg-destructive/10`). Logged in
-  `future-improvements.md`; fixing the baseline then flipping a11y to `"error"`
+- **Finding (reported, not failed):** enabling a11y immediately caught real WCAG
+  **AA color-contrast** misses in the vendored shadcn theme _tokens_ (not the
+  stories) — two root causes: the **`destructive` tint** (3.98:1 — Button/Badge)
+  and **`muted-foreground` on `muted`** (4.38:1 — Avatar fallback, Kbd). Both are
+  token-level, so one fix clears every affected component. Logged with specifics in
+  `future-improvements.md`; fixing the tokens then flipping a11y to `"error"`
   (hard-fail) is the deferred follow-up.
 - **Why report-mode first:** a11y gating on an existing component library is adopted
   incrementally — report → fix findings → enforce — so setup isn't blocked on
