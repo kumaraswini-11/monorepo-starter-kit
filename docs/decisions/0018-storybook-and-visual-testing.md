@@ -249,19 +249,19 @@ Interaction + a11y testing wired and verified green (Windows, browser-mode):
   runs every story as a test (render smoke test + `play` functions + a11y).
 - **Interaction test:** a `play` function on the Button story asserts the `onClick`
   `fn()` spy fires on click (`storybook/test` — `userEvent` + `expect`).
-- **a11y:** `addon-a11y` (axe) runs on every story, kept in **report mode**
-  (`preview.tsx` → `a11y.test: "todo"`): violations surface in the a11y panel and
-  the test report but don't fail the build yet.
-- **Finding (reported, not failed):** enabling a11y immediately caught real WCAG
-  **AA color-contrast** misses in the vendored shadcn theme _tokens_ (not the
-  stories) — two root causes: the **`destructive` tint** (3.98:1 — Button/Badge)
-  and **`muted-foreground` on `muted`** (4.38:1 — Avatar fallback, Kbd). Both are
-  token-level, so one fix clears every affected component. Logged with specifics in
-  `future-improvements.md`; fixing the tokens then flipping a11y to `"error"`
-  (hard-fail) is the deferred follow-up.
-- **Why report-mode first:** a11y gating on an existing component library is adopted
-  incrementally — report → fix findings → enforce — so setup isn't blocked on
-  fixing every existing issue at once.
+- **a11y:** `addon-a11y` (axe) runs on every story in **enforce mode**
+  (`preview.tsx` → `a11y.test: "error"`): any WCAG violation fails the build.
+- **Finding + fix (2026-08-02):** enabling a11y caught real WCAG **AA
+  color-contrast** misses in the vendored shadcn theme _tokens_ (not the stories) —
+  two root causes: the **`destructive` tint** (3.98:1 — Button/Badge) and
+  **`muted-foreground` on `muted`** (4.38:1 — Avatar fallback, Kbd). **Fixed** by
+  darkening the light-mode `--destructive` (L 0.577 → 0.51) and `--muted-foreground`
+  (L 0.553 → 0.53) tokens in `globals.css` to clear 4.5:1 — one token change per
+  root cause fixes every affected component; the deviation from stock shadcn is
+  commented at each token.
+- **Adoption path:** a11y gating on an existing library was adopted incrementally —
+  report the findings, fix them, then enable enforce — rather than blocking setup on
+  fixing everything at once.
 
 ## Sources
 
