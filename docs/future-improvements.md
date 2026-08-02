@@ -26,20 +26,6 @@ already built.
 
 ## Storybook
 
-- **a11y — fix the token contrast baseline, then enforce.** a11y runs in **report
-  mode** (`test: "todo"`) in `apps/storybook`; flip to `test: "error"` (hard-fail)
-  once the findings below are fixed. Both are **WCAG AA color-contrast** misses in
-  the vendored shadcn theme _tokens_ (not the stories), surfaced by temporarily
-  running a11y in `error` mode:
-  - **`destructive` tint — 3.98:1** (needs 4.5:1): `text-destructive` (`#e7000b`)
-    on `bg-destructive/10` (`#fde5e7`). Hits the **Button** and **Badge**
-    `destructive` variants.
-  - **`muted-foreground` on `muted` — 4.38:1** (needs 4.5:1): `#79716b` on
-    `#f5f5f4`. Hits **Avatar** fallback initials and **Kbd** — i.e. any
-    `text-muted-foreground` on a `bg-muted` surface.
-  - The fix is a **design-token** nudge (`--destructive` / `--muted-foreground`, or
-    their on-surface pairings) to clear 4.5:1 — one change fixes every affected
-    component. Don't hand-edit the vendored primitives.
 - The addon trim decision, Chromatic (Phase 3), and publishing (Phase 4) are
   tracked in [decisions/0018](decisions/0018-storybook-and-visual-testing.md).
 

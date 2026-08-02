@@ -19,10 +19,12 @@
   --secondary: oklch(0.97 0.001 106.424);
   --secondary-foreground: oklch(0.216 0.006 56.043);
   --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
+  /* a11y: darkened from stock shadcn 0.553 (4.38:1 on --muted) to clear WCAG AA 4.5:1 */
+  --muted-foreground: oklch(0.53 0.013 58.071);
   --accent: oklch(0.97 0.001 106.424);
   --accent-foreground: oklch(0.216 0.006 56.043);
-  --destructive: oklch(0.577 0.245 27.325);
+  /* a11y: darkened from stock shadcn 0.577 (3.98:1 as text on bg-destructive/10) to clear WCAG AA 4.5:1 */
+  --destructive: oklch(0.51 0.245 27.325);
   --border: oklch(0.923 0.003 48.717);
   --input: oklch(0.923 0.003 48.717);
   --ring: oklch(0.709 0.01 56.259);
