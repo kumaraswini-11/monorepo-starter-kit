@@ -20,7 +20,7 @@ catalog:
   # Shared libraries
   lucide-react: ^1.28.0
   # Language & lint tooling
-  typescript: ^5.9.3
+  typescript: ^7.0.2
   eslint: ^9.39.5
   "@types/node": ^20.19.43
   # Tailwind
