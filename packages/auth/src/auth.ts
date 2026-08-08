@@ -1,8 +1,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
-import { db, schema } from "@workspace/db";
-import { sendResetPasswordEmail, sendVerifyEmail } from "@workspace/email";
+import { db, getUserById, isNewDeviceSignIn, schema } from "@workspace/db";
+import {
+  sendNewDeviceEmail,
+  sendPasswordChangedEmail,
+  sendResetPasswordEmail,
+  sendVerifyEmail,
+} from "@workspace/email";
 
 /**
  * Framework-neutral Better Auth server instance (ADR 0016). It imports **no**
@@ -30,6 +35,22 @@ export const auth = betterAuth({
         resetUrl: url,
       });
     },
+    // On a completed reset: sign out the user's other devices (spec §3) and send the
+    // confirmation/alert email. Covers the forgot-password flow; the settings
+    // "change password" path gets its own hook when that UI lands.
+    revokeSessionsOnPasswordReset: true,
+    onPasswordReset: async ({ user }) => {
+      try {
+        await sendPasswordChangedEmail({
+          to: user.email,
+          firstName: user.name.split(" ")[0],
+          email: user.email,
+        });
+      } catch (error) {
+        // A failed notification must not break the already-completed reset.
+        console.error("[auth] password-changed email failed to send", error);
+      }
+    },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
@@ -38,6 +59,44 @@ export const auth = betterAuth({
         firstName: user.name.split(" ")[0],
         verifyUrl: url,
       });
+    },
+  },
+  // Security notification (spec §4): email the user when a session is created from a
+  // device we haven't seen for them before. Runs on every sign-in; the check + user
+  // lookup stay behind packages/db (ADR 0019). Never throws into the auth flow.
+  databaseHooks: {
+    session: {
+      create: {
+        after: async (session) => {
+          try {
+            const newDevice = await isNewDeviceSignIn({
+              userId: session.userId,
+              currentSessionId: session.id,
+              userAgent: session.userAgent,
+            });
+            if (!newDevice) return;
+
+            const signedInUser = await getUserById(session.userId);
+            if (!signedInUser) return;
+
+            await sendNewDeviceEmail({
+              to: signedInUser.email,
+              firstName: signedInUser.name.split(" ")[0],
+              // TODO(deploy): parse the user agent into a friendly device string and
+              // resolve ipAddress → approx city/country via geo-IP. Raw values for now.
+              device: session.userAgent ?? "Unknown device",
+              location: session.ipAddress ?? "Unknown location",
+              timestamp: new Intl.DateTimeFormat("en-US", {
+                dateStyle: "medium",
+                timeStyle: "short",
+                timeZone: "UTC",
+              }).format(new Date(session.createdAt)),
+            });
+          } catch (error) {
+            console.error("[auth] new-device email failed to send", error);
+          }
+        },
+      },
     },
   },
   session: {
