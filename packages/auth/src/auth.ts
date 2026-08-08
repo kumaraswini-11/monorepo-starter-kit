@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
+import { describeDevice, resolveLocation } from "@workspace/auth/device";
 import { db, getUserById, isNewDeviceSignIn, schema } from "@workspace/db";
 import {
   sendNewDeviceEmail,
@@ -70,7 +71,7 @@ export const auth = betterAuth({
   databaseHooks: {
     session: {
       create: {
-        after: async (session) => {
+        after: async (session, context) => {
           try {
             const newDevice = await isNewDeviceSignIn({
               userId: session.userId,
@@ -85,10 +86,8 @@ export const auth = betterAuth({
             await sendNewDeviceEmail({
               to: signedInUser.email,
               firstName: signedInUser.name.split(" ")[0],
-              // TODO(deploy): parse the user agent into a friendly device string and
-              // resolve ipAddress → approx city/country via geo-IP. Raw values for now.
-              device: session.userAgent ?? "Unknown device",
-              location: session.ipAddress ?? "Unknown location",
+              device: describeDevice(session.userAgent),
+              location: resolveLocation(context?.headers, session.ipAddress),
               timestamp: new Intl.DateTimeFormat("en-US", {
                 dateStyle: "medium",
                 timeStyle: "short",
