@@ -29,6 +29,9 @@ catalog:
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
   "@tailwindcss/vite": ^4.3.3
+  # Storybook — shared by packages/ui (co-located stories) + apps/storybook
+  storybook: ^10.5.7
+  "@storybook/nextjs-vite": ^10.5.7
 
 allowBuilds:
   sharp: true
