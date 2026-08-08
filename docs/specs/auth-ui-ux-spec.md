@@ -18,7 +18,9 @@ SSO/SCIM). Identity, org, and session data persist via
 The UI builds on the existing design system — Base UI + shadcn
 ([ADR 0007](../decisions/0007-base-ui-over-radix.md),
 [ADR 0014](../decisions/0014-base-ui-adoption.md)) — and inherits the security-headers
-baseline ([ADR 0015](../decisions/0015-web-security-headers.md)).
+baseline ([ADR 0015](../decisions/0015-web-security-headers.md)). The **transactional
+emails** these flows send (verify, reset, security alerts) are specified separately in
+[Auth Email Templates](auth-email-templates-spec.md).
 
 **Alignment notes — reconcile during implementation:**
 
