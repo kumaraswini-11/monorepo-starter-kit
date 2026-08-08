@@ -14,7 +14,7 @@
   "dependencies": {
     "@workspace/auth": "workspace:*",
     "@workspace/ui": "workspace:*",
-    "better-auth": "^1.6.26",
+    "better-auth": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
