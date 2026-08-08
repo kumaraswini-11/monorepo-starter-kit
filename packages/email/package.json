@@ -14,6 +14,8 @@
     ".": "./src/index.ts",
     "./types": "./src/types.ts",
     "./render": "./src/render.ts",
+    "./messages": "./src/messages.tsx",
+    "./send-email": "./src/send-email.ts",
     "./adapters/console": "./src/adapters/console.ts",
     "./components/*": "./src/components/*.tsx",
     "./emails/*": "./src/emails/*.tsx"

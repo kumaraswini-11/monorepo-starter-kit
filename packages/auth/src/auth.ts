@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { db, schema } from "@workspace/db";
-import { sendEmail } from "@workspace/email";
+import { sendResetPasswordEmail, sendVerifyEmail } from "@workspace/email";
 
 /**
  * Framework-neutral Better Auth server instance (ADR 0016). It imports **no**
@@ -23,21 +23,20 @@ export const auth = betterAuth({
     requireEmailVerification: false,
     minPasswordLength: 10,
     sendResetPassword: async ({ user, url }) => {
-      await sendEmail({
+      await sendResetPasswordEmail({
         to: user.email,
-        subject: "Reset your password",
-        html: `<p>Click to reset your password:</p><p><a href="${url}">${url}</a></p>`,
-        text: `Reset your password: ${url}`,
+        firstName: user.name.split(" ")[0],
+        email: user.email,
+        resetUrl: url,
       });
     },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      await sendEmail({
+      await sendVerifyEmail({
         to: user.email,
-        subject: "Verify your email",
-        html: `<p>Click to verify your email:</p><p><a href="${url}">${url}</a></p>`,
-        text: `Verify your email: ${url}`,
+        firstName: user.name.split(" ")[0],
+        verifyUrl: url,
       });
     },
   },
