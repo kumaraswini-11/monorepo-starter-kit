@@ -26,7 +26,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   // reactCompiler: true,
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: [
+    "@workspace/ui",
+    "@workspace/auth",
+    "@workspace/db",
+    "@workspace/email",
+  ],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

@@ -1,8 +1,8 @@
-import { consoleEmailAdapter } from "./adapters/console.js";
-import type { SendEmail } from "./types.js";
+import { consoleEmailAdapter } from "@workspace/email/adapters/console";
+import type { SendEmail } from "@workspace/email/types";
 
-export type { EmailMessage, SendEmail } from "./types.js";
-export { consoleEmailAdapter } from "./adapters/console.js";
+export type { EmailMessage, SendEmail } from "@workspace/email/types";
+export { consoleEmailAdapter } from "@workspace/email/adapters/console";
 
 /**
  * The active email sender. Console stub for now (ADR 0020); swap to a

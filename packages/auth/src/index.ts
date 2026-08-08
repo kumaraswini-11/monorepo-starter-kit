@@ -1,4 +1,4 @@
-import { auth } from "./auth.js";
+import { auth } from "@workspace/auth/auth";
 
 export { auth };
 

@@ -1,4 +1,4 @@
-import type { SendEmail } from "../types.js";
+import type { SendEmail } from "@workspace/email/types";
 
 /**
  * Dev/test adapter (ADR 0020): logs the message — including any verification /

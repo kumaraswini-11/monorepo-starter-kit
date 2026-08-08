@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-import * as schema from "./schema.js";
+import * as schema from "@workspace/db/schema";
 
 /**
  * Pooled Postgres connection. `pg` connects lazily (on first query), so importing
