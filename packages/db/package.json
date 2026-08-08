@@ -23,6 +23,7 @@
     "@types/pg": "^8.20.4",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "catalog:",
     "typescript": "catalog:"
