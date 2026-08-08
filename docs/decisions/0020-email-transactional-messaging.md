@@ -197,6 +197,27 @@ Structured exactly like `packages/db` ([0019](0019-data-layer-postgres-drizzle.m
   (webhooks/analytics/suppression) — accept consciously, keep the SMTP adapter as the
   exit.
 
+## Note — the `@react-email/components` npm-deprecation warning is a false alarm
+
+Installing `@react-email/components` prints an npm **deprecation** warning
+(`"Package no longer supported"`) — generic boilerplate, no named successor, and
+**`1.0.12` is still the latest published version**. It is **not** abandoned: React
+Email consolidated its packages into the unified **`react-email`** dev/CLI package
+and added the deprecation to steer imports there. But `react-email`'s main entry
+pulls **`prismjs` + `marked` + `tailwindcss`** into runtime bundles (no
+`sideEffects: false`, no subpath exports — [resend/react-email#3556]), so it is
+**dev tooling, not a runtime component source**; maintainers acknowledge the
+deprecation messaging is premature and that **`@react-email/components` remains the
+correct runtime import**.
+
+**So our split is deliberately correct and must stay:** `packages/email` imports
+components from **`@react-email/components`** (runtime dep) and depends on
+**`react-email`** only as a **devDependency** for the local preview CLI
+(`@react-email/ui` is its preview-UI companion, also dev-only). **Do not "fix" the
+warning** by switching imports to `react-email` — that would drag the CLI's heavy
+deps into the shipped bundle. Revisit if/when React Email ships tree-shakeable
+subpath exports for `react-email` (tracked by #3556).
+
 ## Revisit triggers
 
 - **Outlook-desktop-heavy B2B** becomes primary → evaluate **MJML** for templates.
@@ -210,6 +231,7 @@ Structured exactly like `packages/db` ([0019](0019-data-layer-postgres-drizzle.m
 **Authoring & sending libraries**
 
 - React Email — <https://react.email/docs/introduction>, <https://react.email/docs/utilities/render>, <https://react.email/docs/cli>, <https://react.email/docs/integrations/nodemailer>
+- `@react-email/components` deprecation is misleading / runtime-bundle weight of the unified `react-email` package — <https://github.com/resend/react-email/issues/3556>
 - Nodemailer — <https://nodemailer.com/>, <https://nodemailer.com/smtp>, <https://nodemailer.com/transports>, <https://nodemailer.com/transports/ses>
 - Comparisons — <https://www.pkgpulse.com/guides/react-email-vs-mjml-vs-maizzle-email-template-2026>, <https://www.pkgpulse.com/guides/best-email-libraries-nodejs-2026>, <https://trybuildpilot.com/688-react-email-vs-mjml-vs-maizzle-2026>
 

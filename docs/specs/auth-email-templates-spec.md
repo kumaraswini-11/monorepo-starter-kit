@@ -333,7 +333,7 @@ The [Product] team
 | Variable              | Description                       | Example                    |
 | --------------------- | --------------------------------- | -------------------------- |
 | `{{first_name}}`      | User’s first name or display name | Alex                       |
-| `{{email}}`           | User’s email address              | alex@company.com           |
+| `{{email}}`           | User’s email address              | <alex@company.com>         |
 | `{{device}}`          | Browser + OS                      | Chrome on macOS            |
 | `{{approx_location}}` | City / Country level              | San Francisco, US          |
 | `{{timestamp}}`       | Localized date & time             | Aug 8, 2026 at 7:12 PM IST |
