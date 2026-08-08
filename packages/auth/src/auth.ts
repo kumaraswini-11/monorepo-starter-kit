@@ -53,6 +53,9 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
+    // Progressive verification (auth UI/UX spec): email on sign-up + show a banner,
+    // but don't block access (requireEmailVerification stays false above).
+    sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
       await sendVerifyEmail({
         to: user.email,
