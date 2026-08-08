@@ -212,6 +212,19 @@ reversible for dev/preview; stay on the plain `pg` driver so nothing couples us 
   they go through `packages/db`'s API. A little more boilerplate, and some of Drizzle's
   inline ergonomics traded away, in exchange for the drop-in replaceability above.
 
+### Query organization — per-aggregate modules, not one file
+
+Queries live in `src/queries/`, **one module per aggregate** (`users.ts`,
+`sessions.ts`, … later `billing.ts`, `notifications.ts`), exported via a
+`./queries/*` subpath; the package barrel re-exports for convenience. A single
+`queries.ts` doesn't scale — it becomes a merge-conflict magnet and hard to navigate.
+Aggregate-oriented modules mirror business boundaries and keep granularity
+consistent, the widely-recommended shape for a growing Drizzle data layer
+(repository-per-aggregate; see _Sources_). Schema stays single-file for now (all four
+tables are one bounded context — auth-core); split `schema/` by domain when a second
+context lands. A tenant-aware repository base is the natural extension when B2B
+multi-tenancy arrives.
+
 ## Scaling to millions
 
 **Governing principle:** escalate only on a _measured_ bottleneck, and know which one.
@@ -355,5 +368,12 @@ LEVEL SECURITY` (owners bypass RLS by default), policy keyed on the tenant id.
 - Azure — encryption at rest — <https://learn.microsoft.com/en-us/azure/postgresql/security/security-data-encryption>
 - pgAudit — <https://www.pgaudit.org/>, <https://cloud.google.com/sql/docs/postgres/pg-audit>
 - Expand-contract migrations — <https://xata.io/blog/pgroll-expand-contract>
+
+**Query organization (per-aggregate modules)**
+
+- Drizzle ORM best practices (patterns & structure) — <https://paulserban.eu/blog/post/drizzle-orm-best-practices-principles-patterns-and-real-world-case-studies/>
+- Data-access-pattern-first with Drizzle — <https://medium.com/drizzle-stories/the-data-access-pattern-first-approach-with-drizzle-bca035bbdc63>
+- Repository pattern with Drizzle — <https://medium.com/@vimulatus/repository-pattern-in-nest-js-with-drizzle-orm-e848aa75ecae>
+- Migrations belong in version control — <https://orm.drizzle.team/docs/migrations>
 
 See [0016](0016-authentication-strategy.md) (auth strategy), [../references.md](../references.md), and [../future-improvements.md](../future-improvements.md).

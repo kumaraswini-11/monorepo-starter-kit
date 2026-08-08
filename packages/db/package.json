@@ -16,7 +16,7 @@
     ".": "./src/index.ts",
     "./schema": "./src/schema.ts",
     "./client": "./src/client.ts",
-    "./queries": "./src/queries.ts"
+    "./queries/*": "./src/queries/*.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",
