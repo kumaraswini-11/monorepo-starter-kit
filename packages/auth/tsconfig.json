@@ -1,0 +1,15 @@
+{
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    // Auth has no JSX of its own, but our packages are source-only (no build), so
+    // this program transitively compiles @workspace/email's React Email templates
+    // (.tsx). `jsx` lets tsc parse them; the React types resolve from email's own
+    // node_modules, so auth needs no react dependency. (ADR 0020)
+    "jsx": "react-jsx",
+    "paths": {
+      "@workspace/auth/*": ["./src/*"]
+    }
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
+}

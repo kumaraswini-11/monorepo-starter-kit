@@ -18,7 +18,9 @@ catalog:
   "@types/react": ^19.2.18
   "@types/react-dom": ^19.2.4
   # Shared libraries
-  lucide-react: ^1.28.0
+  lucide-react: ^1.30.0
+  # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
+  better-auth: ^1.6.26
   # Language & lint tooling
   typescript: ^5.9.3
   eslint: ^9.39.5
@@ -27,6 +29,9 @@ catalog:
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
   "@tailwindcss/vite": ^4.3.3
+  # Storybook — shared by packages/ui (co-located stories) + apps/storybook
+  storybook: ^10.5.7
+  "@storybook/nextjs-vite": ^10.5.7
 
 allowBuilds:
   sharp: true

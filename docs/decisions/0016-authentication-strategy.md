@@ -1,6 +1,8 @@
 # 0016. Authentication strategy — adopt Better Auth (self-hosted), not roll-your-own
 
-- **Status:** Accepted (strategy) — implementation is phased and **not yet started**
+- **Status:** Accepted (strategy). Phase 1 (email/password foundation) **implemented
+  & live-verified 2026-08-13**; later phases (OAuth, passwordless, passkeys, MFA,
+  orgs/SSO) pending.
 - **Date:** 2026-07-16
 
 ## Context
@@ -96,6 +98,45 @@ data?_ **No.**
   this repo**: lockfile pinning, the `minimumReleaseAge` cooldown, review-before-
   upgrade, Dependabot/taze. Keep them.
 
+## Session strategy — server-side sessions, not JWT access/refresh tokens
+
+**What we use:** Better Auth's default **database-backed sessions** with a signed,
+`httpOnly`, `SameSite=Lax` cookie. The token returned by sign-in/sign-up is an
+**opaque session key** (a row in the `session` table) — **not** a JWT, and there is
+**no separate access/refresh-token pair**. Config in `packages/auth`:
+
+- `expiresIn: 7d` — session lifetime.
+- `updateAge: 1d` — **sliding renewal**: activity past a day extends the expiry
+  server-side. This _is_ the "refresh" — handled by the server, with no refresh token
+  to store, rotate, or leak.
+- `cookieCache: 5min` — a short signed cookie serves most requests without a DB read
+  (performance); the DB session stays the source of truth.
+
+**Why this beats access/refresh JWTs for a first-party web app:**
+
+- **XSS-resilient.** An `httpOnly` cookie is unreadable by JavaScript; a JWT held in
+  `localStorage` / JS memory is exfiltratable by any XSS. Cookies + our CSRF defenses
+  (Origin + `SameSite` + Fetch-Metadata) are the stronger posture.
+- **Instant revocation.** Because the session lives in our DB, we can kill it
+  immediately — sign-out-everywhere, password reset, admin ban. Stateless JWTs stay
+  valid until expiry unless you bolt on a denylist, which reintroduces the very DB
+  lookup JWTs exist to avoid. Revocation was **verified live** (2026-08-13): a
+  password reset invalidated the prior sessions and the old credentials returned
+  `401`.
+- **Simpler, fewer failure modes** — no refresh-token rotation, reuse-detection, or
+  client-side token-refresh dance.
+
+**When tokens _would_ be justified (opt-in, added later):**
+
+- A **mobile app** or **non-browser / third-party / cross-domain API client** that
+  can't rely on cookies → Better Auth **`bearer`** plugin (`Authorization: Bearer …`).
+- **Stateless identity verification across services** → Better Auth **`jwt`** plugin
+  (issues JWTs + a JWKS endpoint).
+
+Both are first-party plugins we switch on when such a consumer actually appears —
+consistent with the phased approach. Until then, sessions are the correct default and
+match the security model above.
+
 ## Authorization approach (the "later" phase)
 
 Start simple, escalate only when forced:
@@ -145,6 +186,7 @@ Start simple, escalate only when forced:
 - Lucia deprecation: <https://github.com/lucia-auth/lucia/discussions/1714>, <https://lucia-auth.com/>
 - Better Auth methods & B2B plugins: <https://better-auth.com/docs/plugins> (passkey, magic-link, email-otp, 2fa, organization, sso, scim)
 - Better Auth security & telemetry: <https://better-auth.com/docs/reference/security>, <https://better-auth.com/docs/reference/telemetry>
+- Sessions vs JWT (session model, bearer/jwt plugins): <https://better-auth.com/docs/concepts/session-management>, <https://better-auth.com/docs/plugins/bearer>, <https://better-auth.com/docs/plugins/jwt>; OWASP Session Management Cheat Sheet — <https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html>
 - OWASP (roll-your-own / MFA): CSRF & Credential-Stuffing cheat sheets
 - WorkOS pricing (free to 1M MAU): <https://workos.com/pricing>
 
