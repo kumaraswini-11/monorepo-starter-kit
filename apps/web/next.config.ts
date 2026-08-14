@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
   // Type-safe <Link> hrefs. Enable once ALL auth routes exist — it errors on links
   // to not-yet-created routes (/sign-up, /forgot-password). Uncomment then:
   // typedRoutes: true,
+  // Images: `next/image` already optimizes local images (AVIF/WebP) with no config.
+  // Add remote hosts + formats here when the app first loads external images:
+  //   images: {
+  //     formats: ["image/avif", "image/webp"],
+  //     remotePatterns: [{ protocol: "https", hostname: "images.example.com" }],
+  //   },
   transpilePackages: [
     "@workspace/ui",
     "@workspace/auth",
