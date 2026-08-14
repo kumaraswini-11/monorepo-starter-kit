@@ -50,6 +50,7 @@ const nextConfig: NextConfig = {
     "@workspace/auth",
     "@workspace/db",
     "@workspace/email",
+    "@workspace/env",
   ],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

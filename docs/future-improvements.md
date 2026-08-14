@@ -82,10 +82,6 @@ Remaining, **deferred with triggers**:
   server-bundle issue ever appears (`next build` is green today).
 - **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
   observability backend is chosen / server→client data flows grow.
-- **`@workspace/env`** — validated, typed, fail-fast env (zod), replacing raw
-  `process.env` reads. Decided in
-  [decisions/0021](decisions/0021-env-and-secrets-management.md); build it as the
-  foundation work wraps up.
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 

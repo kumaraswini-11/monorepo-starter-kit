@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@workspace/auth": "workspace:*",
+    "@workspace/env": "workspace:*",
     "@workspace/ui": "workspace:*",
     "better-auth": "catalog:",
     "lucide-react": "catalog:",

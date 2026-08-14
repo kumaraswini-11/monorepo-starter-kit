@@ -22,6 +22,30 @@ export const config = [
     },
   },
   {
+    // Guard: force everyone through the validated `@workspace/env` contract instead
+    // of reading `process.env` directly (which silently masks missing config —
+    // ADR 0021). Exemptions below for the env package itself + config/tooling files.
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "MemberExpression[object.name='process'][property.name='env']",
+          message:
+            "Import validated env from `@workspace/env`; don't read `process.env` directly (ADR 0021).",
+        },
+      ],
+    },
+  },
+  {
+    // Config/tooling files (drizzle-kit, next, vitest, eslint) run before/outside the
+    // app and legitimately read process.env.
+    files: ["**/*.config.{js,ts,mjs,cjs}"],
+    rules: {
+      "no-restricted-syntax": "off",
+    },
+  },
+  {
     plugins: {
       onlyWarn,
     },

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 
 import "@workspace/ui/globals.css";
 
+import { appUrl } from "@workspace/env";
 import { Toaster } from "@workspace/ui/components/shadcn/sonner";
 import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
@@ -20,7 +21,7 @@ const fontMono = Geist_Mono({
 
 // TODO: swap "Acme" for the real product name (or wire from config) with branding.
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(appUrl),
   title: { default: "Acme", template: "%s · Acme" },
   description: "Secure, self-hosted authentication starter.",
   applicationName: "Acme",

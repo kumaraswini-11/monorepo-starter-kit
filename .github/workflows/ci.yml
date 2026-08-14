@@ -19,10 +19,14 @@ jobs:
     name: Format, lint, typecheck, build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # env:
-    #   # Uncomment to enable Turborepo Remote Caching (Vercel):
-    #   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-    #   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    env:
+      # @workspace/env validates at import, which runs during `next build`. CI has no
+      # secrets, so skip validation here — real runtimes still fail-fast at startup
+      # (ADR 0021). lint/typecheck don't execute the module, so job-level is safe.
+      SKIP_ENV_VALIDATION: "1"
+      # Uncomment to enable Turborepo Remote Caching (Vercel):
+      # TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      # TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     steps:
       - name: Checkout
         # Third-party actions are pinned to a full commit SHA (supply-chain

@@ -84,9 +84,9 @@ and the error/loading/metadata conventions don't depend on that choice.
   DB/service reads; in frontend-only it caches responses from the external API. Same
   feature, different source.
 - Our repo currently runs **fullstack** (Better Auth in the `/api/auth` route handler
-  - server-side `getSession`), but `packages/auth` / `db` / `email` are
-    framework-agnostic ([0016](0016-authentication-strategy.md)), so extracting a
-    standalone backend later changes the auth **wiring**, **not** this rendering model.
+  and server-side `getSession`), but `packages/auth` / `db` / `email` are
+  framework-agnostic ([0016](0016-authentication-strategy.md)), so extracting a
+  standalone backend later changes the auth **wiring**, **not** this rendering model.
 
 ## Revisit triggers
 

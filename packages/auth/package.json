@@ -18,6 +18,7 @@
   "dependencies": {
     "@workspace/db": "workspace:*",
     "@workspace/email": "workspace:*",
+    "@workspace/env": "workspace:*",
     "better-auth": "catalog:",
     "react": "catalog:",
     "server-only": "catalog:",
