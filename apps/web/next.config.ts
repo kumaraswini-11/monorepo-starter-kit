@@ -26,6 +26,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   // reactCompiler: true,
+  // Don't advertise the framework/version (small info-leak reduction).
+  poweredByHeader: false,
+  // TODO: enable `typedRoutes: true` once all auth routes exist (it errors on
+  // <Link> hrefs to not-yet-created routes like /sign-up, /forgot-password).
   transpilePackages: [
     "@workspace/ui",
     "@workspace/auth",
