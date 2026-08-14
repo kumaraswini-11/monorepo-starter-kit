@@ -1,3 +1,6 @@
+// Build-time guard: fail if the DB layer is ever imported into a client bundle
+// (ADR 0022 — server-only data access).
+import "server-only";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 

@@ -45,6 +45,9 @@ catalogs:
     react-dom:
       specifier: 19.2.8
       version: 19.2.8
+    server-only:
+      specifier: ^0.0.1
+      version: 0.0.1
     storybook:
       specifier: ^10.5.7
       version: 10.5.7
@@ -223,6 +226,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
+      server-only:
+        specifier: 'catalog:'
+        version: 0.0.1
       ua-parser-js:
         specifier: ^2.0.10
         version: 2.0.10
@@ -254,6 +260,9 @@ importers:
       pg:
         specifier: ^8.22.0
         version: 8.22.0
+      server-only:
+        specifier: 'catalog:'
+        version: 0.0.1
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -294,6 +303,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
+      server-only:
+        specifier: 'catalog:'
+        version: 0.0.1
     devDependencies:
       '@react-email/ui':
         specifier: ^6.9.1
@@ -5875,6 +5887,9 @@ packages:
     resolution: {integrity: sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw==}
     engines: {node: '>= 18'}
 
+  server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+
   set-cookie-parser@3.1.2:
     resolution: {integrity: sha512-5/r/lTwbJ3zQ+qwdUFZYeRNqda7P5HD8zQKqlSjdGt1/S0cjLAphHusj4Y58ahDtWn/g32xrIS58/ikOvwl0Lw==}
 
@@ -8387,7 +8402,7 @@ snapshots:
       storybook: 10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8)
       styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.2.8)
       vite: 8.2.1(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.11)(yaml@2.9.0)
-      vite-plugin-storybook-nextjs: 3.3.1(next@16.3.0(@types/node@20.19.43)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(typescript@5.9.3)(vite@8.2.1(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.11)(yaml@2.9.0))
+      vite-plugin-storybook-nextjs: 3.3.1(next@16.3.0(@babel/core@7.29.7)(@types/node@20.19.43)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(typescript@5.9.3)(vite@8.2.1(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.11)(yaml@2.9.0))
     optionalDependencies:
       '@types/react': 19.2.18
       '@types/react-dom': 19.2.4(@types/react@19.2.18)
@@ -11566,6 +11581,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  server-only@0.0.1: {}
+
   set-cookie-parser@3.1.2: {}
 
   set-function-length@1.2.2:
@@ -12224,7 +12241,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite-plugin-storybook-nextjs@3.3.1(next@16.3.0(@types/node@20.19.43)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(typescript@5.9.3)(vite@8.2.1(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.11)(yaml@2.9.0)):
+  vite-plugin-storybook-nextjs@3.3.1(next@16.3.0(@babel/core@7.29.7)(@types/node@20.19.43)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(typescript@5.9.3)(vite@8.2.1(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.11)(yaml@2.9.0)):
     dependencies:
       '@next/env': 16.0.0
       image-size: 2.0.2

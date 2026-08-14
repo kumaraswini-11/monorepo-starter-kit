@@ -19,6 +19,7 @@
     "@workspace/email": "workspace:*",
     "better-auth": "catalog:",
     "react": "catalog:",
+    "server-only": "catalog:",
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {

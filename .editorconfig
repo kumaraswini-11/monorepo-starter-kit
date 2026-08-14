@@ -1,3 +1,6 @@
+# Universal whitespace rules every editor respects natively (editorconfig.org).
+# Complements Prettier: Prettier formats code files; this also covers non-code
+# files (.env, dotfiles) and applies as you type, in any editor.
 root = true
 
 [*]

@@ -21,6 +21,8 @@ catalog:
   lucide-react: ^1.30.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.4.3
+  # server-only — build-time guard on server modules (db/auth/email)
+  server-only: ^0.0.1
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.6.26
   # Language & lint tooling

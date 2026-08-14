@@ -24,7 +24,8 @@
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.1.0",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "server-only": "catalog:"
   },
   "devDependencies": {
     "@react-email/ui": "^6.9.1",

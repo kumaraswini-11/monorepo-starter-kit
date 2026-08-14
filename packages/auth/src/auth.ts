@@ -1,3 +1,6 @@
+// Build-time guard: this holds the secret + DB adapter, so fail if a client bundle
+// ever imports it (ADR 0022). The client entry is the separate `./client` module.
+import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
