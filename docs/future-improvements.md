@@ -9,8 +9,11 @@ already built.
 
 ## CI / CD
 
-- **Testing job** — add Vitest (unit/component) + Playwright (e2e) and a `test`
-  step in CI, then a report-only coverage job that later flips to thresholds.
+- **Testing** — Vitest (unit) is wired (co-located `src/*.test.ts` per package, run
+  by the turbo `test` task). Remaining: a CI **`test` job**, **Playwright** (e2e), a
+  report-only **coverage** job that later flips to thresholds, and (if useful) a shared
+  `@workspace/vitest-config`. The deeper strategy — DB integration tests + mocking,
+  component tests — is designed when those needs land.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into

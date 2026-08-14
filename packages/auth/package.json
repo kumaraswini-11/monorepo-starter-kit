@@ -6,7 +6,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -28,6 +29,7 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
