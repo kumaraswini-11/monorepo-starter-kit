@@ -53,16 +53,36 @@ already built.
 - Replace the CODEOWNERS placeholder owner with real **teams** as they form.
 - Consider **required signed commits**.
 
-## App & framework hardening (from the initial review)
+## App & framework hardening
 
-- `next.config.ts` — security headers (CSP / HSTS / …), `poweredByHeader: false`,
-  `images` config, stable `typedRoutes`.
-- `app/layout.tsx` — a `metadata` export (title / description / Open Graph).
-- **Accessibility** — add `eslint-plugin-jsx-a11y`.
-- **Node pinning** — `.nvmrc` + align `@types/node` + tighten `engines`.
-- **DX files** — `.editorconfig`, `.vscode/{settings,extensions}.json`,
-  `.env.example`.
-- Remove the unused `zod` dependency (or adopt it for form validation).
+Most of the original list is **done**: security headers
+([decisions/0015](decisions/0015-web-security-headers.md)), `poweredByHeader: false`,
+root `metadata`/`viewport`/`robots`/`manifest`, `eslint-plugin-jsx-a11y`
+([decisions/0014](decisions/0014-base-ui-adoption.md)), `.env.example`
+([decisions/0021](decisions/0021-env-and-secrets-management.md)), `zod` adopted for
+form validation, Node pinning + DX files, and the rendering/perf model
+([decisions/0023](decisions/0023-nextjs-rendering-and-performance-model.md)).
+
+Remaining, **deferred with triggers**:
+
+- **`typedRoutes: true`** — commented in `apps/web/next.config.ts`. **Trigger:** all
+  auth routes exist (it errors on `<Link>`s to not-yet-created routes). Then uncomment.
+- **`useReportWebVitals`** — report real-user Core Web Vitals (LCP/INP/CLS/FCP/TTFB).
+  **How:** a `next/web-vitals` client component in the root layout that POSTs metrics.
+  **Trigger:** an analytics sink is chosen (otherwise it reports nowhere).
+- **SEO for public pages** — `opengraph-image`/`twitter-image`, JSON-LD, canonical
+  URLs. **Trigger:** public/marketing pages exist (auth pages stay `noindex`; a
+  minimal `sitemap.ts` + `robots` already ship).
+- **`forbidden.tsx` / `unauthorized.tsx`** — custom 403/401 UI paired with
+  `forbidden()`/`unauthorized()`. **Trigger:** RBAC (auth org/permissions phase).
+- **`serverExternalPackages`** — re-check `pg` / `better-auth` server bundling if a
+  server-bundle issue ever appears (`next build` is green today).
+- **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
+  observability backend is chosen / server→client data flows grow.
+- **`@workspace/env`** — validated, typed, fail-fast env (zod), replacing raw
+  `process.env` reads. Decided in
+  [decisions/0021](decisions/0021-env-and-secrets-management.md); build it as the
+  foundation work wraps up.
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 

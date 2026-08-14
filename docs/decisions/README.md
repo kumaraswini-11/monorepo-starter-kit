@@ -33,6 +33,7 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 | [0020](0020-email-transactional-messaging.md)          | Email — React Email + a `sendEmail` port (`packages/email`); provider deferred       | Accepted | 2026-08-04 |
 | [0021](0021-env-and-secrets-management.md)             | Environment variables & secrets management (per-app .env, turbo, secrets manager)    | Accepted | 2026-08-04 |
 | [0022](0022-shared-code-and-utilities-organization.md) | Shared-code organization — focused `utils` package, one-purpose packages, boundaries | Accepted | 2026-08-09 |
+| [0023](0023-nextjs-rendering-and-performance-model.md) | Next.js rendering & performance model — Cache Components (PPR), React 19 form idiom  | Accepted | 2026-08-14 |
 
 See also [../references.md](../references.md) for the sources behind these
 decisions, and [../future-improvements.md](../future-improvements.md) for the
