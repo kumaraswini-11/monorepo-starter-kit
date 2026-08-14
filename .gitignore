@@ -49,6 +49,12 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Next.js 16.3+ auto-generates per-app AI-agent pointer files on `next dev`.
+# The root AGENTS.md is the single source of truth (ADR 0012), so ignore the
+# generated per-app copies rather than tracking/churning them.
+apps/*/AGENTS.md
+apps/*/CLAUDE.md
+
 # vercel
 .vercel
 
