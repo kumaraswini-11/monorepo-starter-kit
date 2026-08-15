@@ -83,6 +83,27 @@ Remaining, **deferred with triggers**:
 - **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
   observability backend is chosen / server→client data flows grow.
 
+## Auth flow (UI built; wiring + later screens deferred)
+
+The auth **UI** is complete — entry (`/auth`), email capture, sign-in, sign-up, and
+forgot/reset-password — all presentational with injected handlers (ADR 0025), so wiring
+is a matter of supplying those handlers. Deferred:
+
+- **Wiring** — inject the real Better Auth calls (`signIn.email`, `signUp.email`,
+  `forgetPassword`, `resetPassword`) into the step components, plus the email step's
+  account-existence check that routes to `/auth/sign-in` vs `/auth/sign-up`. After
+  **sign-up → auto-login → `/dashboard`**; after **reset → sign in** (sessions revoked,
+  [decisions/0016](decisions/0016-authentication-strategy.md)).
+- **Change password (Settings)** — a future settings screen needs current + new password
+  (± confirm). **Reuse the auth primitives**: `PasswordInput`, `PasswordStrength`,
+  `firstError` / `passwordField`. If sign-up and change-password end up duplicating the
+  "new password + strength" block, extract a shared `NewPasswordField` then (rule of
+  three). Better Auth: `authClient.changePassword({ currentPassword, newPassword,
+revokeOtherSessions })`.
+- **Verify-email banner, lightweight onboarding, OAuth (Google) callback** — later phases
+  per the [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
+  [decisions/0016](decisions/0016-authentication-strategy.md).
+
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 
 See [decisions/0004](decisions/0004-defer-typescript-7.md).
