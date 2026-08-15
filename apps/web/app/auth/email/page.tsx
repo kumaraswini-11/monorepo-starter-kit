@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeftIcon } from "lucide-react";
 
-import { buttonVariants } from "@workspace/ui/components/shadcn/button";
-import { cn } from "@workspace/ui/lib/utils";
-
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 import { AuthHeader } from "@/components/auth/auth-header";
 import { EmailStep } from "@/components/auth/email-step";
 
@@ -18,18 +14,7 @@ export const metadata: Metadata = { title: "Continue with email" };
 export default function EmailCapturePage() {
   return (
     <div className="flex flex-col gap-6">
-      {/* `-ms-1.5` cancels the button's start padding so the arrow sits on the same
-          left axis as the wordmark and heading below it. */}
-      <Link
-        href="/auth"
-        className={cn(
-          buttonVariants({ variant: "ghost", size: "sm" }),
-          "-ms-1.5 self-start text-muted-foreground"
-        )}
-      >
-        <ArrowLeftIcon data-icon="inline-start" />
-        Back
-      </Link>
+      <AuthBackLink href="/auth" />
 
       {/* Deliberately neutral description: naming the account-exists branch that follows
           would telegraph whether the address is registered (enumeration — spec §1). */}

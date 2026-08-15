@@ -39,7 +39,11 @@ export function PasswordInput({
           aria-pressed={visible}
           onClick={() => setVisible((value) => !value)}
         >
-          {visible ? <EyeOffIcon /> : <EyeIcon />}
+          {visible ? (
+            <EyeOffIcon aria-hidden="true" />
+          ) : (
+            <EyeIcon aria-hidden="true" />
+          )}
         </InputGroupButton>
       </InputGroupAddon>
     </InputGroup>

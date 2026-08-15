@@ -12,13 +12,7 @@ import {
 import { Input } from "@workspace/ui/components/shadcn/input";
 import { Spinner } from "@workspace/ui/components/shadcn/spinner";
 
-import { emailField } from "@/lib/validation";
-
-/** Module scope so the function isn't recreated per render. */
-function validate(value: string): string | undefined {
-  const parsed = emailField.safeParse(value);
-  return parsed.success ? undefined : parsed.error.issues[0]?.message;
-}
+import { emailField, firstError } from "@/lib/validation";
 
 /**
  * Email capture — step 2 of the method-first auth flow (auth-ui-ux spec §3.2, §11).
@@ -45,12 +39,12 @@ export function EmailCaptureForm({
   // Derived, not stored: "reward early, punish late" — stay quiet until the first
   // submit attempt, then re-validate on every keystroke so the error clears as soon
   // as the address becomes valid.
-  const error = showErrors ? validate(email) : undefined;
+  const error = showErrors ? firstError(emailField, email) : undefined;
 
   const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setShowErrors(true);
-    if (validate(email)) {
+    if (firstError(emailField, email)) {
       return;
     }
     startTransition(async () => {
@@ -85,10 +79,10 @@ export function EmailCaptureForm({
         </Field>
 
         {/*
-         * Deliberately NOT "disabled until valid" (spec §5). A disabled submit gives no
-         * reason for being disabled, is removed from the tab order, and leaves screen
-         * reader users unable to discover the blocker. Keeping it enabled and answering
-         * with a specific inline error is the accessible pattern.
+         * Submit stays ENABLED and validates on click — a deliberate deviation from spec
+         * §5's "disabled until valid": a disabled submit gives no reason, leaves the tab
+         * order, and hides the blocker from screen readers. Enabled + a specific inline
+         * error is the accessible pattern (WCAG-aligned; ADR 0024).
          */}
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
           {pending ? (

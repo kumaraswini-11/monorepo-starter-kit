@@ -48,7 +48,7 @@ export default function AuthEntryPage() {
             "w-full"
           )}
         >
-          <MailIcon data-icon="inline-start" />
+          <MailIcon data-icon="inline-start" aria-hidden="true" />
           <span className="min-w-38 text-start">Continue with email</span>
         </Link>
       </div>
@@ -57,14 +57,14 @@ export default function AuthEntryPage() {
         By continuing, you agree to our{" "}
         <Link
           href="/terms"
-          className="underline underline-offset-4 hover:text-primary"
+          className="underline underline-offset-4 hover:text-foreground"
         >
           Terms of Service
         </Link>{" "}
         and{" "}
         <Link
           href="/privacy"
-          className="underline underline-offset-4 hover:text-primary"
+          className="underline underline-offset-4 hover:text-foreground"
         >
           Privacy Policy
         </Link>

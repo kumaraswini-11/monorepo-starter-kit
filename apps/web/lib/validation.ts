@@ -35,6 +35,15 @@ export const signUpSchema = z.object({
 export type SignInValues = z.infer<typeof signInSchema>;
 export type SignUpValues = z.infer<typeof signUpSchema>;
 
+/** First validation message for a single-field schema, or `undefined` if it passes. */
+export function firstError(
+  schema: z.ZodType<string>,
+  value: string
+): string | undefined {
+  const parsed = schema.safeParse(value);
+  return parsed.success ? undefined : parsed.error.issues[0]?.message;
+}
+
 /** First error message per field, as a `{ field: message }` map. */
 export function fieldErrorsOf(error: z.ZodError): Record<string, string> {
   const out: Record<string, string> = {};

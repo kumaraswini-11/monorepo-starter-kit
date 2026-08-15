@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import type { ZodType } from "zod";
 
 import { Button } from "@workspace/ui/components/shadcn/button";
 import {
@@ -17,16 +16,11 @@ import { Spinner } from "@workspace/ui/components/shadcn/spinner";
 import type { AuthMode } from "@/components/auth/auth-flow-provider";
 import { PasswordInput } from "@/components/auth/password-input";
 import { PasswordStrength } from "@/components/auth/password-strength";
-import { passwordField, signInPasswordField } from "@/lib/validation";
-
-/** Module scope so the function isn't recreated per render. */
-function firstError(
-  schema: ZodType<string>,
-  value: string
-): string | undefined {
-  const parsed = schema.safeParse(value);
-  return parsed.success ? undefined : parsed.error.issues[0]?.message;
-}
+import {
+  firstError,
+  passwordField,
+  signInPasswordField,
+} from "@/lib/validation";
 
 /**
  * Credential step — email shown read-only (identity confirmation), then the password.
@@ -43,7 +37,6 @@ export function PasswordForm({
   email,
   mode,
   onSubmit,
-  onSwitchMode,
 }: {
   email: string;
   mode: AuthMode;
@@ -51,7 +44,6 @@ export function PasswordForm({
     password: string;
     name?: string;
   }) => Promise<void> | void;
-  onSwitchMode?: () => void;
 }) {
   const isSignUp = mode === "sign-up";
   const [name, setName] = useState("");
@@ -157,19 +149,6 @@ export function PasswordForm({
             "Sign in"
           )}
         </Button>
-
-        {onSwitchMode ? (
-          <p className="text-center text-sm text-muted-foreground">
-            {isSignUp ? "Already have an account?" : "New to efferd?"}{" "}
-            <button
-              type="button"
-              onClick={onSwitchMode}
-              className="font-medium text-foreground underline-offset-4 hover:underline"
-            >
-              {isSignUp ? "Sign in" : "Create an account"}
-            </button>
-          </p>
-        ) : null}
       </FieldGroup>
     </form>
   );
