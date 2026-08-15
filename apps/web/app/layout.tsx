@@ -4,7 +4,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "@workspace/ui/globals.css";
 
 import { appUrl } from "@workspace/env";
-import { Toaster } from "@workspace/ui/components/shadcn/sonner";
+import { Toaster } from "@workspace/ui/components/shadcn/toast";
 import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 
