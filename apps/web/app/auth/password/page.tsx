@@ -5,16 +5,16 @@ import { ArrowLeftIcon } from "lucide-react";
 import { buttonVariants } from "@workspace/ui/components/shadcn/button";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { AuthHeader } from "@/components/auth/auth-header";
 import { PasswordStep } from "@/components/auth/password-step";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "Continue" };
 
 /**
- * Password entry — step 3 of the sign-in path, at `/auth/password`. Server Component
- * shell (ADR 0023): the back link and header are static; `PasswordStep` adds the client
- * guard + form. Reached only via the flow from `/auth/email` (it needs the captured
- * email); arriving without one restarts at the email step.
+ * Credential step at `/auth/password` — sign-in or sign-up depending on the flow's mode.
+ * Server Component shell (ADR 0023): the back link is static; `PasswordStep` renders the
+ * mode-aware header + form as a client island (it reads the in-memory flow state).
+ * Reached only via `/auth/email` (it needs the captured email); arriving without one
+ * restarts at the email step.
  */
 export default function PasswordPage() {
   return (
@@ -31,11 +31,6 @@ export default function PasswordPage() {
         <ArrowLeftIcon data-icon="inline-start" />
         Back
       </Link>
-
-      <AuthHeader
-        title="Enter your password"
-        description="Enter the password for your account to continue."
-      />
 
       <PasswordStep />
     </div>

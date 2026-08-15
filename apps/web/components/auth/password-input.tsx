@@ -3,44 +3,45 @@
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
-import { Button } from "@workspace/ui/components/shadcn/button";
-import { Input } from "@workspace/ui/components/shadcn/input";
-import { cn } from "@workspace/ui/lib/utils";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@workspace/ui/components/shadcn/input-group";
 
 /**
- * Password field with an accessible show/hide toggle — a real `<button>` (not a
- * CSS trick) with `aria-pressed` + `aria-label`, and `tabIndex={-1}` so it doesn't
- * interrupt the tab flow between the field and submit.
+ * Password field with an accessible show/hide toggle, built on shadcn's `input-group`
+ * (the purpose-built input-with-addon primitive) instead of hand-positioning a button —
+ * so the border, focus-visible ring, and `aria-invalid` state are handled by the group.
+ * The toggle is a real `<button>` with `aria-pressed` + `aria-label`, and `tabIndex={-1}`
+ * so it doesn't interrupt the tab flow between the field and submit.
  */
 export function PasswordInput({
   className,
   ...props
-}: React.ComponentProps<typeof Input>) {
+}: React.ComponentProps<typeof InputGroupInput>) {
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="relative">
-      <Input
+    <InputGroup>
+      <InputGroupInput
         type={visible ? "text" : "password"}
-        className={cn("pe-10", className)}
+        className={className}
         {...props}
       />
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        tabIndex={-1}
-        aria-label={visible ? "Hide password" : "Show password"}
-        aria-pressed={visible}
-        onClick={() => setVisible((v) => !v)}
-        className="absolute end-0 top-0 h-full px-3 text-muted-foreground hover:bg-transparent"
-      >
-        {visible ? (
-          <EyeOffIcon className="size-4" />
-        ) : (
-          <EyeIcon className="size-4" />
-        )}
-      </Button>
-    </div>
+      <InputGroupAddon align="inline-end">
+        <InputGroupButton
+          type="button"
+          size="icon-xs"
+          tabIndex={-1}
+          aria-label={visible ? "Hide password" : "Show password"}
+          aria-pressed={visible}
+          onClick={() => setVisible((value) => !value)}
+        >
+          {visible ? <EyeOffIcon /> : <EyeIcon />}
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   );
 }
