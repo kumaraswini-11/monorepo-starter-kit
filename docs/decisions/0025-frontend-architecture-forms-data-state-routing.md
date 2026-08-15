@@ -79,6 +79,16 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
 - **Not Redux:** heavy boilerplate; its historical server-cache role is now TanStack
   Query's; overkill for this app. Redux Toolkit remains a fallback only if a future app
   needs complex, tightly-coupled global state — unlikely.
+- **Applied — the multi-step auth flow.** The email is carried from `/auth/email` to
+  `/auth/password` in an **in-memory React Context** (`AuthFlowProvider`, mounted in the
+  `/auth` layout), **never the URL** — a query string would leak PII into logs, history,
+  and `Referer` (compliance). It resets on reload **by design**: credential entry
+  **restarts, it does not resume** — the password step guards on the email and returns to
+  `/auth/email` when it's absent. Resume is reserved for token-carried flows (magic link,
+  verify) and server-persisted **post-signup onboarding** (a later, separate flow). This
+  is why Context (auto-scoped, auto-reset) beats a global Zustand store here. Detail lives
+  in the `auth-flow-provider` / `password-step` comments and the
+  [auth-ui-ux spec](../specs/auth-ui-ux-spec.md).
 
 ### 5. `proxy.ts` (Next 16 rename of Middleware) — optional, not now
 
