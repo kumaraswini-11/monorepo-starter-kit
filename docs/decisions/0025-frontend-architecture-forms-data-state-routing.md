@@ -30,14 +30,25 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
 
 ## Decisions (recommended)
 
-### 1. Routing — `(auth)` + `(app)` route groups (by _area / layout_, not access)
+### 1. Routing — `/auth/*` namespace, `(app)` group, `/` dispatcher
 
-- Route groups organize by **shared layout / area**, not by access-control: `(auth)` =
-  the centered auth shell; `(app)` = the authed application shell.
-- **Not `(public)` / `(protected)`:** authorization is enforced by the **layout guard /
-  proxy + server session check** ([0023]), never by a folder name. Naming folders by
-  access conflates routing with authorization, breaks for semi-public routes, and
-  duplicates the real guard. Area/layout naming is the Next.js convention and scales.
+- **`/`** is a **dispatcher** (signed-in → `/dashboard`, else → `/auth`) — no UI; keeps
+  `/` free for a future marketing home.
+- **`/auth/*`** is a real folder (a segment we _want_) with its own layout:
+  `/auth` (entry) → `/auth/email` → `/auth/sign-in` | `/auth/sign-up`, plus
+  `/auth/forgot-password` and `/auth/reset-password`.
+- **`(app)`** is a route group (no URL segment) for the authed area (`/dashboard`),
+  guarded by a server session check ([0023] `instant = false`).
+- **Identifier-first credential routes:** the email step decides the branch and routes to
+  `/auth/sign-in` (existing) or `/auth/sign-up` (new) — dedicated, single-responsibility
+  routes, **not** a mode-toggled single page (spec §2 "branching happens server-side; UI
+  only reacts"; the Google/Auth0/WorkOS pattern). No manual sign-in/sign-up toggle; to
+  switch, the user changes the email (Back / "Change").
+- **Post-auth redirects (R&D-backed):** sign-up → **auto-login → `/dashboard`**; password
+  reset → **sign in** (not auto-login — sessions are revoked on reset, [0016]). See
+  `../future-improvements.md`.
+- **Not `(public)` / `(protected)`:** authorization is the guard's job, not a folder name
+  — naming by access conflates routing with authz and breaks for semi-public routes.
 
 ### 2. Forms — React Hook Form + zod, **presentational**
 

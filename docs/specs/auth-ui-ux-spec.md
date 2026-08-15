@@ -567,16 +567,28 @@ Deep Link → Entry → Auth → Identity Resolution → Original URL restored
 
 ## Additional Deep Implementation Specs
 
-### Recommended Route Structure
+### Route Structure (as built)
 
-- `/auth` or `/login` — unified entry
-- `/auth/email` — email capture
-- `/auth/password` — password step
-- `/auth/callback/google` — OAuth return
-- `/auth/onboarding` — lightweight (new accounts only)
-- `/auth/invite/:token` — invite join
-- `/auth/recover` — forgot / locked
-- Post-auth redirects handled by single `PostAuthRouter` component
+- `/` — dispatcher (signed-in → `/dashboard`, else → `/auth`)
+- `/auth` — entry / method chooser (Google + email)
+- `/auth/email` — email capture; the existence check routes to sign-in or sign-up
+- `/auth/sign-in` — returning user: password (+ "Forgot password?")
+- `/auth/sign-up` — new user: name (optional) + password + strength meter
+- `/auth/forgot-password` — request reset link (enumeration-safe + resend cooldown)
+- `/auth/reset-password?token=…` — set a new password → sign in
+- Later: `/auth/callback/google` (OAuth), `/auth/onboarding`, `/auth/invite/:token`
+
+**Reconciled during implementation** (see
+[ADR 0025](../decisions/0025-frontend-architecture-forms-data-state-routing.md)): the
+single "Password" step (§3.3) is split into dedicated **`/auth/sign-in`** and
+**`/auth/sign-up`** routes — still identifier-first (the email decides; no manual toggle),
+but with single-responsibility components, distinct URLs, and room for sign-up to grow.
+The `/` dispatcher + per-area guards replace `PostAuthRouter`. Post-auth: **sign-up →
+auto-login → `/dashboard`**; **reset → sign in** (sessions revoked,
+[ADR 0016](../decisions/0016-authentication-strategy.md)). Sign-up uses a **strength
+meter, no confirm field** (2026 UX); the layout is **flat** (efferd brand) rather than a
+420px `AuthCard`; the email "Continue" stays **enabled** (validate-on-submit) rather than
+§5's "disabled until valid" (accessibility).
 
 ### Data Model Alignment (from original principles)
 

@@ -84,6 +84,19 @@ deferred because a nonce-based CSP forces every page into dynamic rendering
 (losing static optimization, CDN caching, and PPR). This is a web-security
 decision recorded in [0015](0015-web-security-headers.md).
 
+### Toast — native Base UI (not Sonner), + component re-audit (2026-08)
+
+- The `base-vega` style ships a **native Base UI Toast** (`@base-ui/react/toast`). We
+  migrated off **Sonner** (the Radix-era third-party toast) to `toast.tsx` (Toaster + a
+  `toast.add()` manager), matching our Base UI commitment.
+- A full sweep confirmed **no Radix components remain** — every interactive primitive is
+  Base UI. The six third-party components are the standard shadcn deps with **no Base UI
+  equivalent**, so they stay: `react-day-picker` (calendar), `cmdk` (command),
+  `embla-carousel-react` (carousel), `recharts` (chart), `input-otp`, and
+  `react-resizable-panels`.
+- **Prefer a shadcn primitive over hand-rolling** — e.g. the password show/hide field uses
+  `input-group` rather than an absolutely-positioned button.
+
 ## Consequences
 
 - Accessibility is now _enforced_ on our app code, not merely assumed.
