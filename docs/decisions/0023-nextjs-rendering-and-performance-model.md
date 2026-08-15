@@ -49,6 +49,11 @@ These are the bulk of the "faster" story and we already get them:
    flag + returned error state from the hook, no manual `useState`/`onSubmit`). Better
    Auth's browser client runs inside the action. (Full Server Actions — for
    progressive enhancement — remain an option once we wire server-side cookie setting.)
+   **Refined by [0025](0025-frontend-architecture-forms-data-state-routing.md)
+   (Proposed):** while the backend is undecided, the _default_ form is React Hook Form
+   with an injected handler (presentational, backend-agnostic); `useActionState` and
+   Server Actions are the **fullstack** option, adopted if/when we commit to
+   Next-as-backend.
 3. **React Compiler — enabled** (`reactCompiler: true` + `babel-plugin-react-compiler`).
    Auto-memoizes components (fewer runtime re-renders; drops manual `useMemo`/
    `useCallback`) at the cost of a **slightly slower Babel compile step** — Next limits

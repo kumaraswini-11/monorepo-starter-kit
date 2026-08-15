@@ -90,3 +90,11 @@ decision recorded in [0015](0015-web-security-headers.md).
 - Base UI's platform concerns (RTL, forms, CSP) are explicitly tracked with a
   decision or a deferral + trigger — not silently skipped.
 - Styling, TypeScript, and composition follow Base UI's documented model.
+
+## See also
+
+- **[0024](0024-ui-foundations-layout-responsiveness-accessibility.md)** — the
+  codebase-wide **layout, responsiveness (mobile → TV) & semantic-HTML/accessibility**
+  conventions built on this adoption: Base UI is _behavior, not layout_; page semantics
+  (landmarks + heading levels) that shadcn's `<div>`-based `Card` deliberately leaves to
+  us; and the `start-`/`end-` logical-utility convention.
