@@ -19,7 +19,7 @@ export default function EmailCapturePage() {
       {/* Deliberately neutral description: naming the account-exists branch that follows
           would telegraph whether the address is registered (enumeration — spec §1). */}
       <AuthHeader
-        title="What's your work email?"
+        title="What's your email?"
         description="We'll take you to the right next step."
       />
 
