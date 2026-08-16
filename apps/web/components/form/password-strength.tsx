@@ -3,9 +3,10 @@
 import { cn } from "@workspace/ui/lib/utils";
 
 /**
- * Live password-strength hint for the sign-up path (spec §3.3/§5). Deliberately a light
- * heuristic (length + character variety) — real-user feedback, not a security control;
- * the actual policy is enforced server-side. No zxcvbn dependency for a UI cue.
+ * Live password-strength hint for new-password fields (sign-up / reset / change-password).
+ * A deliberately light heuristic (length + character variety) — real-user feedback, not a
+ * security control; the actual policy is enforced server-side. No zxcvbn dependency for a
+ * UI cue. Generic (not auth-specific) — lives in `components/form/` with the field layer.
  */
 const LEVELS = [
   { label: "Weak", bar: "bg-destructive" },

@@ -93,10 +93,13 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
   spinner + label, focus-to-error) is [0026](0026-form-submission-and-pending-state-pattern.md).
 - **Validation timing:** RHF's default `mode: onSubmit` + `reValidateMode: onChange` is
   exactly "reward early, punish late" — no config needed.
-- **Reusable layer** (`apps/web/components/form/`): `FormTextField`, `FormPasswordField`,
-  `FormError`, `submitWithFormError`. Kept in `apps/web` (RHF is app-only for now); promote
-  to `packages/ui` if a second app needs it. The Settings change-password form reuses these
-  components together with the `passwordField` schema rule.
+- **Reusable layer** (`apps/web/components/form/`): `Form`, `SubmitButton`, `FormError`,
+  `FormTextField` / `FormPasswordField`, `submitWithFormError`, plus the generic
+  `PasswordInput` / `PasswordStrength` primitives (relocated here from `auth/` — they are
+  **not** auth-specific). Kept in `apps/web` as **app-level-shared** (RHF is app-only for
+  now); the whole folder promotes to `packages/ui` at the first 2nd-app trigger
+  ([0022](0022-shared-code-and-utilities-organization.md)). The Settings change-password
+  form reuses these with the `passwordField` schema rule.
 
 ### 3. Client data-fetching — TanStack Query over Server Actions
 
