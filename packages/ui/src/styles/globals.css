@@ -132,4 +132,30 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
+  /*
+   * Autofill: user agents lock `background-color` on autofilled inputs, so we override it via
+   * the inset box-shadow trick + `-webkit-text-fill-color` — the field matches the theme
+   * instead of the UA's yellow/blue tint (Chrome/Edge/Safari/Opera; Firefox applies none).
+   * The focus *border* cue still shows; only the ring glow is replaced while a field is filled.
+   */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+    caret-color: var(--foreground);
+  }
+
+  /*
+   * Edge/IE add native password-reveal (`::-ms-reveal`) and clear (`::-ms-clear`) controls
+   * that no other browser shows. We ship our own show/hide toggle (`PasswordInput`), so hide
+   * these for cross-browser consistency and to avoid a duplicate eye icon. (Microsoft's own
+   * guidance: a site offering its own reveal should hide the built-in one.)
+   */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
 }
