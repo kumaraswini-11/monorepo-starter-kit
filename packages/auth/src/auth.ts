@@ -14,6 +14,7 @@ import {
   sendVerifyEmail,
 } from "@workspace/email";
 import { env } from "@workspace/env";
+import { firstWord } from "@workspace/utils/string";
 
 /**
  * Framework-neutral Better Auth server instance (ADR 0016). It imports **no**
@@ -34,12 +35,18 @@ export const auth = betterAuth({
     requireEmailVerification: false,
     minPasswordLength: 10,
     sendResetPassword: async ({ user, url }) => {
-      await sendResetPasswordEmail({
-        to: user.email,
-        firstName: user.name.split(" ")[0],
-        email: user.email,
-        resetUrl: url,
-      });
+      try {
+        await sendResetPasswordEmail({
+          to: user.email,
+          firstName: firstWord(user.name),
+          email: user.email,
+          resetUrl: url,
+        });
+      } catch (error) {
+        // Enumeration-safe + resilient: a mail-transport failure must not become a
+        // reset error for existing accounts (non-existent users never reach here).
+        console.error("[auth] reset-password email failed to send", error);
+      }
     },
     // On a completed reset: sign out the user's other devices (spec §3) and send the
     // confirmation/alert email. Covers the forgot-password flow; the settings
@@ -49,7 +56,7 @@ export const auth = betterAuth({
       try {
         await sendPasswordChangedEmail({
           to: user.email,
-          firstName: user.name.split(" ")[0],
+          firstName: firstWord(user.name),
           email: user.email,
         });
       } catch (error) {
@@ -63,11 +70,17 @@ export const auth = betterAuth({
     // but don't block access (requireEmailVerification stays false above).
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendVerifyEmail({
-        to: user.email,
-        firstName: user.name.split(" ")[0],
-        verifyUrl: url,
-      });
+      try {
+        await sendVerifyEmail({
+          to: user.email,
+          firstName: firstWord(user.name),
+          verifyUrl: url,
+        });
+      } catch (error) {
+        // Progressive verification (banner, not a gate): a mail-transport failure must
+        // not fail an otherwise-successful sign-up — the user can resend later.
+        console.error("[auth] verification email failed to send", error);
+      }
     },
   },
   // Security notification (spec §4): email the user when a session is created from a
@@ -90,7 +103,7 @@ export const auth = betterAuth({
 
             await sendNewDeviceEmail({
               to: signedInUser.email,
-              firstName: signedInUser.name.split(" ")[0],
+              firstName: firstWord(signedInUser.name),
               device: describeDevice(session.userAgent),
               location: resolveLocation(context?.headers, session.ipAddress),
               timestamp: new Intl.DateTimeFormat("en-US", {

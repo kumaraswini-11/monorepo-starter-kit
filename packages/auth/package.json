@@ -19,6 +19,7 @@
     "@workspace/db": "workspace:*",
     "@workspace/email": "workspace:*",
     "@workspace/env": "workspace:*",
+    "@workspace/utils": "workspace:*",
     "better-auth": "catalog:",
     "react": "catalog:",
     "server-only": "catalog:",
