@@ -20,7 +20,7 @@ export function SignInStep() {
     <>
       <AuthHeader
         title="Enter your password"
-        description="Enter the password for your account to continue."
+        description="Use the password for this account."
       />
       {/* Wiring: inject `onSubmit` here; throw a user-safe Error to surface it (ADR 0025 §2). */}
       <SignInForm email={email} />
