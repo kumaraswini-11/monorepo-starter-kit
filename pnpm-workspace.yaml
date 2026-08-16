@@ -30,7 +30,7 @@ catalog:
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.6.26
   # Language & lint tooling
-  typescript: ^5.9.3
+  typescript: ^7.0.2
   eslint: ^9.39.5
   "@types/node": ^20.19.43
   # Tailwind
