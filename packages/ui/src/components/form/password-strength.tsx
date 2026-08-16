@@ -26,27 +26,37 @@ function scorePassword(value: string): number {
 }
 
 export function PasswordStrength({ password }: { password: string }) {
-  if (!password) {
-    return null;
-  }
-
-  const score = scorePassword(password);
-  const level = LEVELS[score]!;
+  const score = password ? scorePassword(password) : -1;
+  const level = score >= 0 ? LEVELS[score]! : null;
 
   return (
-    <div className="flex items-center gap-2" aria-live="polite">
-      <div className="flex flex-1 gap-1" aria-hidden="true">
-        {LEVELS.map((_, index) => (
-          <span
-            key={index}
-            className={cn(
-              "h-1 flex-1 rounded-full transition-colors",
-              index <= score ? level.bar : "bg-muted"
-            )}
-          />
-        ))}
-      </div>
-      <span className="w-10 text-xs text-muted-foreground">{level.label}</span>
-    </div>
+    <>
+      {/*
+       * Always-mounted polite live region so the FIRST strength change is announced — a
+       * region that appears already-populated is often skipped by screen readers. The
+       * visual bars are decorative (`aria-hidden`); this text is the accessible source.
+       */}
+      <span className="sr-only" role="status">
+        {level ? `Password strength: ${level.label}` : ""}
+      </span>
+      {level ? (
+        <div className="flex items-center gap-2" aria-hidden="true">
+          <div className="flex flex-1 gap-1">
+            {LEVELS.map((_, index) => (
+              <span
+                key={index}
+                className={cn(
+                  "h-1 flex-1 rounded-full transition-colors",
+                  index <= score ? level.bar : "bg-muted"
+                )}
+              />
+            ))}
+          </div>
+          <span className="w-10 text-xs text-muted-foreground">
+            {level.label}
+          </span>
+        </div>
+      ) : null}
+    </>
   );
 }

@@ -25,10 +25,12 @@ export function PasswordInput({
 
   return (
     <InputGroup>
+      {/* `type` is applied AFTER `{...props}` so the show/hide toggle always owns it —
+          a caller-supplied `type` can't clobber visibility. */}
       <InputGroupInput
-        type={visible ? "text" : "password"}
         className={className}
         {...props}
+        type={visible ? "text" : "password"}
       />
       <InputGroupAddon align="inline-end">
         <InputGroupButton

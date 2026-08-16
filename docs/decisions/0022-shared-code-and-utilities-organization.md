@@ -92,7 +92,9 @@ library, **feature-based** grouping for app code).
 **`@workspace/ui` is the single source of truth for atoms + molecules** — presentational
 _and_ form-bound. Reusable molecules go here **from the start**, not deferred to a
 "2nd-consumer" (that bar is only for _uncertain_ abstractions and feature/domain code), and
-they get Storybook stories here alongside the atoms. Feature **organisms** (e.g. `SignInForm`,
+they can get Storybook stories here alongside the atoms (the shadcn atoms have them;
+stories for the just-promoted molecules are a tracked follow-up — see
+[../future-improvements.md](../future-improvements.md)). Feature **organisms** (e.g. `SignInForm`,
 which is auth-specific) stay in the app, grouped by feature.
 
 **`react-hook-form` is a `@workspace/ui` dependency — deliberately.** The form molecules

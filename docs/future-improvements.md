@@ -31,6 +31,12 @@ already built.
 
 - The addon trim decision, Chromatic (Phase 3), and publishing (Phase 4) are
   tracked in [decisions/0018](decisions/0018-storybook-and-visual-testing.md).
+- **Stories for the promoted molecules** — the shadcn _atoms_ each have a co-located
+  `*.stories.tsx`; the form molecules just promoted into `@workspace/ui` (`Form`,
+  `SubmitButton`, `FormError`, `FormTextField`/`FormPasswordField`, `PasswordInput`,
+  `PasswordStrength`) and the brand `Logo` don't yet
+  ([decisions/0022](decisions/0022-shared-code-and-utilities-organization.md) §Component
+  placement). RHF-bound molecules need a `useForm` wrapper in the story.
 
 ## Pull requests & developer experience
 

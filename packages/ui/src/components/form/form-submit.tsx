@@ -1,4 +1,6 @@
-import type { BaseSyntheticEvent } from "react";
+// JSX-free, but `.tsx` because `@workspace/ui`'s `exports` map serves `./components/*`
+// only as `*.tsx` — this keeps the form logic co-located with the form components rather
+// than splitting it into `lib/`. `React.*` is the ambient global (matches the siblings).
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 /**
@@ -46,7 +48,7 @@ export function submitWithFormError<T extends FieldValues>(
     }
   });
 
-  return (event: BaseSyntheticEvent) => {
+  return (event: React.BaseSyntheticEvent) => {
     if (form.formState.isSubmitting) {
       event.preventDefault();
       return;
