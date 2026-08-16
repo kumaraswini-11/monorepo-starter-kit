@@ -70,6 +70,32 @@ goes into a catch-all.
 | Cross-cutting contract types used by ≥2 domains that can't own them                                                     | colocate with the owning domain first; a tiny `@workspace/types` **only** if genuinely shared                             | ⬜ defer                    |
 | Config (eslint, tsconfig, tailwind)                                                                                     | `@workspace/eslint-config`, `@workspace/typescript-config`                                                                | ✅ exists                   |
 
+### Component placement — app scope vs. `@workspace/ui`
+
+The table's "UI components → `@workspace/ui`" row is the _cross-app_ destination, not a
+blanket rule. Every component sits in one of three tiers:
+
+- **App-specific** (a feature's screens / flows, brand identity, app wiring) → the app
+  (`apps/*/components/*`). **Folder by concern** so _generic_ vs _scope_ is visible at a
+  glance — e.g. the auth work keeps generic form infrastructure in `components/form/` and
+  auth-only composition in `components/auth/`.
+- **Truly generic + brand/domain-agnostic**, reused across **≥ 2 apps** → `@workspace/ui`.
+  The promotion trigger is the **second consumer**, not "might be reused someday"
+  (rule-of-three; a premature abstraction is costlier than duplication). Because the generic
+  pieces are already isolated in their own folder, promotion is a cheap **folder-move**, not
+  an untangling job — which is the whole point of foldering by scope _now_.
+- **App / brand identity** (the `Logo`, product name) → the app
+  ([0024](0024-ui-foundations-layout-responsiveness-accessibility.md) §6); `@workspace/ui`
+  stays **brand-agnostic** so it is reusable across products. A dedicated `@workspace/brand`
+  is the home only if multiple apps of the **same** product must share one identity.
+
+The guardrail cuts both ways: **don't scatter** a generic primitive inside a feature folder
+(hard to find and promote), and **don't hoist** an app-specific or single-consumer component
+into `@workspace/ui` (freezes an API before a 2nd use and pollutes the shared lib). Applied
+example: `PasswordInput` / `PasswordStrength` are generic → `components/form/`, not
+`components/auth/`; the React Hook Form layer is generic but single-consumer → stays
+app-level until a 2nd app, cleanly promotable ([0025 §2](0025-frontend-architecture-forms-data-state-routing.md)).
+
 ### `@workspace/utils` rules (so it never becomes the anti-pattern)
 
 1. **Isomorphic & pure only** — identical on client and server. No Node-only (`fs`,

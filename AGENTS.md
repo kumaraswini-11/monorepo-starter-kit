@@ -74,6 +74,12 @@ Before treating a change as done, run
   if it changes how we work. `taze` also reorders/tightens manifests — **audit its
   diff** before committing.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
+- **Component placement (scope vs. reuse):** classify each new component/module up front —
+  **app-specific** (a feature's screens/flows, brand identity, wiring) stays in the app
+  (`apps/*/components/*`, foldered so _generic_ vs _scope_ is visible, e.g. `form/` vs
+  `auth/`); **truly generic + brand/domain-agnostic** UI earns `@workspace/ui`, but only at
+  the **second consumer**, never speculatively. Keep generic pieces isolated so promotion is
+  a cheap folder-move — a wrong/early abstraction costs more than duplication. (ADR 0022)
 - **Record notable decisions as ADRs** in `docs/decisions/` (copy the existing
   `NNNN-title.md` format and update the index). Log deferred work in
   `docs/future-improvements.md`.
