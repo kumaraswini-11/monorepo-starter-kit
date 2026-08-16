@@ -32,7 +32,8 @@ catalog:
   # Language & lint tooling
   typescript: ^5.9.3
   eslint: ^9.39.5
-  "@types/node": ^20.19.43
+  # Tracks the Node LTS we run (24); bump with the runtime, not ahead of it.
+  "@types/node": ^24.0.0
   # Tailwind
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
