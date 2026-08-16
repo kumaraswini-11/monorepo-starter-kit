@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-import { Field, FieldLabel } from "@workspace/ui/components/shadcn/field";
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+} from "@workspace/ui/components/shadcn/field";
 import { Input } from "@workspace/ui/components/shadcn/input";
 
 /**
@@ -27,8 +31,12 @@ export function AuthEmailField({ email }: { email: string }) {
         value={email}
         readOnly
         autoComplete="username"
+        aria-describedby="email-hint"
         className="text-muted-foreground"
       />
+      <FieldDescription id="email-hint">
+        Email is fixed for this step. Use Change to pick a different address.
+      </FieldDescription>
     </Field>
   );
 }

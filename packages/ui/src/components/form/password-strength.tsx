@@ -10,9 +10,9 @@ import { cn } from "@workspace/ui/lib/utils";
  */
 const LEVELS = [
   { label: "Weak", bar: "bg-destructive" },
-  { label: "Fair", bar: "bg-amber-500" },
-  { label: "Good", bar: "bg-amber-500" },
-  { label: "Strong", bar: "bg-emerald-500" },
+  { label: "Fair", bar: "bg-chart-4" },
+  { label: "Good", bar: "bg-chart-2" },
+  { label: "Strong", bar: "bg-chart-1" },
 ] as const;
 
 /** 0–3, mapping to the four `LEVELS`. */
