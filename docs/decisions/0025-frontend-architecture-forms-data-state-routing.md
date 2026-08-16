@@ -181,9 +181,11 @@ approach: the direction is locked, the dependency lands when the need is real.
 ## Revisit / finalize triggers
 
 - **Finalize** (Proposed → Accepted) once the approach is confirmed.
-- **Backend decided (fullstack vs separate)** → implement the `lib/` seam accordingly;
-  if fullstack, Server Actions / `useActionState` ([0023] §2) become available for
-  progressive enhancement.
+- **Backend decided (fullstack vs separate)** → **resolved in
+  [0027](0027-backend-architecture-fullstack-and-migration.md): Next.js fullstack now**, with
+  the `lib/` seam + a separate-backend migration playbook. Server Actions / `useActionState`
+  ([0023] §2) become available (fullstack) but are intentionally **not** adopted — the seam
+  keeps the injected browser-client handler portable.
 - **GraphQL chosen** → TanStack Query pairs with a typed GraphQL client (e.g.
   graphql-request / urql) behind the same data seam.
 
