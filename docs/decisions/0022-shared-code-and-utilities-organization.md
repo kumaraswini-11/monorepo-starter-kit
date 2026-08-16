@@ -62,13 +62,13 @@ goes into a catch-all.
 
 ### Where each kind of code lives
 
-| Kind of code                                                                                                            | Home                                                                                                                      | Status                      |
-| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| Business/domain logic (auth flows, data access, email)                                                                  | its **own domain package** (`auth`, `db`, `email`; future `payments`, `notifications`) — owns its logic **and** its types | ✅ exists                   |
-| UI utilities (`cn`, React hooks, components)                                                                            | `@workspace/ui` (`./lib/*`, `./hooks/*`, `./components/*`)                                                                | ✅ exists                   |
-| Pure, generic, framework-agnostic helpers (date/string/number/array, `Result`, guards, `assert`, slugify, retry, sleep) | a focused **`@workspace/utils`** ("general logic")                                                                        | ⬜ create when first needed |
-| Cross-cutting contract types used by ≥2 domains that can't own them                                                     | colocate with the owning domain first; a tiny `@workspace/types` **only** if genuinely shared                             | ⬜ defer                    |
-| Config (eslint, tsconfig, tailwind)                                                                                     | `@workspace/eslint-config`, `@workspace/typescript-config`                                                                | ✅ exists                   |
+| Kind of code                                                                                                            | Home                                                                                                                      | Status                |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| Business/domain logic (auth flows, data access, email)                                                                  | its **own domain package** (`auth`, `db`, `email`; future `payments`, `notifications`) — owns its logic **and** its types | ✅ exists             |
+| UI utilities (`cn`, React hooks, components)                                                                            | `@workspace/ui` (`./lib/*`, `./hooks/*`, `./components/*`)                                                                | ✅ exists             |
+| Pure, generic, framework-agnostic helpers (date/string/number/array, `Result`, guards, `assert`, slugify, retry, sleep) | a focused **`@workspace/utils`** ("general logic")                                                                        | ✅ created 2026-08-16 |
+| Cross-cutting contract types used by ≥2 domains that can't own them                                                     | colocate with the owning domain first; a tiny `@workspace/types` **only** if genuinely shared                             | ⬜ defer              |
+| Config (eslint, tsconfig, tailwind)                                                                                     | `@workspace/eslint-config`, `@workspace/typescript-config`                                                                | ✅ exists             |
 
 ### Component placement — atomic-design lens; `@workspace/ui` is the single design system
 
@@ -151,6 +151,11 @@ component package (and/or headless logic), not this one.
    places. Domain-specific helpers stay in their domain package. A wrong abstraction is
    costlier than duplication.
 5. **Source-only** (no build step) — matches every other `@workspace/*` package.
+
+> **Created 2026-08-16**, seeded with `firstName` (`@workspace/utils/string`) — the first
+> genuinely-generic helper to clear the entry bar (extracted from `packages/auth`, which now
+> consumes it). Zero runtime dependencies. Add further helpers per the rules above; one
+> concern per module.
 
 ### Client / server / isomorphic — the bundle-safety boundary
 

@@ -36,8 +36,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   // Don't advertise the framework/version (small info-leak reduction).
   poweredByHeader: false,
-  // Type-safe <Link> hrefs. Enable once ALL auth routes exist — it errors on links
-  // to not-yet-created routes (/sign-up, /forgot-password). Uncomment then:
+  // Type-safe <Link> hrefs. Enable once ALL linked routes exist — it errors on links
+  // to not-yet-created routes. Remaining: /terms and /privacy (linked from /auth).
+  // Uncomment then:
   // typedRoutes: true,
   // Images: `next/image` already optimizes local images (AVIF/WebP) with no config.
   // Add remote hosts + formats here when the app first loads external images:

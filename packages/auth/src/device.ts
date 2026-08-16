@@ -14,6 +14,15 @@ export function describeDevice(userAgent: string | null | undefined): string {
   return label || "Unknown device";
 }
 
+/** decodeURIComponent that never throws on malformed percent-encoding (bad proxy header). */
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 /**
  * Best-effort human location for a sign-in. Prefers geo the edge/proxy already
  * resolved (Vercel/Cloudflare set these headers — no third-party call, so no user IP
@@ -28,7 +37,7 @@ export function resolveLocation(
 
   const rawCity =
     read("x-vercel-ip-city") ?? read("cf-ipcity") ?? read("x-geo-city");
-  const city = rawCity && decodeURIComponent(rawCity);
+  const city = rawCity && safeDecode(rawCity);
   const region = read("x-vercel-ip-country-region") ?? read("x-geo-region");
   const country =
     read("x-vercel-ip-country") ??

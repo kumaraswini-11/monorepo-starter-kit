@@ -76,7 +76,7 @@ building scalable products. It ships:
 
 ### Prerequisites
 
-- **Node.js** 20+ (latest LTS recommended)
+- **Node.js** 24+ (LTS) — matches `.nvmrc` (`pnpm install` is `engine-strict`)
 - **pnpm** via [Corepack](https://nodejs.org/api/corepack.html) — run
   `corepack enable`
 - **Docker** — only needed to run PostgreSQL locally when you wire/run auth

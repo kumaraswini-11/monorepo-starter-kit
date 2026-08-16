@@ -8,7 +8,7 @@ import { AuthFlowProvider } from "@/components/auth/auth-flow-provider";
  * - `min-h-svh` (small-viewport-height) so mobile browser chrome never clips content.
  * - Native document scroll — NO `overflow-hidden` — so it still works when content
  *   exceeds the viewport (zoom, short screens, long error states, translations).
- * - Flex-centered content in a capped `max-w-sm` column; responsive padding.
+ * - Flex-centered content in a capped `max-w-md` column; responsive padding.
  * - `relative` wrapper reserves a slot for a later decorative background layer
  *   (absolute, `-z-10`, `aria-hidden`, `prefers-reduced-motion`-guarded).
  *

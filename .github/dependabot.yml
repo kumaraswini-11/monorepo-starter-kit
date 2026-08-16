@@ -22,14 +22,17 @@ updates:
         patterns: ["*"]
         update-types: ["minor", "patch"]
 
-  # Keep npm/pnpm dependencies current.
-  # NOTE: catalog entries (next, react, tailwind, …) use `catalog:` in
-  # package.json, which Dependabot cannot read — those are kept fresh with taze
-  # (`pnpm deps:check`). Dependabot here covers inlined package-level deps.
+  # Keep npm/pnpm dependencies current — low-noise (quarterly + grouped).
+  # Dependabot now reads pnpm `catalog:` entries (pnpm-workspace.yaml), so it also
+  # proposes catalog deps; `taze` (`pnpm deps:check`) still handles routine catalog
+  # refreshes. `quarterly` = every 3 months (GitHub Dependabot options reference;
+  # GitHub Enterprise Server needs 3.19+). Majors for the deliberately-deferred
+  # tooling are IGNORED below (ADR 0004) so they stop reopening — adopt those
+  # manually when the ecosystem is ready.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "quarterly"
     open-pull-requests-limit: 10
     cooldown:
       default-days: 3
@@ -40,3 +43,16 @@ updates:
       npm-minor-and-patch:
         patterns: ["*"]
         update-types: ["minor", "patch"]
+    ignore:
+      # TypeScript 7 / ESLint 10 — deferred until typescript-eslint / the ESLint
+      # plugin ecosystem support them (ADR 0004 / future-improvements.md).
+      # `@eslint/js` moves with eslint's major, not ahead of it.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      # `@types/node` tracks the Node LTS we run (24); don't jump to Current (26+).
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]

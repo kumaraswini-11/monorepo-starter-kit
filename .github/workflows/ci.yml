@@ -47,7 +47,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          # Single source of truth for the Node version — .nvmrc (Node 24 LTS).
+          # Keeps CI, local dev (nvm), and engines from drifting apart.
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install dependencies

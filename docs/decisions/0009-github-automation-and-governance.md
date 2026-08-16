@@ -55,3 +55,8 @@ posture (`pnpm-workspace.yaml`).
   visibility (the report-only `pnpm audit --prod` CI step is the backstop).
 - _Refined 2026-07-20:_ added Dependabot update **grouping** + release **cooldown**
   (rationale in the `.github/dependabot.yml` comments).
+- _Refined 2026-08-16:_ CI Node is pinned via `node-version-file: .nvmrc` (Node 24
+  LTS — supersedes the "Node 22" above); Dependabot `npm` cadence → **quarterly** with
+  `ignore` rules for the deferred tooling majors (TypeScript 7 / ESLint 10 /
+  `@eslint/js` / `@types/node`) — see [0004](0004-defer-typescript-7.md) and the
+  `.github/dependabot.yml` comments.

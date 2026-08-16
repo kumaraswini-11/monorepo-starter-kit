@@ -42,7 +42,7 @@ New to open source? These resources help:
 
 ### Prerequisites
 
-- **Node.js** 20 or newer (latest LTS recommended)
+- **Node.js** 24 or newer (LTS) — matches `.nvmrc` (`pnpm install` is `engine-strict`)
 - **pnpm** via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`
 
 ### Set up the project
