@@ -14,8 +14,8 @@ import {
  * Password field with an accessible show/hide toggle, built on shadcn's `input-group`
  * (the purpose-built input-with-addon primitive) instead of hand-positioning a button —
  * so the border, focus-visible ring, and `aria-invalid` state are handled by the group.
- * The toggle is a real `<button>` with `aria-pressed` + `aria-label`, and `tabIndex={-1}`
- * so it doesn't interrupt the tab flow between the field and submit.
+ * The toggle is a real `<button>` with `aria-pressed` + `aria-label`, kept
+ * keyboard-reachable so keyboard users can toggle visibility too (WCAG 2.1.1).
  */
 export function PasswordInput({
   className,
@@ -36,7 +36,6 @@ export function PasswordInput({
         <InputGroupButton
           type="button"
           size="icon-xs"
-          tabIndex={-1}
           aria-label={visible ? "Hide password" : "Show password"}
           aria-pressed={visible}
           onClick={() => setVisible((value) => !value)}
