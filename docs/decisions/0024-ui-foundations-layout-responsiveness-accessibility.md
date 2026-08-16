@@ -159,6 +159,31 @@ Every component and page is designed for the **full range, phone → 4K/TV**:
   - We omit `focusable="false"` (a legacy-IE workaround) — the stack is modern-only and
     lucide does not emit it either.
 
+### 7. Cross-browser input hardening — autofill & Edge native controls (2026-08-16)
+
+Three UA-specific `<input>` behaviours are normalized once in
+`packages/ui/src/styles/globals.css` (the design-system layer, so every input inherits them).
+Base UI is behaviour-only / unstyled, so these are ours to own in CSS, not the primitive's job.
+
+- **Autofill tint.** Chrome/Edge/Safari/Opera paint autofilled inputs with a yellow/blue
+  background and lock `background-color` (UA `!important`). We override with the standard
+  **inset box-shadow trick** — `-webkit-box-shadow: 0 0 0 1000px var(--background) inset` +
+  `-webkit-text-fill-color: var(--foreground)` + `caret-color` — so autofilled fields match the
+  theme in light and dark. The focus **border** (`focus-visible:border-ring`) still shows; only
+  the ring _glow_ is replaced while a field is autofilled (fine — the border is a valid focus
+  cue). Firefox applies no such tint, so no rule is needed there. _Limitation:_ the inset uses
+  `--background`; an input on a differently-coloured surface (e.g. a card) may need a
+  per-context override — none exist today (auth inputs sit on `--background`).
+- **Edge/IE native password-reveal + clear.** `::-ms-reveal` (password eye) and `::-ms-clear`
+  (clear "×") render only in Edge/IE. Since we ship our own accessible show/hide toggle
+  (`PasswordInput`), `::-ms-reveal` **duplicated** our eye in Edge — we `display: none` both,
+  matching Chrome/Firefox (which render neither), per Microsoft's own guidance. _Trade-off:_
+  this also drops Edge's clear-"×" on plain text inputs (intentional, for cross-browser
+  consistency; scope to `input[type="password"]` if a text-input clear is ever wanted).
+- **Disabled controls** already carry `disabled:pointer-events-none` via the shadcn
+  `Button`/`Input`, and `globals.css` gives only _enabled_ buttons `cursor: pointer` — so a
+  disabled control is inert with no interactive cursor. No change needed.
+
 ## Consequences
 
 - Every screen gets: **`<main>` + landmarks**, **`min-h-svh`**, **native scroll**
@@ -204,6 +229,12 @@ Every component and page is designed for the **full range, phone → 4K/TV**:
 - SVG icon accessibility (decorative vs meaningful; `currentColor` / `viewBox`):
   <https://dev.to/svgicons/svg-icon-accessibility-decorative-vs-meaningful-icons-2430>,
   <https://koenvangilst.nl/lab/accessible-svgs>
+- Autofill styling (`:autofill` + inset box-shadow trick): MDN
+  <https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill>, CSS-Tricks
+  <https://css-tricks.com/almanac/pseudo-selectors/a/autofill/>
+- Edge password-reveal (`::-ms-reveal` / `::-ms-clear`): Microsoft Learn
+  <https://learn.microsoft.com/en-us/microsoft-edge/web-platform/password-reveal>, Stefan
+  Judis <https://www.stefanjudis.com/snippets/how-to-hide-microsoft-edges-password-reveal-button/>
 
 See [0007](0007-base-ui-over-radix.md) (Base UI over Radix),
 [0014](0014-base-ui-adoption.md) (Base UI adoption / a11y enforcement),
