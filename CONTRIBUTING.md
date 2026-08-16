@@ -55,13 +55,17 @@ pnpm dev        # starts the app at http://localhost:3000
 
 ### Project layout
 
-| Path                         | Description                                    |
-| ---------------------------- | ---------------------------------------------- |
-| `apps/web`                   | Next.js 16 application                         |
-| `apps/docs`                  | Documentation site (placeholder)               |
-| `packages/ui`                | Shared component library (shadcn/ui + Base UI) |
-| `packages/eslint-config`     | Shared ESLint flat configs                     |
-| `packages/typescript-config` | Shared `tsconfig` presets                      |
+| Path                         | Description                                     |
+| ---------------------------- | ----------------------------------------------- |
+| `apps/web`                   | Next.js 16 application (auth UI, dashboard)     |
+| `apps/storybook`             | Storybook for the shared UI library             |
+| `packages/ui`                | Shared component library (shadcn/ui + Base UI)  |
+| `packages/auth`              | Better Auth server + client (framework-neutral) |
+| `packages/db`                | PostgreSQL + Drizzle schema & client            |
+| `packages/email`             | React Email templates + `sendEmail` port        |
+| `packages/env`               | Validated environment contract                  |
+| `packages/eslint-config`     | Shared ESLint flat configs                      |
+| `packages/typescript-config` | Shared `tsconfig` presets                       |
 
 ### Make your change
 
