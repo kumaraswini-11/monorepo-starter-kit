@@ -31,7 +31,7 @@ catalog:
   better-auth: ^1.6.26
   # Language & lint tooling
   typescript: ^5.9.3
-  eslint: ^9.39.5
+  eslint: ^10.8.1
   "@types/node": ^20.19.43
   # Tailwind
   tailwindcss: ^4.3.3
