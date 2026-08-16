@@ -9,6 +9,7 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { AuthHeader } from "@/components/auth/auth-header";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { brand } from "@/lib/brand";
 
 /**
  * Client wiring for `/auth/reset-password`. The reset token rides the URL (a signed,
@@ -42,11 +43,13 @@ export function ResetPasswordStep() {
     <>
       <AuthHeader
         title="Set a new password"
-        description="Choose a new password for your efferd account."
+        description={`Choose a new password for your ${brand.name} account.`}
       />
       <ResetPasswordForm
         onSubmit={async () => {
-          // Wiring: await authClient.resetPassword({ token, newPassword: password }).
+          // Wiring: accept the password arg and await
+          // authClient.resetPassword({ token, newPassword }); a thrown error surfaces
+          // via FormError (ADR 0025 §2). This success stub advances to sign-in.
           toast.add({
             title: "Password updated",
             description: "Sign in with your new password.",

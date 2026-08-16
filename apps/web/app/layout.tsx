@@ -9,6 +9,7 @@ import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { brand } from "@/lib/brand";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 
@@ -19,12 +20,11 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-// TODO: swap "Acme" for the real product name (or wire from config) with branding.
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
-  title: { default: "Acme", template: "%s · Acme" },
+  title: { default: brand.name, template: `%s · ${brand.name}` },
   description: "Secure, self-hosted authentication starter.",
-  applicationName: "Acme",
+  applicationName: brand.name,
 };
 
 export const viewport: Viewport = {

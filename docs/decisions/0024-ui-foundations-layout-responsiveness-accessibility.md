@@ -122,7 +122,10 @@ Every component and page is designed for the **full range, phone → 4K/TV**:
 [0022](0022-shared-code-and-utilities-organization.md)):**
 
 - **Our brand** (efferd `Logo` / `LogoIcon`) → `apps/web/components/brand/`. It is
-  app-specific identity and must not pollute the template-reusable `packages/ui`.
+  app-specific identity and must not pollute the template-reusable `packages/ui`. The brand
+  **name string** is separate from the mark: it lives in `apps/web/lib/brand.ts`
+  (`brand.name`) — the single rebrand seam, wired into `metadata`, UI copy, and the marks'
+  `aria-label`, so renaming the product is a one-file change while the SVG marks stay here.
 - **Generic / third-party UI icons** (`GoogleIcon`, `GithubIcon` — social-login
   affordances any app reuses) → `packages/ui/src/components/icons/`.
 - **Functional glyphs** → **lucide-react** (already a dep, tree-shaken via

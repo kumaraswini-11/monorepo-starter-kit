@@ -1,5 +1,8 @@
+import { brand } from "@/lib/brand";
+
 /**
- * Brand marks — the single source of the "efferd" identity.
+ * Brand marks — the visual identity. The product name string lives in `@/lib/brand`
+ * (the single rebrand seam); these are the SVG marks that render it.
  *
  * - `Logo` — the full wordmark (use in the auth entry, headers, footers).
  * - `LogoIcon` — the compact mark (use where space is tight: collapsed sidebar,
@@ -9,13 +12,13 @@
  * colour and adapt to light/dark) and are size-agnostic — the caller sets the size via
  * `className` (e.g. `h-7 w-auto`), matching how `GoogleIcon` and lucide icons work.
  * Labelled `role="img"` / `aria-label` since the mark is the only on-screen brand name;
- * pass `aria-hidden` at a call site where it sits next to visible "efferd" text.
+ * pass `aria-hidden` at a call site where it sits next to the visible brand name.
  */
 export function Logo(props: React.ComponentProps<"svg">) {
   return (
     <svg
       role="img"
-      aria-label="efferd"
+      aria-label={brand.name}
       fill="currentColor"
       viewBox="0 0 114 24"
       xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +40,7 @@ export function LogoIcon(props: React.ComponentProps<"svg">) {
   return (
     <svg
       role="img"
-      aria-label="efferd"
+      aria-label={brand.name}
       fill="currentColor"
       viewBox="0 -2.5 29 29"
       xmlns="http://www.w3.org/2000/svg"

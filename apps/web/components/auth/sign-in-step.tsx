@@ -2,17 +2,18 @@
 
 import { useRequiredEmail } from "@/components/auth/auth-flow-provider";
 import { AuthHeader } from "@/components/auth/auth-header";
+import { AuthStepSkeleton } from "@/components/auth/auth-step-skeleton";
 import { SignInForm } from "@/components/auth/sign-in-form";
 
 /**
  * Client wiring + guard for `/auth/sign-in`. Requires the email captured at `/auth/email`;
- * a refresh / direct nav without one restarts the flow there (ADR 0025 §4). Renders
- * nothing while redirecting.
+ * a refresh / direct nav without one restarts the flow there (ADR 0025 §4). Shows a
+ * skeleton while redirecting.
  */
 export function SignInStep() {
   const email = useRequiredEmail();
   if (!email) {
-    return null;
+    return <AuthStepSkeleton />;
   }
 
   return (
@@ -21,7 +22,7 @@ export function SignInStep() {
         title="Enter your password"
         description="Enter the password for your account to continue."
       />
-      {/* `onSubmit` (the sign-in call) is injected here during wiring (ADR 0025). */}
+      {/* Wiring: inject `onSubmit` here; throw a user-safe Error to surface it (ADR 0025 §2). */}
       <SignInForm email={email} />
     </>
   );
