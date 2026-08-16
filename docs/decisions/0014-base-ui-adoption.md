@@ -14,16 +14,16 @@ UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
 
 ## Findings & decisions
 
-| Area                   | Finding                                                                      | Decision                          |
-| ---------------------- | ---------------------------------------------------------------------------- | --------------------------------- |
-| Styling                | `className` + `data-[state]`/`data-[side]` + CSS vars, unstyled — done right | ✅ Adopted as-is                  |
-| TypeScript             | Components typed via `X.Props` (e.g. `TooltipPrimitive.Provider.Props`)      | ✅ Adopted as-is                  |
-| A11y — primitives      | ARIA, keyboard, focus management inherited from Base UI                      | ✅ Adopted as-is                  |
-| **A11y — enforcement** | Nothing linted the _developer's_ a11y duties (alt, labels, ARIA)             | ✅ **Fixed** — `jsx-a11y` (below) |
-| Composition            | Base UI uses the `render` prop / `useRender`, not Radix `asChild`            | ✅ Convention adopted (below)     |
-| RTL                    | `rtl:true` gives logical-property CSS ✓, but `DirectionProvider` is unwired  | ⏸️ Deferred — activate with i18n  |
-| Forms                  | `field.tsx` is presentational only — no `Form`, no validation engine         | ⏸️ Deferred — decision pending    |
-| CSP                    | Base UI injects inline styles needing a nonce under a strict CSP             | ↪️ Tracked with web-security work |
+| Area                   | Finding                                                                      | Decision                              |
+| ---------------------- | ---------------------------------------------------------------------------- | ------------------------------------- |
+| Styling                | `className` + `data-[state]`/`data-[side]` + CSS vars, unstyled — done right | ✅ Adopted as-is                      |
+| TypeScript             | Components typed via `X.Props` (e.g. `TooltipPrimitive.Provider.Props`)      | ✅ Adopted as-is                      |
+| A11y — primitives      | ARIA, keyboard, focus management inherited from Base UI                      | ✅ Adopted as-is                      |
+| **A11y — enforcement** | Nothing linted the _developer's_ a11y duties (alt, labels, ARIA)             | ✅ **Fixed** — `jsx-a11y` (below)     |
+| Composition            | Base UI uses the `render` prop / `useRender`, not Radix `asChild`            | ✅ Convention adopted (below)         |
+| RTL                    | `rtl:true` gives logical-property CSS ✓, but `DirectionProvider` is unwired  | ⏸️ Deferred — activate with i18n      |
+| Forms                  | `field.tsx` is presentational only — no `Form`, no validation engine         | ✅ **Resolved** — RHF + zod (0025 §2) |
+| CSP                    | Base UI injects inline styles needing a nonce under a strict CSP             | ↪️ Tracked with web-security work     |
 
 ### Accessibility enforcement — `jsx-a11y` (done)
 
@@ -61,18 +61,20 @@ UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
 - **Decision:** leave prepped; wire `DirectionProvider` + a dynamic `dir` when
   internationalization lands. Trigger: adding i18n / an RTL locale.
 
-### Forms (deferred — decision pending)
+### Forms — resolved: React Hook Form + zod (2026-08-16)
 
 - `field.tsx` (base-vega) is **presentational only** — layout plus a manual
   `errors` prop. It is _not_ Base UI's `Field`, and there is no `Form` and no form
   library wired.
-- Two lanes to choose from when the first real form appears:
-  1. **React Hook Form + zod** — ecosystem default; `field.tsx` is designed for it;
-     we already ship `zod` in `packages/ui` (only `react-hook-form` is missing).
-  2. **Base UI `Form` + `Field`** — native, no extra library; consolidated error
-     handling and validation, but less surrounding ecosystem tooling.
-- **Decision:** defer until we build the first form; current lean is **RHF + zod**.
-  Trigger: the first non-trivial form.
+- **Decision:** adopt **React Hook Form + zod**, bound to the `Field` primitives via
+  `useController` (our inputs are Base UI, so `register` gives no perf win —
+  [mui/base-ui#3819](https://github.com/mui/base-ui/issues/3819)). We do **not** add
+  shadcn's `<Form>`/`<FormField>`: it is Radix-Slot-based and we run no Radix. The full
+  rationale — `isSubmitting`-over-`useTransition`, the `root.serverError` contract, and the
+  reusable field layer — lives in
+  [0025 §2](0025-frontend-architecture-forms-data-state-routing.md).
+- **Rejected:** Base UI's own `Form` + `Field` engine (less surrounding ecosystem) and
+  **TanStack Form** (smaller ecosystem).
 
 ### CSP (tracked separately)
 

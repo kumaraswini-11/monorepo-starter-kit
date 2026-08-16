@@ -3,9 +3,11 @@
 - **Status:** Proposed
 - **Date:** 2026-08-15
 
-> **Proposed, not Accepted.** The R&D and recommendations below are recorded so the
-> reasoning is not lost. Flip to **Accepted** once finalized. Nothing here is installed
-> yet — these are decide-now / adopt-at-trigger decisions.
+> **Status: Proposed** (partially realized). The R&D and recommendations below are recorded
+> so the reasoning is not lost. **§2 (React Hook Form + zod) is now implemented** — see the
+> _Implementation_ note in §2 and [0026](0026-form-submission-and-pending-state-pattern.md).
+> The rest (TanStack Query, Zustand, `proxy.ts`) remain adopt-at-trigger; flip to
+> **Accepted** once finalized.
 
 ## Context
 
@@ -50,12 +52,11 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
 - **Not `(public)` / `(protected)`:** authorization is the guard's job, not a folder name
   — naming by access conflates routing with authz and breaks for semi-public routes.
 
-### 2. Forms — React Hook Form + zod, **presentational**
+### 2. Forms — React Hook Form + zod, **presentational** (adopted)
 
-- **RHF + zod:** ecosystem default; uncontrolled (minimal re-renders); first-class zod
-  resolver; purely **client-side** so a form can submit **anywhere**. `field.tsx`
-  already consumes an errors array, and **`zod` already ships** in the repo (schemas
-  shared client + server).
+- **RHF + zod:** ecosystem default; first-class zod resolver; purely **client-side** so a
+  form can submit **anywhere**. Our shadcn `FieldError` already takes RHF's error shape,
+  and **`zod` already ships** in the repo (schemas shared client + server).
 - **Presentational pattern (the lock-in breaker):** form components receive an
   **injected `onSubmit`** and know nothing about _where_ the data goes. The same
   `<SignInForm onSubmit={…}>` works with the Better Auth browser client (fullstack)
@@ -63,10 +64,39 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
 - **Rejected for the wiring layer:** `useActionState` + **Server Actions** — powerful,
   but **Next-fullstack-only**; wiring forms to them locks the frontend to
   Next-as-backend, contradicting the undecided-backend constraint. **TanStack Form** is
-  promising but has a smaller ecosystem; RHF is the safer default.
+  promising but has a smaller ecosystem; RHF is the safer default (2026 library survey +
+  shadcn/zod alignment).
 - **Refines [0023] §2**, which (assuming fullstack) prescribed `useActionState`. That
   remains valid **if/when we commit to fullstack**; the **default wiring-agnostic form**
   is RHF + an injected handler.
+
+**Implementation (adopted 2026-08-16 — the auth flow is the first non-trivial form).**
+
+- **`useController`, not `register`.** Our inputs are **Base UI** primitives, which
+  re-render on every keystroke even when registered uncontrolled
+  ([mui/base-ui#3819](https://github.com/mui/base-ui/issues/3819)) — so `register`'s
+  uncontrolled-perf win doesn't apply here. `useController` isolates re-renders to the one
+  field, is RHF's documented path for external UI libraries, and gives the password field
+  its live value for the strength meter.
+- **Bound to the Base UI `Field` primitives, not shadcn's `<Form>`/`<FormField>`** — that
+  wrapper is Radix-Slot-based and we run no Radix ([0014](0014-base-ui-adoption.md)).
+- **`formState.isSubmitting` is the pending state** (RHF owns the async submit lifecycle),
+  so these client forms use **no `useTransition`**. `useTransition` / `useActionState`
+  stay reserved for **Server Actions** (the fullstack path) — no conflict, since we wire
+  via an injected client handler.
+- **Server errors → `setError("root.serverError")`**, rendered by a `FormError` banner
+  (`role="alert"`, which also **takes focus** when it appears); field-level (validation)
+  errors stay inline. **Safe-by-default:** only a thrown **`FormSubmitError`** (deliberately
+  user-safe copy from the wiring layer) is shown verbatim — any other throw shows a generic
+  message, so a raw upstream/SDK error or an enumeration hint can't leak. The full
+  submit/pending pattern (enabled fields, disabled button + re-entrancy guard, `aria-busy`,
+  spinner + label, focus-to-error) is [0026](0026-form-submission-and-pending-state-pattern.md).
+- **Validation timing:** RHF's default `mode: onSubmit` + `reValidateMode: onChange` is
+  exactly "reward early, punish late" — no config needed.
+- **Reusable layer** (`apps/web/components/form/`): `FormTextField`, `FormPasswordField`,
+  `FormError`, `submitWithFormError`. Kept in `apps/web` (RHF is app-only for now); promote
+  to `packages/ui` if a second app needs it. The Settings change-password form reuses these
+  components together with the `passwordField` schema rule.
 
 ### 3. Client data-fetching — TanStack Query over Server Actions
 
@@ -91,10 +121,10 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
   Query's; overkill for this app. Redux Toolkit remains a fallback only if a future app
   needs complex, tightly-coupled global state — unlikely.
 - **Applied — the multi-step auth flow.** The email is carried from `/auth/email` to
-  `/auth/password` in an **in-memory React Context** (`AuthFlowProvider`, mounted in the
+  the credential step (`/auth/sign-in` | `/auth/sign-up`) in an **in-memory React Context** (`AuthFlowProvider`, mounted in the
   `/auth` layout), **never the URL** — a query string would leak PII into logs, history,
   and `Referer` (compliance). It resets on reload **by design**: credential entry
-  **restarts, it does not resume** — the password step guards on the email and returns to
+  **restarts, it does not resume** — the credential step guards on the email and returns to
   `/auth/email` when it's absent. Resume is reserved for token-carried flows (magic link,
   verify) and server-persisted **post-signup onboarding** (a later, separate flow). This
   is why Context (auto-scoped, auto-reset) beats a global Zustand store here. Detail lives
@@ -123,8 +153,9 @@ implementations**, not the UI.
 
 ## Adoption triggers (nothing installed today)
 
-- **React Hook Form** → install at the **first non-trivial form** (resolves the
-  [0014](0014-base-ui-adoption.md) forms deferral).
+- **React Hook Form** → ✅ **installed 2026-08-16** for the auth flow (the first
+  non-trivial form) — resolves the [0014](0014-base-ui-adoption.md) forms deferral. See
+  §2 _Implementation_.
 - **TanStack Query** → install at the **first client-side data read/mutation**.
 - **Zustand** → **only** when genuinely-global client state appears.
 - **`proxy.ts`** → when edge-level optimistic redirects are worth it.
@@ -155,6 +186,10 @@ approach: the direction is locked, the dependency lands when the need is real.
 - Official docs (gathered during the R&D pass, via context7 / vendor sites):
   **TanStack Query**, **React Hook Form**, **Zustand**, Next.js **Proxy (Middleware)**,
   React 19 **Actions / `useActionState`**.
+- RHF adoption R&D (2026-08-16): **React Hook Form** + **`@hookform/resolvers`** docs (via
+  context7), the 2026 form-library surveys (RHF vs TanStack Form vs plain state), and the
+  Base UI ↔ RHF integration finding
+  ([mui/base-ui#3819](https://github.com/mui/base-ui/issues/3819)).
 - Related ADRs: [0023](0023-nextjs-rendering-and-performance-model.md),
   [0014](0014-base-ui-adoption.md), [0016](0016-authentication-strategy.md),
   [0021](0021-env-and-secrets-management.md).

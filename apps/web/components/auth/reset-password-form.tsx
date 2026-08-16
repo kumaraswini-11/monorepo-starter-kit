@@ -1,79 +1,59 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-import { Button } from "@workspace/ui/components/shadcn/button";
+import { FieldGroup } from "@workspace/ui/components/shadcn/field";
+
+import { Form } from "@/components/form/form";
+import { FormError } from "@/components/form/form-error";
+import { FormPasswordField } from "@/components/form/form-field";
+import { SubmitButton } from "@/components/form/submit-button";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/shadcn/field";
-import { Spinner } from "@workspace/ui/components/shadcn/spinner";
-
-import { PasswordInput } from "@/components/auth/password-input";
-import { PasswordStrength } from "@/components/auth/password-strength";
-import { firstError, passwordField } from "@/lib/validation";
+  newPasswordFormSchema,
+  type NewPasswordFormValues,
+} from "@/lib/validation";
 
 /**
  * Reset-password form — set a new password (with a live strength meter and the
- * new-password policy). Presentational per ADR 0025: the submit handler is injected.
- * No confirm field — show/hide covers verification (spec §3.3).
+ * new-password policy). Presentational per ADR 0025: the submit handler is injected (it may
+ * throw a `FormSubmitError`, e.g. an expired token). No confirm field — show/hide covers
+ * verification (spec §3.3). Pending/submit behaviour is the shared `Form` pattern (ADR 0026).
  */
 export function ResetPasswordForm({
   onSubmit,
 }: {
   onSubmit?: (password: string) => Promise<void> | void;
 }) {
-  const [password, setPassword] = useState("");
-  const [showErrors, setShowErrors] = useState(false);
-  const [pending, startTransition] = useTransition();
-
-  const error = showErrors ? firstError(passwordField, password) : undefined;
-
-  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setShowErrors(true);
-    if (firstError(passwordField, password)) {
-      return;
-    }
-    startTransition(async () => {
-      await onSubmit?.(password);
-    });
-  };
+  const form = useForm<NewPasswordFormValues>({
+    resolver: zodResolver(newPasswordFormSchema),
+    defaultValues: { password: "" },
+  });
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <Form
+      form={form}
+      onSubmit={async ({ password }) => {
+        await onSubmit?.(password);
+      }}
+    >
+      <FormError control={form.control} />
       <FieldGroup>
-        <Field data-invalid={Boolean(error)}>
-          <FieldLabel htmlFor="password">New password</FieldLabel>
-          <PasswordInput
-            id="password"
-            name="password"
-            autoComplete="new-password"
-            // First field on a step the user navigated to (from the email link).
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? "password-error" : undefined}
-            disabled={pending}
-          />
-          <PasswordStrength password={password} />
-          <FieldError id="password-error">{error}</FieldError>
-        </Field>
+        <FormPasswordField
+          control={form.control}
+          name="password"
+          label="New password"
+          autoComplete="new-password"
+          showStrength
+          // First field on a step the user navigated to (from the email link).
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
+        />
 
-        <Button type="submit" size="lg" className="w-full" disabled={pending}>
-          {pending ? (
-            <>
-              <Spinner /> Updating…
-            </>
-          ) : (
-            "Reset password"
-          )}
-        </Button>
+        <SubmitButton control={form.control} pendingLabel="Updating…">
+          Reset password
+        </SubmitButton>
       </FieldGroup>
-    </form>
+    </Form>
   );
 }

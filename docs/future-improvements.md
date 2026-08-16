@@ -95,11 +95,12 @@ is a matter of supplying those handlers. Deferred:
   **sign-up → auto-login → `/dashboard`**; after **reset → sign in** (sessions revoked,
   [decisions/0016](decisions/0016-authentication-strategy.md)).
 - **Change password (Settings)** — a future settings screen needs current + new password
-  (± confirm). **Reuse the auth primitives**: `PasswordInput`, `PasswordStrength`,
-  `firstError` / `passwordField`. If sign-up and change-password end up duplicating the
-  "new password + strength" block, extract a shared `NewPasswordField` then (rule of
-  three). Better Auth: `authClient.changePassword({ currentPassword, newPassword,
-revokeOtherSessions })`.
+  (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
+  `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
+  (`PasswordInput` / `PasswordStrength` underlie the field component). If sign-up and
+  change-password end up duplicating the "new password + strength" block, extract a shared
+  field then (rule of three). Better Auth: `authClient.changePassword({ currentPassword,
+newPassword, revokeOtherSessions })`.
 - **Verify-email banner, lightweight onboarding, OAuth (Google) callback** — later phases
   per the [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
   [decisions/0016](decisions/0016-authentication-strategy.md).

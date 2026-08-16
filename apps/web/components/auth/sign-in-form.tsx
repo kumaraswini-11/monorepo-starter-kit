@@ -1,25 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-import { Button } from "@workspace/ui/components/shadcn/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/shadcn/field";
-import { Spinner } from "@workspace/ui/components/shadcn/spinner";
+import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
 import { AuthEmailField } from "@/components/auth/auth-email-field";
-import { PasswordInput } from "@/components/auth/password-input";
-import { firstError, signInPasswordField } from "@/lib/validation";
+import { Form } from "@/components/form/form";
+import { FormError } from "@/components/form/form-error";
+import { FormPasswordField } from "@/components/form/form-field";
+import { SubmitButton } from "@/components/form/submit-button";
+import { signInFormSchema, type SignInFormValues } from "@/lib/validation";
 
 /**
  * Sign-in credential form (returning user). Presentational per ADR 0025 — the email is a
  * prop and the submit handler is injected, so it's agnostic to how sign-in is performed.
- * Client validation is minimal (non-empty); the real check is server-side.
+ * Client validation is minimal (non-empty); the real check is server-side, surfaced via
+ * `FormError` when the injected `onSubmit` throws a `FormSubmitError` (e.g. an
+ * enumeration-safe "Invalid email or password"). Pending/submit behaviour is the shared
+ * `Form` pattern (ADR 0026).
  */
 export function SignInForm({
   email,
@@ -28,66 +28,44 @@ export function SignInForm({
   email: string;
   onSubmit?: (password: string) => Promise<void> | void;
 }) {
-  const [password, setPassword] = useState("");
-  const [showErrors, setShowErrors] = useState(false);
-  const [pending, startTransition] = useTransition();
-
-  const error = showErrors
-    ? firstError(signInPasswordField, password)
-    : undefined;
-
-  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setShowErrors(true);
-    if (firstError(signInPasswordField, password)) {
-      return;
-    }
-    startTransition(async () => {
-      await onSubmit?.(password);
-    });
-  };
+  const form = useForm<SignInFormValues>({
+    resolver: zodResolver(signInFormSchema),
+    defaultValues: { password: "" },
+  });
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <Form
+      form={form}
+      onSubmit={async ({ password }) => {
+        await onSubmit?.(password);
+      }}
+    >
+      <FormError control={form.control} />
       <FieldGroup>
         <AuthEmailField email={email} />
 
-        <Field data-invalid={Boolean(error)}>
-          <div className="flex items-center justify-between">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+        <FormPasswordField
+          control={form.control}
+          name="password"
+          label="Password"
+          labelAction={
             <Link
               href="/auth/forgot-password"
               className="text-sm text-muted-foreground underline-offset-4 hover:underline"
             >
               Forgot password?
             </Link>
-          </div>
-          <PasswordInput
-            id="password"
-            name="password"
-            autoComplete="current-password"
-            // First editable field on a step the user navigated to (spec §3.3).
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? "password-error" : undefined}
-            disabled={pending}
-          />
-          <FieldError id="password-error">{error}</FieldError>
-        </Field>
+          }
+          autoComplete="current-password"
+          // First editable field on a step the user navigated to (spec §3.3).
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
+        />
 
-        <Button type="submit" size="lg" className="w-full" disabled={pending}>
-          {pending ? (
-            <>
-              <Spinner /> Signing in…
-            </>
-          ) : (
-            "Sign in"
-          )}
-        </Button>
+        <SubmitButton control={form.control} pendingLabel="Signing in…">
+          Sign in
+        </SubmitButton>
       </FieldGroup>
-    </form>
+    </Form>
   );
 }

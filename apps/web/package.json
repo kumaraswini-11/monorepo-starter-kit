@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.8.0",
     "@workspace/auth": "workspace:*",
     "@workspace/env": "workspace:*",
     "@workspace/ui": "workspace:*",
@@ -21,6 +22,7 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-hook-form": "^7.85.0",
     "zod": "catalog:"
   },
   "devDependencies": {

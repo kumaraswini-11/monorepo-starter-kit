@@ -1,23 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-import { Button } from "@workspace/ui/components/shadcn/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/shadcn/field";
-import { Input } from "@workspace/ui/components/shadcn/input";
-import { Spinner } from "@workspace/ui/components/shadcn/spinner";
+import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
-import { emailField, firstError } from "@/lib/validation";
+import { Form } from "@/components/form/form";
+import { FormError } from "@/components/form/form-error";
+import { FormTextField } from "@/components/form/form-field";
+import { SubmitButton } from "@/components/form/submit-button";
+import { emailFormSchema, type EmailFormValues } from "@/lib/validation";
 
 /**
  * Forgot-password request form — collects the email to send a reset link to.
  * Presentational per ADR 0025: the submit handler is injected. `defaultEmail` pre-fills
- * from the flow when the user arrived from the sign-in screen.
+ * from the flow when the user arrived from the sign-in screen. Pending/submit behaviour is
+ * the shared `Form` pattern (ADR 0026).
  */
 export function ForgotPasswordForm({
   defaultEmail = "",
@@ -26,57 +24,37 @@ export function ForgotPasswordForm({
   defaultEmail?: string;
   onSubmit?: (email: string) => Promise<void> | void;
 }) {
-  const [email, setEmail] = useState(defaultEmail);
-  const [showErrors, setShowErrors] = useState(false);
-  const [pending, startTransition] = useTransition();
-
-  const error = showErrors ? firstError(emailField, email) : undefined;
-
-  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setShowErrors(true);
-    if (firstError(emailField, email)) {
-      return;
-    }
-    startTransition(async () => {
-      await onSubmit?.(email.trim());
-    });
-  };
+  const form = useForm<EmailFormValues>({
+    resolver: zodResolver(emailFormSchema),
+    defaultValues: { email: defaultEmail },
+  });
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <Form
+      form={form}
+      onSubmit={async ({ email }) => {
+        await onSubmit?.(email);
+      }}
+    >
+      <FormError control={form.control} />
       <FieldGroup>
-        <Field data-invalid={Boolean(error)}>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            // First field on a step the user navigated to.
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            placeholder="you@company.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? "email-error" : undefined}
-            disabled={pending}
-          />
-          <FieldError id="email-error">{error}</FieldError>
-        </Field>
+        <FormTextField
+          control={form.control}
+          name="email"
+          label="Email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder="you@company.com"
+          // First field on a step the user navigated to.
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
+        />
 
-        <Button type="submit" size="lg" className="w-full" disabled={pending}>
-          {pending ? (
-            <>
-              <Spinner /> Sending…
-            </>
-          ) : (
-            "Send reset link"
-          )}
-        </Button>
+        <SubmitButton control={form.control} pendingLabel="Sending…">
+          Send reset link
+        </SubmitButton>
       </FieldGroup>
-    </form>
+    </Form>
   );
 }
