@@ -1,0 +1,15 @@
+import type { MetadataRoute } from "next";
+
+import { appUrl } from "@workspace/env";
+
+/** Generated at `/robots.txt`. Keep private/API surfaces out of the index. */
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/api/", "/auth", "/dashboard"],
+    },
+    sitemap: `${appUrl}/sitemap.xml`,
+  };
+}

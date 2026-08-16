@@ -1,8 +1,12 @@
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 
 import "@workspace/ui/globals.css";
 
+import { appUrl } from "@workspace/env";
+import { Toaster } from "@workspace/ui/components/shadcn/toast";
 import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
+import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -15,6 +19,20 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
+
+export const metadata: Metadata = {
+  metadataBase: new URL(appUrl),
+  title: { default: brand.name, template: `%s · ${brand.name}` },
+  description: "Secure, self-hosted authentication starter.",
+  applicationName: brand.name,
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -36,6 +54,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <TooltipProvider>{children}</TooltipProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

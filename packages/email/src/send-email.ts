@@ -1,3 +1,7 @@
+// Build-time guard: the transport (SMTP/provider creds later) is server-only —
+// fail if a client bundle imports it (ADR 0022). Templates stay isomorphic.
+import "server-only";
+
 import { consoleEmailAdapter } from "@workspace/email/adapters/console";
 import type { SendEmail } from "@workspace/email/types";
 

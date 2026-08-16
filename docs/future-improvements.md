@@ -9,8 +9,11 @@ already built.
 
 ## CI / CD
 
-- **Testing job** — add Vitest (unit/component) + Playwright (e2e) and a `test`
-  step in CI, then a report-only coverage job that later flips to thresholds.
+- **Testing** — Vitest (unit) is wired (co-located `src/*.test.ts` per package, run
+  by the turbo `test` task). Remaining: a CI **`test` job**, **Playwright** (e2e), a
+  report-only **coverage** job that later flips to thresholds, and (if useful) a shared
+  `@workspace/vitest-config`. The deeper strategy — DB integration tests + mocking,
+  component tests — is designed when those needs land.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
@@ -28,6 +31,12 @@ already built.
 
 - The addon trim decision, Chromatic (Phase 3), and publishing (Phase 4) are
   tracked in [decisions/0018](decisions/0018-storybook-and-visual-testing.md).
+- **Stories for the promoted molecules** — the shadcn _atoms_ each have a co-located
+  `*.stories.tsx`; the form molecules just promoted into `@workspace/ui` (`Form`,
+  `SubmitButton`, `FormError`, `FormTextField`/`FormPasswordField`, `PasswordInput`,
+  `PasswordStrength`) and the brand `Logo` don't yet
+  ([decisions/0022](decisions/0022-shared-code-and-utilities-organization.md) §Component
+  placement). RHF-bound molecules need a `useForm` wrapper in the story.
 
 ## Pull requests & developer experience
 
@@ -53,16 +62,54 @@ already built.
 - Replace the CODEOWNERS placeholder owner with real **teams** as they form.
 - Consider **required signed commits**.
 
-## App & framework hardening (from the initial review)
+## App & framework hardening
 
-- `next.config.ts` — security headers (CSP / HSTS / …), `poweredByHeader: false`,
-  `images` config, stable `typedRoutes`.
-- `app/layout.tsx` — a `metadata` export (title / description / Open Graph).
-- **Accessibility** — add `eslint-plugin-jsx-a11y`.
-- **Node pinning** — `.nvmrc` + align `@types/node` + tighten `engines`.
-- **DX files** — `.editorconfig`, `.vscode/{settings,extensions}.json`,
-  `.env.example`.
-- Remove the unused `zod` dependency (or adopt it for form validation).
+Most of the original list is **done**: security headers
+([decisions/0015](decisions/0015-web-security-headers.md)), `poweredByHeader: false`,
+root `metadata`/`viewport`/`robots`/`manifest`, `eslint-plugin-jsx-a11y`
+([decisions/0014](decisions/0014-base-ui-adoption.md)), `.env.example`
+([decisions/0021](decisions/0021-env-and-secrets-management.md)), `zod` adopted for
+form validation, Node pinning + DX files, and the rendering/perf model
+([decisions/0023](decisions/0023-nextjs-rendering-and-performance-model.md)).
+
+Remaining, **deferred with triggers**:
+
+- **`typedRoutes: true`** — commented in `apps/web/next.config.ts`. **Trigger:** all
+  auth routes exist (it errors on `<Link>`s to not-yet-created routes). Then uncomment.
+- **`useReportWebVitals`** — report real-user Core Web Vitals (LCP/INP/CLS/FCP/TTFB).
+  **How:** a `next/web-vitals` client component in the root layout that POSTs metrics.
+  **Trigger:** an analytics sink is chosen (otherwise it reports nowhere).
+- **SEO for public pages** — `opengraph-image`/`twitter-image`, JSON-LD, canonical
+  URLs. **Trigger:** public/marketing pages exist (auth pages stay `noindex`; a
+  minimal `sitemap.ts` + `robots` already ship).
+- **`forbidden.tsx` / `unauthorized.tsx`** — custom 403/401 UI paired with
+  `forbidden()`/`unauthorized()`. **Trigger:** RBAC (auth org/permissions phase).
+- **`serverExternalPackages`** — re-check `pg` / `better-auth` server bundling if a
+  server-bundle issue ever appears (`next build` is green today).
+- **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
+  observability backend is chosen / server→client data flows grow.
+
+## Auth flow (UI built; wiring + later screens deferred)
+
+The auth **UI** is complete — entry (`/auth`), email capture, sign-in, sign-up, and
+forgot/reset-password — all presentational with injected handlers (ADR 0025), so wiring
+is a matter of supplying those handlers. Deferred:
+
+- **Wiring** — inject the real Better Auth calls (`signIn.email`, `signUp.email`,
+  `forgetPassword`, `resetPassword`) into the step components, plus the email step's
+  account-existence check that routes to `/auth/sign-in` vs `/auth/sign-up`. After
+  **sign-up → auto-login → `/dashboard`**; after **reset → sign in** (sessions revoked,
+  [decisions/0016](decisions/0016-authentication-strategy.md)).
+- **Change password (Settings)** — a future settings screen needs current + new password
+  (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
+  `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
+  (`PasswordInput` / `PasswordStrength` underlie the field component). If sign-up and
+  change-password end up duplicating the "new password + strength" block, extract a shared
+  field then (rule of three). Better Auth: `authClient.changePassword({ currentPassword,
+newPassword, revokeOtherSessions })`.
+- **Verify-email banner, lightweight onboarding, OAuth (Google) callback** — later phases
+  per the [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
+  [decisions/0016](decisions/0016-authentication-strategy.md).
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 

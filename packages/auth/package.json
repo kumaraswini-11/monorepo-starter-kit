@@ -6,24 +6,31 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "exports": {
     ".": "./src/index.ts",
     "./auth": "./src/auth.ts",
+    "./client": "./src/client.ts",
     "./device": "./src/device.ts"
   },
   "dependencies": {
     "@workspace/db": "workspace:*",
     "@workspace/email": "workspace:*",
+    "@workspace/env": "workspace:*",
     "better-auth": "catalog:",
+    "react": "catalog:",
+    "server-only": "catalog:",
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

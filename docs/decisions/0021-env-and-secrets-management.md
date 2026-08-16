@@ -1,7 +1,7 @@
 # 0021. Environment variables & secrets management
 
 - **Status:** Accepted
-- **Date:** 2026-08-04
+- **Date:** 2026-08-04 · **Updated:** 2026-08-15 (§5 env validation implemented)
 
 ## Context
 
@@ -113,13 +113,48 @@ purely provisioning the service.
   Provisioning the instance is infra we stand up then; the decision + seam are locked
   now, so it is **not** left vague.
 
-### 5. Shared, typed env **contract**: `packages/env`
+### 5. Shared, typed, validated env: `@workspace/env` (implemented 2026-08-15)
 
-To avoid duplicating the env _schema_ across apps and to fail-fast on a missing/invalid
-`BETTER_AUTH_SECRET` / `DATABASE_URL`, env is validated once in a shared, framework-
-agnostic **`packages/env`** (zod-based), imported by every app and by
-`packages/auth` / `packages/db`. One definition of the contract; type-safe; validated
-at startup. **Status: to implement** (decided here; slots into the Phase 0 build).
+Env is validated **once** in a shared package so the schema isn't duplicated and a
+missing/invalid `DATABASE_URL` / `BETTER_AUTH_SECRET` **fails fast at startup** — this
+replaces the `process.env.X ?? "localhost…"` fallbacks that silently masked bad config.
+
+**Library — `@t3-oss/env-core` (framework-agnostic), _not_ `@t3-oss/env-nextjs`.**
+R&D (sources below) confirmed **t3-env** is the 2026 standard for typed env in TS — the
+`create-t3-app` default (very high real-world usage), **Standard-Schema** based so it
+uses our existing **zod**, small/focused/maintained. Critically we use the **`env-core`**
+variant: it takes `runtimeEnv: process.env` and imports nothing framework-specific —
+unlike `env-nextjs`, which hard-codes Next's `NEXT_PUBLIC_` + build integration. This
+keeps `@workspace/env` **portable**: it runs unchanged in Next (fullstack) _or_ a
+standalone Node / Express / NestJS backend — no lock-in, satisfying the
+"fullstack-vs-separate-backend is undecided, so don't lock in" constraint. (Plain zod
+was the lighter alternative — no new dep — but env-core won for the server/client guard
+and build-skip ergonomics at a tiny agnostic cost.)
+
+**Not over-engineering:** for a monorepo with ≥3 consumers (`db`/`auth`/`web`), one
+shared schema beats duplicated reads; fail-fast typed env is a 12-Factor best practice.
+
+**Guarded against bypass:** an ESLint rule (`no-restricted-syntax`) bans `process.env`
+outside `@workspace/env` + config/tooling files, so a new contributor can't accidentally
+read raw env — the error points them to the validated contract.
+
+**Build-time safety (the [0019] "build needs no DB/secret" rule):** validation runs at
+import, which happens during `next build`. `skipValidation` (gated on
+`SKIP_ENV_VALIDATION`, which our CI sets) keeps a secret-free build green; real runtimes
+— and local `.env.local` — still validate. `emptyStringAsUndefined` treats blanks as
+missing.
+
+**Deployment portability:** Vercel / Railway / AWS / Azure all inject vars into
+`process.env`; env-core reads `process.env` and validates at startup, so the code is
+identical everywhere — the only per-platform difference is _where you set the vars_, not
+how they're read.
+
+**Client env:** none today (all four vars are server-side), so the package is
+`server-only`. If a browser var appears, add a `client` block with `clientPrefix`
+(env-core handles it generically) — the shared package stays neutral. `apps/web`
+metadata/robots/sitemap read a build-safe `appUrl` export instead of `process.env`.
+
+**Status: implemented** — `@workspace/env`; `db`/`auth` read `env.*`.
 
 ### 6. Twelve-Factor baseline
 
@@ -137,7 +172,9 @@ platform's secret store. No named per-environment files committed.
 - Hosting (docker / self-host / Neon) is a config change, never a code change.
 - We are secrets-manager-ready today (the `process.env` seam) with **zero** code debt;
   standing up Infisical is a provisioning step at the multi-app trigger.
-- `packages/env` gives a single, validated env contract across apps (pending build).
+- `@workspace/env` gives a single validated env contract (`@t3-oss/env-core`,
+  framework-agnostic), fails fast on missing/invalid vars, and a lint guard blocks raw
+  `process.env`. **Implemented.**
 
 ## Revisit triggers
 
@@ -147,6 +184,8 @@ platform's secret store. No named per-environment files committed.
   the task's hashed `env`, not passthrough.
 - **A shared dev value genuinely needed by many apps before the manager lands** →
   interim, load it via each app's `@next/env` / `dotenv` from one documented source.
+- **A browser (`NEXT_PUBLIC_*`) env var** → add a `client` block + `clientPrefix` to
+  `@workspace/env` (env-core supports it); keep the package framework-neutral.
 
 ## Sources
 
@@ -161,6 +200,10 @@ platform's secret store. No named per-environment files committed.
 - Drizzle — config file (`dbCredentials`, no auto-`.env`):
   <https://orm.drizzle.team/docs/drizzle-config-file>
 - The Twelve-Factor App — Config: <https://12factor.net/config>
+- T3 Env — framework-agnostic core + Next variant (Standard Schema, zod):
+  <https://env.t3.gg/docs/core>, <https://env.t3.gg/docs/nextjs>
+- Env-validation comparison (dotenv vs t3-env vs envalid, 2026):
+  <https://www.pkgpulse.com/guides/dotenv-vs-t3-env-vs-envalid-env-validation-nodejs-2026>
 - Prisma — Turborepo guide (contrasting `globalEnv` + package `.env`):
   <https://www.prisma.io/docs/guides/deployment/turborepo>
 - Infisical (open-source, self-hostable secrets manager): <https://infisical.com>

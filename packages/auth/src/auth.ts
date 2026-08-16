@@ -1,3 +1,7 @@
+// Build-time guard: this holds the secret + DB adapter, so fail if a client bundle
+// ever imports it (ADR 0022). The client entry is the separate `./client` module.
+import "server-only";
+
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
@@ -9,19 +13,20 @@ import {
   sendResetPasswordEmail,
   sendVerifyEmail,
 } from "@workspace/email";
+import { env } from "@workspace/env";
 
 /**
  * Framework-neutral Better Auth server instance (ADR 0016). It imports **no**
  * framework code — the app supplies the adapter (`toNextJsHandler` in apps/web; a
  * Node/Express service would use `toNodeHandler` against this same instance).
  *
- * Env is read from `process.env` for now; it moves behind the validated
- * `@workspace/env` contract later (ADR 0021). `pg` connects lazily and Better Auth
- * tolerates a missing secret at build, so `next build` with no DB/secret stays safe.
+ * Env comes from the validated `@workspace/env` contract (fail-fast, ADR 0021), not
+ * raw `process.env`. `pg` connects lazily and a CI `next build` sets
+ * `SKIP_ENV_VALIDATION=1`, so building with no DB/secret stays safe.
  */
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
-  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
+  secret: env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
     enabled: true,

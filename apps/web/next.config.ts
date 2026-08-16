@@ -25,12 +25,32 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // reactCompiler: true,
+  // React Compiler: auto-memoizes components (fewer re-renders at runtime) at the
+  // cost of a slightly slower Babel compile step. Needs babel-plugin-react-compiler.
+  // (ADR 0023)
+  reactCompiler: true,
+  // Cache Components (stable, Next 16): PPR by default — static shell streams
+  // immediately, dynamic (cookies/headers) content streams under Suspense, and
+  // `use cache` opts data into caching. See ADR 0023. Dynamic access must sit under
+  // a Suspense boundary (we provide segment `loading.tsx` files).
+  cacheComponents: true,
+  // Don't advertise the framework/version (small info-leak reduction).
+  poweredByHeader: false,
+  // Type-safe <Link> hrefs. Enable once ALL auth routes exist — it errors on links
+  // to not-yet-created routes (/sign-up, /forgot-password). Uncomment then:
+  // typedRoutes: true,
+  // Images: `next/image` already optimizes local images (AVIF/WebP) with no config.
+  // Add remote hosts + formats here when the app first loads external images:
+  //   images: {
+  //     formats: ["image/avif", "image/webp"],
+  //     remotePatterns: [{ protocol: "https", hostname: "images.example.com" }],
+  //   },
   transpilePackages: [
     "@workspace/ui",
     "@workspace/auth",
     "@workspace/db",
     "@workspace/email",
+    "@workspace/env",
   ],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

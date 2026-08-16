@@ -14,16 +14,16 @@ UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
 
 ## Findings & decisions
 
-| Area                   | Finding                                                                      | Decision                          |
-| ---------------------- | ---------------------------------------------------------------------------- | --------------------------------- |
-| Styling                | `className` + `data-[state]`/`data-[side]` + CSS vars, unstyled — done right | ✅ Adopted as-is                  |
-| TypeScript             | Components typed via `X.Props` (e.g. `TooltipPrimitive.Provider.Props`)      | ✅ Adopted as-is                  |
-| A11y — primitives      | ARIA, keyboard, focus management inherited from Base UI                      | ✅ Adopted as-is                  |
-| **A11y — enforcement** | Nothing linted the _developer's_ a11y duties (alt, labels, ARIA)             | ✅ **Fixed** — `jsx-a11y` (below) |
-| Composition            | Base UI uses the `render` prop / `useRender`, not Radix `asChild`            | ✅ Convention adopted (below)     |
-| RTL                    | `rtl:true` gives logical-property CSS ✓, but `DirectionProvider` is unwired  | ⏸️ Deferred — activate with i18n  |
-| Forms                  | `field.tsx` is presentational only — no `Form`, no validation engine         | ⏸️ Deferred — decision pending    |
-| CSP                    | Base UI injects inline styles needing a nonce under a strict CSP             | ↪️ Tracked with web-security work |
+| Area                   | Finding                                                                      | Decision                              |
+| ---------------------- | ---------------------------------------------------------------------------- | ------------------------------------- |
+| Styling                | `className` + `data-[state]`/`data-[side]` + CSS vars, unstyled — done right | ✅ Adopted as-is                      |
+| TypeScript             | Components typed via `X.Props` (e.g. `TooltipPrimitive.Provider.Props`)      | ✅ Adopted as-is                      |
+| A11y — primitives      | ARIA, keyboard, focus management inherited from Base UI                      | ✅ Adopted as-is                      |
+| **A11y — enforcement** | Nothing linted the _developer's_ a11y duties (alt, labels, ARIA)             | ✅ **Fixed** — `jsx-a11y` (below)     |
+| Composition            | Base UI uses the `render` prop / `useRender`, not Radix `asChild`            | ✅ Convention adopted (below)         |
+| RTL                    | `rtl:true` gives logical-property CSS ✓, but `DirectionProvider` is unwired  | ⏸️ Deferred — activate with i18n      |
+| Forms                  | `field.tsx` is presentational only — no `Form`, no validation engine         | ✅ **Resolved** — RHF + zod (0025 §2) |
+| CSP                    | Base UI injects inline styles needing a nonce under a strict CSP             | ↪️ Tracked with web-security work     |
 
 ### Accessibility enforcement — `jsx-a11y` (done)
 
@@ -61,18 +61,20 @@ UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
 - **Decision:** leave prepped; wire `DirectionProvider` + a dynamic `dir` when
   internationalization lands. Trigger: adding i18n / an RTL locale.
 
-### Forms (deferred — decision pending)
+### Forms — resolved: React Hook Form + zod (2026-08-16)
 
 - `field.tsx` (base-vega) is **presentational only** — layout plus a manual
   `errors` prop. It is _not_ Base UI's `Field`, and there is no `Form` and no form
   library wired.
-- Two lanes to choose from when the first real form appears:
-  1. **React Hook Form + zod** — ecosystem default; `field.tsx` is designed for it;
-     we already ship `zod` in `packages/ui` (only `react-hook-form` is missing).
-  2. **Base UI `Form` + `Field`** — native, no extra library; consolidated error
-     handling and validation, but less surrounding ecosystem tooling.
-- **Decision:** defer until we build the first form; current lean is **RHF + zod**.
-  Trigger: the first non-trivial form.
+- **Decision:** adopt **React Hook Form + zod**, bound to the `Field` primitives via
+  `useController` (our inputs are Base UI, so `register` gives no perf win —
+  [mui/base-ui#3819](https://github.com/mui/base-ui/issues/3819)). We do **not** add
+  shadcn's `<Form>`/`<FormField>`: it is Radix-Slot-based and we run no Radix. The full
+  rationale — `isSubmitting`-over-`useTransition`, the `root.serverError` contract, and the
+  reusable field layer — lives in
+  [0025 §2](0025-frontend-architecture-forms-data-state-routing.md).
+- **Rejected:** Base UI's own `Form` + `Field` engine (less surrounding ecosystem) and
+  **TanStack Form** (smaller ecosystem).
 
 ### CSP (tracked separately)
 
@@ -84,9 +86,30 @@ deferred because a nonce-based CSP forces every page into dynamic rendering
 (losing static optimization, CDN caching, and PPR). This is a web-security
 decision recorded in [0015](0015-web-security-headers.md).
 
+### Toast — native Base UI (not Sonner), + component re-audit (2026-08)
+
+- The `base-vega` style ships a **native Base UI Toast** (`@base-ui/react/toast`). We
+  migrated off **Sonner** (the Radix-era third-party toast) to `toast.tsx` (Toaster + a
+  `toast.add()` manager), matching our Base UI commitment.
+- A full sweep confirmed **no Radix components remain** — every interactive primitive is
+  Base UI. The six third-party components are the standard shadcn deps with **no Base UI
+  equivalent**, so they stay: `react-day-picker` (calendar), `cmdk` (command),
+  `embla-carousel-react` (carousel), `recharts` (chart), `input-otp`, and
+  `react-resizable-panels`.
+- **Prefer a shadcn primitive over hand-rolling** — e.g. the password show/hide field uses
+  `input-group` rather than an absolutely-positioned button.
+
 ## Consequences
 
 - Accessibility is now _enforced_ on our app code, not merely assumed.
 - Base UI's platform concerns (RTL, forms, CSP) are explicitly tracked with a
   decision or a deferral + trigger — not silently skipped.
 - Styling, TypeScript, and composition follow Base UI's documented model.
+
+## See also
+
+- **[0024](0024-ui-foundations-layout-responsiveness-accessibility.md)** — the
+  codebase-wide **layout, responsiveness (mobile → TV) & semantic-HTML/accessibility**
+  conventions built on this adoption: Base UI is _behavior, not layout_; page semantics
+  (landmarks + heading levels) that shadcn's `<div>`-based `Card` deliberately leaves to
+  us; and the `start-`/`end-` logical-utility convention.
