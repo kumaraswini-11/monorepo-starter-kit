@@ -1,3 +1,4 @@
+import type { BaseSyntheticEvent } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 /**
@@ -45,7 +46,7 @@ export function submitWithFormError<T extends FieldValues>(
     }
   });
 
-  return (event: React.BaseSyntheticEvent) => {
+  return (event: BaseSyntheticEvent) => {
     if (form.formState.isSubmitting) {
       event.preventDefault();
       return;

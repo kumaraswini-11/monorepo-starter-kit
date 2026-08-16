@@ -1,7 +1,7 @@
-import { brand } from "@/lib/brand";
+import { brand } from "@workspace/ui/lib/brand";
 
 /**
- * Brand marks — the visual identity. The product name string lives in `@/lib/brand`
+ * Brand marks — the visual identity. The product name string lives in `@workspace/ui/lib/brand`
  * (the single rebrand seam); these are the SVG marks that render it.
  *
  * - `Logo` — the full wordmark (use in the auth entry, headers, footers).

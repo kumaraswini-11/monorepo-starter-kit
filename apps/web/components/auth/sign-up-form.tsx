@@ -3,13 +3,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { Form } from "@workspace/ui/components/form/form";
+import { FormError } from "@workspace/ui/components/form/form-error";
+import {
+  FormPasswordField,
+  FormTextField,
+} from "@workspace/ui/components/form/form-field";
+import { SubmitButton } from "@workspace/ui/components/form/submit-button";
 import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
 import { AuthEmailField } from "@/components/auth/auth-email-field";
-import { Form } from "@/components/form/form";
-import { FormError } from "@/components/form/form-error";
-import { FormPasswordField, FormTextField } from "@/components/form/form-field";
-import { SubmitButton } from "@/components/form/submit-button";
 import { signUpFormSchema, type SignUpFormValues } from "@/lib/validation";
 
 /**

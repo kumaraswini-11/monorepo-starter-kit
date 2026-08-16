@@ -7,15 +7,14 @@ import {
   type FieldValues,
 } from "react-hook-form";
 
+import { PasswordInput } from "@workspace/ui/components/form/password-input";
+import { PasswordStrength } from "@workspace/ui/components/form/password-strength";
 import {
   Field,
   FieldError,
   FieldLabel,
 } from "@workspace/ui/components/shadcn/field";
 import { Input } from "@workspace/ui/components/shadcn/input";
-
-import { PasswordInput } from "@/components/form/password-input";
-import { PasswordStrength } from "@/components/form/password-strength";
 
 /**
  * React Hook Form-bound field components, built on shadcn's Base UI `Field` primitives.

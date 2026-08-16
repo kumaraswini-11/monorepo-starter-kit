@@ -6,9 +6,8 @@ import {
   type UseFormReturn,
 } from "react-hook-form";
 
+import { submitWithFormError } from "@workspace/ui/components/form/form-submit";
 import { cn } from "@workspace/ui/lib/utils";
-
-import { submitWithFormError } from "@/components/form/form-submit";
 
 /**
  * Shared form shell that owns the app-wide submit / pending-state pattern (ADR 0026):

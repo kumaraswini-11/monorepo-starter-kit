@@ -6,10 +6,10 @@ import "@workspace/ui/globals.css";
 import { appUrl } from "@workspace/env";
 import { Toaster } from "@workspace/ui/components/shadcn/toast";
 import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
+import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import { brand } from "@/lib/brand";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 

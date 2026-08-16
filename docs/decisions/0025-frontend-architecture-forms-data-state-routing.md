@@ -99,7 +99,10 @@ deferral — **resolved here**), [0016](0016-authentication-strategy.md) (auth w
   **not** auth-specific). Kept in `apps/web` as **app-level-shared** (RHF is app-only for
   now); the whole folder promotes to `packages/ui` at the first 2nd-app trigger
   ([0022](0022-shared-code-and-utilities-organization.md)). The Settings change-password
-  form reuses these with the `passwordField` schema rule.
+  form reuses these with the `passwordField` schema rule. **(Revised 2026-08-16: the form
+  layer + `PasswordInput`/`PasswordStrength` now live in `@workspace/ui` (`components/form`),
+  with `react-hook-form` as a `@workspace/ui` dependency — the single design system; see
+  [0022](0022-shared-code-and-utilities-organization.md) → Component placement.)**
 
 ### 3. Client data-fetching — TanStack Query over Server Actions
 

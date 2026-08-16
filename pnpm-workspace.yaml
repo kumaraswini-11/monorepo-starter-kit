@@ -21,6 +21,8 @@ catalog:
   lucide-react: ^1.30.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.4.3
+  # React Hook Form — packages/ui form layer + apps/web auth forms
+  react-hook-form: ^7.85.0
   # server-only — build-time guard on server modules (db/auth/email)
   server-only: ^0.0.1
   # Vitest — unit test runner, shared by apps/storybook + packages/*

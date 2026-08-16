@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { buttonVariants } from "@workspace/ui/components/shadcn/button";
 import { toast } from "@workspace/ui/components/shadcn/toast";
+import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { AuthHeader } from "@/components/auth/auth-header";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
-import { brand } from "@/lib/brand";
 
 /**
  * Client wiring for `/auth/reset-password`. The reset token rides the URL (a signed,

@@ -126,6 +126,10 @@ Every component and page is designed for the **full range, phone → 4K/TV**:
   **name string** is separate from the mark: it lives in `apps/web/lib/brand.ts`
   (`brand.name`) — the single rebrand seam, wired into `metadata`, UI copy, and the marks'
   `aria-label`, so renaming the product is a one-file change while the SVG marks stay here.
+  **(Revised 2026-08-16 → both the marks and `brand.ts` move into `@workspace/ui` as this
+  product's shared identity — the accepted single "brand" concession in an otherwise
+  brand-agnostic library; see
+  [0022](0022-shared-code-and-utilities-organization.md) → Component placement.)**
 - **Generic / third-party UI icons** (`GoogleIcon`, `GithubIcon` — social-login
   affordances any app reuses) → `packages/ui/src/components/icons/`.
 - **Functional glyphs** → **lucide-react** (already a dep, tree-shaken via

@@ -1,10 +1,11 @@
 "use client";
 
+import { brand } from "@workspace/ui/lib/brand";
+
 import { useRequiredEmail } from "@/components/auth/auth-flow-provider";
 import { AuthHeader } from "@/components/auth/auth-header";
 import { AuthStepSkeleton } from "@/components/auth/auth-step-skeleton";
 import { SignUpForm } from "@/components/auth/sign-up-form";
-import { brand } from "@/lib/brand";
 
 /**
  * Client wiring + guard for `/auth/sign-up`. Requires the email captured at `/auth/email`;

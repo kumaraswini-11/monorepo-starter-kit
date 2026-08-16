@@ -1,4 +1,4 @@
-import { Logo } from "@/components/brand/logo";
+import { Logo } from "@workspace/ui/components/brand/logo";
 
 /**
  * Shared heading block for auth screens — the brand wordmark, the page's real `<h1>`

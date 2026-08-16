@@ -70,31 +70,68 @@ goes into a catch-all.
 | Cross-cutting contract types used by ≥2 domains that can't own them                                                     | colocate with the owning domain first; a tiny `@workspace/types` **only** if genuinely shared                             | ⬜ defer                    |
 | Config (eslint, tsconfig, tailwind)                                                                                     | `@workspace/eslint-config`, `@workspace/typescript-config`                                                                | ✅ exists                   |
 
-### Component placement — app scope vs. `@workspace/ui`
+### Component placement — atomic-design lens; `@workspace/ui` is the single design system
 
-The table's "UI components → `@workspace/ui`" row is the _cross-app_ destination, not a
-blanket rule. Every component sits in one of three tiers:
+_Settled 2026-08-16, after building the auth UI (RHF form layer, password inputs, brand),
+which forced the recurring question: where does a piece of UI live, and how reusable should
+it be? Sources at the end._
 
-- **App-specific** (a feature's screens / flows, brand identity, app wiring) → the app
-  (`apps/*/components/*`). **Folder by concern** so _generic_ vs _scope_ is visible at a
-  glance — e.g. the auth work keeps generic form infrastructure in `components/form/` and
-  auth-only composition in `components/auth/`.
-- **Truly generic + brand/domain-agnostic**, reused across **≥ 2 apps** → `@workspace/ui`.
-  The promotion trigger is the **second consumer**, not "might be reused someday"
-  (rule-of-three; a premature abstraction is costlier than duplication). Because the generic
-  pieces are already isolated in their own folder, promotion is a cheap **folder-move**, not
-  an untangling job — which is the whole point of foldering by scope _now_.
-- **App / brand identity** (the `Logo`, product name) → the app
-  ([0024](0024-ui-foundations-layout-responsiveness-accessibility.md) §6); `@workspace/ui`
-  stays **brand-agnostic** so it is reusable across products. A dedicated `@workspace/brand`
-  is the home only if multiple apps of the **same** product must share one identity.
+**Use Atomic Design as a _lens_, not a folder taxonomy.** Categorize by atomic level to pick
+the _home_, but keep **reusability-tier packages + feature folders** — never literal
+`atoms/`/`molecules/`/`organisms/` directories (they cause endless "molecule or organism?"
+debates and navigation bloat; the 2026 consensus is a hybrid: atomic thinking for the shared
+library, **feature-based** grouping for app code).
 
-The guardrail cuts both ways: **don't scatter** a generic primitive inside a feature folder
-(hard to find and promote), and **don't hoist** an app-specific or single-consumer component
-into `@workspace/ui` (freezes an API before a 2nd use and pollutes the shared lib). Applied
-example: `PasswordInput` / `PasswordStrength` are generic → `components/form/`, not
-`components/auth/`; the React Hook Form layer is generic but single-consumer → stays
-app-level until a 2nd app, cleanly promotable ([0025 §2](0025-frontend-architecture-forms-data-state-routing.md)).
+| Atomic level            | Example                                                                                                                      | Home                                              |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **Atoms**               | shadcn `Button`, `Input`, `Field`, `Alert`                                                                                   | `@workspace/ui`                                   |
+| **Molecules**           | `PasswordInput`, `PasswordStrength`, `FormTextField`, `FormPasswordField`, `Form`, `SubmitButton`, `FormError`, brand `Logo` | `@workspace/ui`                                   |
+| **Organisms** (feature) | `SignInForm`, `SignUpForm`, `AuthHeader`                                                                                     | `apps/web/components/<feature>` (feature-grouped) |
+| **Templates / Pages**   | the `/auth/*` routes                                                                                                         | `apps/web/app`                                    |
+
+**`@workspace/ui` is the single source of truth for atoms + molecules** — presentational
+_and_ form-bound. Reusable molecules go here **from the start**, not deferred to a
+"2nd-consumer" (that bar is only for _uncertain_ abstractions and feature/domain code), and
+they get Storybook stories here alongside the atoms. Feature **organisms** (e.g. `SignInForm`,
+which is auth-specific) stay in the app, grouped by feature.
+
+**`react-hook-form` is a `@workspace/ui` dependency — deliberately.** The form molecules
+(`Form`, `SubmitButton`, `FormError`, `FormTextField`/`FormPasswordField`,
+`submitWithFormError` / `FormSubmitError`) bind to RHF, and that is the right call **for this
+repo**: `@workspace/ui` is an **internal** design system (not published for arbitrary
+consumers), and **RHF is standardized across every app**
+([0025](0025-frontend-architecture-forms-data-state-routing.md)). Making the design system
+"form-state-agnostic" would optimize for a consumer our own standing decision rules out. It is
+also **shadcn's own pattern** (its `Form` ships in the component layer with RHF). RHF is
+pinned in the **catalog**, so every app shares one version; tree-shaking keeps it out of
+bundles that import only atoms.
+
+> **Considered and rejected: a separate `@workspace/form` composition package.** The "keep
+> the design system library-agnostic / bring-your-own-state" principle (Brad Frost;
+> Piccalilli) is real, but it is strongest for a **published, cross-stack** design system —
+> not an internal monorepo committed to one form library. Single source of truth + one
+> Storybook + shadcn-alignment win here; the agnosticism it buys is theoretical for us.
+
+**Brand → `@workspace/ui`.** `Logo`/`LogoIcon` + product name (`brand.ts`) live here as the
+product's shared identity (so multiple apps share one brand). Trade-off: a different-brand
+project overwrites them there — the accepted single identity concession in an otherwise
+brand-agnostic library. (Revises
+[0024](0024-ui-foundations-layout-responsiveness-accessibility.md) §6, which had placed brand
+in the app.)
+
+The guardrail still holds: **don't scatter** a generic primitive inside a feature folder
+(hard to find/reuse), and **don't hoist** a feature-specific **organism** (e.g. `SignInForm`)
+into `@workspace/ui`.
+
+**Revisit trigger — the one scenario that reopens this.** If `@workspace/ui` ever must serve a
+**web** consumer that does _not_ use react-hook-form (a different form library, or a
+form-less context), split the RHF-bound molecules into a dedicated `@workspace/form` package
+(depending on `ui` + RHF) so the core stays agnostic. Unlikely, given the standing RHF
+decision. **React Native is a _different_ scenario, not this trigger:** RHF itself supports
+React Native, but `@workspace/ui` is a **web / DOM** design system (shadcn + Base UI) — an RN
+app cannot render these components and needs its **own** UI layer regardless, so the
+RHF-in-`ui` choice does not block it. If RN ever lands, the shared piece is a separate RN
+component package (and/or headless logic), not this one.
 
 ### `@workspace/utils` rules (so it never becomes the anti-pattern)
 
@@ -180,6 +217,14 @@ pure.
 - Premature abstraction / rule of three — Sandi Metz, "The Wrong Abstraction"
   <https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction>; Kent C. Dodds, "AHA
   Programming" <https://kentcdodds.com/blog/aha-programming>
+- Component placement § (agnostic design system + Atomic Design, added 2026-08-16) — Brad
+  Frost, "Managing technology-agnostic design systems"
+  <https://bradfrost.com/blog/post/managing-technology-agnostic-design-systems/> & "Atomic
+  Design" <https://bradfrost.com/blog/post/atomic-web-design/>; Piccalilli,
+  "Framework-agnostic design systems"
+  <https://piccalil.li/blog/framework-agnostic-design-systems-part-1/>; Atomic-Design +
+  Feature-Sliced hybrid / feature-based critique
+  <https://www.codewithseb.com/blog/from-components-to-systems-scalable-frontend-with-atomiec-design>
 - `eslint-plugin-boundaries` (module-boundary enforcement) —
   <https://github.com/javierbrea/eslint-plugin-boundaries>
 

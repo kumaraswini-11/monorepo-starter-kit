@@ -74,12 +74,16 @@ Before treating a change as done, run
   if it changes how we work. `taze` also reorders/tightens manifests — **audit its
   diff** before committing.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
-- **Component placement (scope vs. reuse):** classify each new component/module up front —
-  **app-specific** (a feature's screens/flows, brand identity, wiring) stays in the app
-  (`apps/*/components/*`, foldered so _generic_ vs _scope_ is visible, e.g. `form/` vs
-  `auth/`); **truly generic + brand/domain-agnostic** UI earns `@workspace/ui`, but only at
-  the **second consumer**, never speculatively. Keep generic pieces isolated so promotion is
-  a cheap folder-move — a wrong/early abstraction costs more than duplication. (ADR 0022)
+- **Component placement (atomic-design _lens_; ADR 0022 → Component placement):** categorize
+  by atomic level to pick the home, but keep **reusability-tier packages + feature folders**
+  (never literal `atoms/molecules/organisms` folders). **Atoms + agnostic molecules**
+  (shadcn/Base UI primitives, `PasswordInput`, brand) → **`@workspace/ui`**, which stays
+  **the single design system** — presentational _and_ form-bound (`PasswordInput`, `Form`,
+  `SubmitButton`, `FormTextField`); `react-hook-form` is a deliberate `@workspace/ui`
+  dependency (internal monorepo standardized on RHF). **Feature organisms** (a feature's
+  screens/flows, e.g. `SignInForm`) → the app (`apps/*/components/<feature>/`). Proven-generic
+  UI goes to `@workspace/ui` from the start; only _uncertain_ abstractions wait for a 2nd
+  consumer.
 - **Record notable decisions as ADRs** in `docs/decisions/` (copy the existing
   `NNNN-title.md` format and update the index). Log deferred work in
   `docs/future-improvements.md`.
