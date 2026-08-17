@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@workspace/ui/components/shadcn/button";
+import { toast } from "@workspace/ui/components/shadcn/toast";
 
 import { useAuthFlow } from "@/components/auth/auth-flow-provider";
 import { AuthHeader } from "@/components/auth/auth-header";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { requestPasswordReset } from "@/lib/auth/actions";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -14,22 +16,33 @@ const RESEND_COOLDOWN_SECONDS = 30;
  * Client wiring for `/auth/forgot-password`. Two states: the request form, then an
  * enumeration-safe "check your inbox" confirmation (spec §1 — we never reveal whether the
  * address is registered). The email pre-fills from the flow when the user arrived from
- * sign-in. Sending the email is wired later (the template + `onPasswordReset` already
- * exist in `packages/email` / `packages/auth`).
+ * sign-in. Better Auth returns success even for unknown emails, so we advance to the
+ * confirmation regardless; only a transport failure surfaces — via `FormError` on the form,
+ * or a toast on resend.
  */
 export function ForgotPasswordStep() {
   const { email: flowEmail } = useAuthFlow();
   const [sentTo, setSentTo] = useState<string | null>(null);
 
-  function sendReset(email: string) {
-    // Wiring: await authClient.forgetPassword({ email, redirectTo: "/auth/reset-password" }).
-    // Advance regardless of whether the account exists (enumeration-safe).
+  async function sendReset(email: string) {
+    await requestPasswordReset(email);
     setSentTo(email);
   }
 
   if (sentTo) {
     return (
-      <SentConfirmation email={sentTo} onResend={() => sendReset(sentTo)} />
+      <SentConfirmation
+        email={sentTo}
+        onResend={() => {
+          void requestPasswordReset(sentTo).catch(() => {
+            toast.add({
+              title: "Couldn't resend the email",
+              description: "Please try again in a moment.",
+              type: "error",
+            });
+          });
+        }}
+      />
     );
   }
 

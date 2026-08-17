@@ -1,6 +1,20 @@
 "use client";
 
+import type { BetterAuthClientPlugin } from "better-auth/client";
 import { createAuthClient } from "better-auth/react";
+
+import type { accountExists } from "@workspace/auth/plugins/account-exists";
+
+/**
+ * Client half of the account-exists plugin — makes the server endpoint available as
+ * `authClient.accountExists({ email })` for identifier-first routing (ADR 0027 §3). The
+ * server plugin is imported type-only, so no server code reaches the client bundle.
+ */
+const accountExistsClient = () =>
+  ({
+    id: "account-exists",
+    $InferServerPlugin: {} as ReturnType<typeof accountExists>,
+  }) satisfies BetterAuthClientPlugin;
 
 /**
  * Browser auth client (ADR 0016). Client-only entry — server code uses the `auth`
@@ -11,6 +25,8 @@ import { createAuthClient } from "better-auth/react";
  * `"use client"` marks the client boundary so apps can import it into Server
  * Components without a wrapper (per the Next.js library-author guidance).
  */
-export const authClient = createAuthClient();
+export const authClient = createAuthClient({
+  plugins: [accountExistsClient()],
+});
 
 export const { signIn, signUp, signOut, useSession } = authClient;

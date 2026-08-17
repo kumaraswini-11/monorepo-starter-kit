@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { useAuthFlow } from "@/components/auth/auth-flow-provider";
 import { EmailCaptureForm } from "@/components/auth/email-capture-form";
+import { resolveAuthRoute } from "@/lib/auth/actions";
 
 /**
  * Client wiring for the email step: captures the address into the auth-flow state and
@@ -11,10 +12,10 @@ import { EmailCaptureForm } from "@/components/auth/email-capture-form";
  * the page a static shell (ADR 0023) — only this thin wrapper is client. `defaultEmail`
  * re-fills the field when the user comes Back from a credential step.
  *
- * Identifier-first: the destination is chosen by an account-existence check —
- * `/auth/sign-in` for an existing account, `/auth/sign-up` for a new one. Until that check
- * is wired it defaults to sign-in (the returning-user path); preview sign-up directly at
- * `/auth/sign-up`.
+ * Identifier-first: the destination is chosen by a rate-limited account-existence check
+ * (`resolveAuthRoute` → ADR 0027 §3) — `/auth/sign-in` for an existing account,
+ * `/auth/sign-up` for a new one. A thrown `FormSubmitError` (e.g. rate-limited) surfaces in
+ * the form's error banner.
  */
 export function EmailStep() {
   const router = useRouter();
@@ -23,9 +24,10 @@ export function EmailStep() {
   return (
     <EmailCaptureForm
       defaultEmail={email}
-      onSubmit={(value) => {
+      onSubmit={async (value) => {
         setEmail(value);
-        router.push("/auth/sign-in");
+        const route = await resolveAuthRoute(value);
+        router.push(`/auth/${route}`);
       }}
     />
   );

@@ -89,17 +89,19 @@ Remaining, **deferred with triggers**:
 - **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
   observability backend is chosen / server→client data flows grow.
 
-## Auth flow (UI built; wiring + later screens deferred)
+## Auth flow (wired; later screens deferred)
 
-The auth **UI** is complete — entry (`/auth`), email capture, sign-in, sign-up, and
-forgot/reset-password — all presentational with injected handlers (ADR 0025), so wiring
-is a matter of supplying those handlers. Deferred:
+The auth **UI** is complete and now **wired to Better Auth** (ADR 0027): the app-side seam
+(`apps/web/lib/auth/`) injects `signIn.email` / `signUp.email` / `requestPasswordReset` /
+`resetPassword` into the steps, routes the email step via a rate-limited identifier-first
+existence check, and sends **sign-up → auto-login → `/dashboard`** and **reset → sign in**
+(sessions revoked, [decisions/0016](decisions/0016-authentication-strategy.md)). Remaining:
 
-- **Wiring** — inject the real Better Auth calls (`signIn.email`, `signUp.email`,
-  `forgetPassword`, `resetPassword`) into the step components, plus the email step's
-  account-existence check that routes to `/auth/sign-in` vs `/auth/sign-up`. After
-  **sign-up → auto-login → `/dashboard`**; after **reset → sign in** (sessions revoked,
-  [decisions/0016](decisions/0016-authentication-strategy.md)).
+- **Rate-limit storage** — the identifier-first existence check is a Better Auth **plugin
+  endpoint** (`packages/auth/src/plugins/account-exists.ts`), so BA rate-limits it alongside
+  its own endpoints. BA's rate-limit store defaults to **in-memory** (per-instance); set
+  `rateLimit.storage` to `"database"` / secondary storage before production. Identifier-first
+  is an intentional enumeration trade-off (ADR 0027 §3).
 - **Change password (Settings)** — a future settings screen needs current + new password
   (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
   `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
