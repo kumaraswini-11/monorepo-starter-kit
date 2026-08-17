@@ -6,6 +6,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { describeDevice, resolveLocation } from "@workspace/auth/device";
+import { accountExists } from "@workspace/auth/plugins/account-exists";
 import { db, getUserById, isNewDeviceSignIn, schema } from "@workspace/db";
 import {
   sendNewDeviceEmail,
@@ -119,6 +120,9 @@ export const auth = betterAuth({
       },
     },
   },
+  // Identifier-first existence check as a BA plugin endpoint — inherits BA's rate limiting
+  // (ADR 0027 §3); read-only via the internal adapter, adds no schema.
+  plugins: [accountExists()],
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // refresh at most once per day

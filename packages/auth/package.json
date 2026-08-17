@@ -13,7 +13,8 @@
     ".": "./src/index.ts",
     "./auth": "./src/auth.ts",
     "./client": "./src/client.ts",
-    "./device": "./src/device.ts"
+    "./device": "./src/device.ts",
+    "./plugins/*": "./src/plugins/*.ts"
   },
   "dependencies": {
     "@workspace/db": "workspace:*",
@@ -23,7 +24,8 @@
     "better-auth": "catalog:",
     "react": "catalog:",
     "server-only": "catalog:",
-    "ua-parser-js": "^2.0.10"
+    "ua-parser-js": "^2.0.10",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
