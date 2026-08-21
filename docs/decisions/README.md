@@ -38,6 +38,7 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 | [0025](0025-frontend-architecture-forms-data-state-routing.md)     | Front-end architecture — forms (RHF), data (TanStack Query), state, routing (agnostic)          | Proposed | 2026-08-15 |
 | [0026](0026-form-submission-and-pending-state-pattern.md)          | Form submission & pending-state UX pattern (enabled fields, spinner + label, focus-to-error)    | Accepted | 2026-08-16 |
 | [0027](0027-backend-architecture-fullstack-and-migration.md)       | Backend architecture — Next.js fullstack now; wiring plan + separate-backend migration playbook | Accepted | 2026-08-16 |
+| [0028](0028-rate-limiting-and-secondary-storage.md)                | Rate limiting & secondary storage — Redis for production, wired at deploy                       | Accepted | 2026-08-17 |
 
 See also [../references.md](../references.md) for the sources behind these
 decisions, and [../future-improvements.md](../future-improvements.md) for the

@@ -97,11 +97,13 @@ The auth **UI** is complete and now **wired to Better Auth** (ADR 0027): the app
 existence check, and sends **sign-up → auto-login → `/dashboard`** and **reset → sign in**
 (sessions revoked, [decisions/0016](decisions/0016-authentication-strategy.md)). Remaining:
 
-- **Rate-limit storage** — the identifier-first existence check is a Better Auth **plugin
-  endpoint** (`packages/auth/src/plugins/account-exists.ts`), so BA rate-limits it alongside
-  its own endpoints. BA's rate-limit store defaults to **in-memory** (per-instance); set
-  `rateLimit.storage` to `"database"` / secondary storage before production. Identifier-first
-  is an intentional enumeration trade-off (ADR 0027 §3).
+- **Rate-limit / secondary storage** — BA rate-limits its endpoints (incl. the
+  `account-exists` plugin) by default, but the store defaults to **in-memory** (per-instance).
+  **Decided:** Redis (`secondary-storage`) is the production store, wired at the deploy/scale
+  trigger — turnkey steps in
+  [decisions/0028](decisions/0028-rate-limiting-and-secondary-storage.md). Dev stays on the
+  default (rate limiting is off in dev). Identifier-first is an intentional enumeration
+  trade-off (ADR 0027 §3).
 - **Change password (Settings)** — a future settings screen needs current + new password
   (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
   `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
