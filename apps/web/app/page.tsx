@@ -7,8 +7,9 @@ import { getSession } from "@/lib/session";
  * user goes to the app, everyone else to the auth entry. This keeps `/` free for a future
  * marketing home and centralizes the "where do I land?" decision.
  *
- * It reads the session, so it renders per-request (`instant = false`, Cache Components /
- * ADR 0023) — there is no static shell to lose, the page only redirects.
+ * It reads the session (`headers()`), so it's dynamic with no static shell — it only
+ * redirects. `instant = false` opts this segment out of instant-navigation validation
+ * (Cache Components / ADR 0023), acknowledging the intentional server-blocking read.
  */
 export const instant = false;
 

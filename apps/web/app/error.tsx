@@ -5,15 +5,16 @@ import { useEffect } from "react";
 import { Button } from "@workspace/ui/components/shadcn/button";
 
 /**
- * Segment error boundary for uncaught render errors (Next 16 — note the prop is
- * `unstable_retry`, which replaced `reset`). Must be a Client Component.
+ * Segment error boundary for uncaught render errors. `retry` re-renders the segment —
+ * stable in Next 16.3 (it supersedes the earlier `unstable_retry` name). Must be a
+ * Client Component.
  */
 export default function Error({
   error,
-  unstable_retry,
+  retry,
 }: {
   error: Error & { digest?: string };
-  unstable_retry: () => void;
+  retry: () => void;
 }) {
   useEffect(() => {
     // TODO(deploy): forward to an error-monitoring service (Sentry, etc.).
@@ -29,7 +30,7 @@ export default function Error({
         An unexpected error occurred. You can try again, and if it keeps
         happening, please contact support.
       </p>
-      <Button onClick={() => unstable_retry()}>Try again</Button>
+      <Button onClick={() => retry()}>Try again</Button>
     </main>
   );
 }
