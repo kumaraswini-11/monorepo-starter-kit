@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeftIcon } from "lucide-react";
@@ -11,11 +12,13 @@ import { cn } from "@workspace/ui/lib/utils";
  * decorative (the visible "Back" label is the accessible name), so it is `aria-hidden`
  * (ADR 0024 §6).
  */
-export function AuthBackLink({
+export function AuthBackLink<T extends string>({
   href,
   children = "Back",
 }: {
-  href: string;
+  // Custom wrapper around next/link → type the prop with the generic `Route<T>` so
+  // `typedRoutes` validates each caller's href (Next.js "Statically Typed Links").
+  href: Route<T>;
   children?: ReactNode;
 }) {
   return (
