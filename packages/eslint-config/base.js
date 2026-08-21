@@ -46,6 +46,24 @@ export const config = [
     },
   },
   {
+    // Module boundaries (ADR 0022 §Governance): consumers go through a package's `exports`
+    // map — never reach into its `src/`. Keeps internals swappable + the public surface honest.
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@workspace/*/src/*", "@workspace/*/src/**"],
+              message:
+                "Deep import bypasses the package's exports map — import from its public entry (e.g. `@workspace/ui/components/...`), not `src/` (ADR 0022).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     plugins: {
       onlyWarn,
     },

@@ -173,11 +173,12 @@ pure.
 
 ### Governance (what stops the rot)
 
-- **Enforce boundaries in lint, not docs** — `eslint-plugin-boundaries` (or
-  `import/no-restricted-imports`): apps may import packages but not each other;
-  `@workspace/utils` imports **nothing** internal; no deep-reaching past a package's
-  `exports` map. CI already fails on warnings ([0003](0003-hard-lint-gate.md)), so this
-  becomes a hard gate.
+- **Enforce boundaries in lint, not docs** — **implemented** in `@workspace/eslint-config`
+  via core `no-restricted-imports`: **no deep-reaching past a package's `exports` map**
+  (bans `@workspace/*/src/**`), and **`@workspace/utils` imports nothing internal** (leaf
+  rule in its own config). CI fails on warnings ([0003](0003-hard-lint-gate.md)), so these
+  are hard gates. A richer element-type graph (app-can't-import-app, per-type allowed-deps)
+  via `eslint-plugin-boundaries` stays available if the package graph grows.
 - **Acyclic dependency direction:** `utils` (leaf) → domain packages → `ui` → apps.
 - **One purpose per package**, documented; `@workspace/*` naming (existing convention).
 
