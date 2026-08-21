@@ -96,3 +96,17 @@ export async function resolveAuthRoute(
   }
   return data?.exists ? "sign-in" : "sign-up";
 }
+
+/**
+ * Resend the email-verification link (progressive verification, ADR 0016). Throws on failure
+ * so the caller (the verify-email banner) can surface it via a toast.
+ */
+export async function resendVerificationEmail(email: string): Promise<void> {
+  const { error } = await authClient.sendVerificationEmail({
+    email,
+    callbackURL: "/dashboard",
+  });
+  if (error) {
+    throw new Error("Could not resend the verification email.");
+  }
+}

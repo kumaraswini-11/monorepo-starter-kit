@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
 import { getSession } from "@/lib/session";
 
 /**
@@ -24,5 +25,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/auth");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {!session.user.emailVerified && (
+        <VerifyEmailBanner email={session.user.email} />
+      )}
+      {children}
+    </>
+  );
 }

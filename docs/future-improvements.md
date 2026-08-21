@@ -111,8 +111,11 @@ existence check, and sends **sign-up → auto-login → `/dashboard`** and **res
   change-password end up duplicating the "new password + strength" block, extract a shared
   field then (rule of three). Better Auth: `authClient.changePassword({ currentPassword,
 newPassword, revokeOtherSessions })`.
-- **Verify-email banner, lightweight onboarding, OAuth (Google) callback** — later phases
-  per the [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
+- **Verify-email banner** — ✅ done: `VerifyEmailBanner` in the authed-area layout prompts
+  signed-in-but-unverified users with a rate-limited resend; the emailed link is handled by
+  BA's route handler (progressive verification, ADR 0016).
+- **Lightweight onboarding, OAuth (Google) callback** — later phases per the
+  [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
   [decisions/0016](decisions/0016-authentication-strategy.md).
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
