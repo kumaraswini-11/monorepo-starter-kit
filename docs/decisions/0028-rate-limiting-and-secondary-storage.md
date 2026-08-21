@@ -5,12 +5,16 @@
 
 ## Context
 
-Better Auth's rate limiter is **enabled by default in production** (off in dev) and covers
-all `/api/auth/*` routes, including our `account-exists` plugin endpoint (ADR 0027 §3). Its
-**storage defaults to in-memory**, which on serverless / multi-instance (e.g. Vercel) is
-per-instance and resets on cold start — so brute-force and enumeration limits are largely
-ineffective in production (god-mode audit, Med). The same question applies to sessions and
-any future caching once the app runs on more than one instance.
+Better Auth ships a **built-in rate limiter, enabled by default in production** (disabled in
+dev), covering all `/api/auth/*` routes — including our `account-exists` plugin endpoint (ADR
+0027 §3). Defaults: **100 req / 60s** globally, with **sensitive paths stricter (3 / 10s)** —
+`/sign-in/email`, `/two-factor/verify`, … — and it applies to **client-initiated requests
+only** (server `auth.api` calls are exempt). Tune with `rateLimit.customRules` (wildcards).
+
+So rate limiting itself is **not** something we add — BA does it. The only open question is
+its **storage**, which **defaults to in-memory**: per-instance and reset on cold start, so on
+serverless / multi-instance (e.g. Vercel) the limits are largely ineffective in production
+(god-mode audit, Med). The same applies to sessions + any future caching at >1 instance.
 
 Better Auth storage options: **memory** (dev only), **database** (persistent, no extra
 infra), and **secondary-storage** (Redis/KV — BA's default when available).
@@ -32,7 +36,7 @@ re-investigation — the same "decide now, adopt at the trigger" pattern as
   sub-millisecond, in-memory). Sessions + caching are the same shape.
 - **Keep churn off the primary DB:** Postgres is the durable, transactional source of truth
   ([0019](0019-data-layer-postgres-drizzle.md)); routing a write-per-request onto it adds load
-  - contention. Redis absorbs it.
+  and contention. Redis absorbs it.
 - **Horizontal scale:** one shared Redis enforces limits globally across N instances; memory
   cannot, and the DB pays the cost above.
 - **Database storage** remains the documented **no-infra fallback** for small / single-DB
@@ -53,11 +57,19 @@ single-instance template (dev rate-limiting off) is premature infra.
    in `docker-compose.yml` for local dev.
 2. **`packages/auth` config:**
    ```ts
+   // Prefer a BA `redisStorage()` helper if one ships (it implements the full interface).
+   // Manually — secondary-storage RATE LIMITING requires an atomic `increment`; BA throws
+   // "SecondaryStorage.increment is required" without it:
    secondaryStorage: {
      get: (key) => redis.get(key),
      set: (key, value, ttl) =>
        ttl ? redis.set(key, value, "EX", ttl) : redis.set(key, value),
      delete: (key) => redis.del(key),
+     increment: async (key, ttl) => {
+       const count = await redis.incr(key); // atomic counter
+       if (count === 1 && ttl) await redis.expire(key, ttl);
+       return count;
+     },
    },
    rateLimit: { storage: "secondary-storage" }, // the default once secondaryStorage is set
    ```
