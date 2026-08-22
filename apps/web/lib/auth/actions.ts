@@ -44,7 +44,9 @@ export async function signUpWithEmail(params: {
     // The email step routed here because the account didn't exist; a race can still land
     // an "already exists" (safe to reveal at sign-up — the identifier-first trade-off).
     if (error.status === 422) {
-      throw new FormSubmitError("An account with this email already exists.");
+      throw new FormSubmitError(
+        "An account with this email already exists. Sign in instead."
+      );
     }
     throw new FormSubmitError(
       "Could not create your account. Please try again."
@@ -75,7 +77,9 @@ export async function resetPassword(
 ): Promise<void> {
   const { error } = await authClient.resetPassword({ token, newPassword });
   if (error) {
-    throw new FormSubmitError("This reset link is invalid or has expired.");
+    throw new FormSubmitError(
+      "This reset link is invalid or has expired. Request a new one below."
+    );
   }
 }
 

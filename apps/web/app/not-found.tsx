@@ -19,7 +19,7 @@ export default function NotFound() {
         The page you were looking for does not exist or may have moved.
       </p>
       <Link href="/" className={buttonVariants()}>
-        Back home
+        Go to homepage
       </Link>
     </main>
   );

@@ -27,8 +27,7 @@ export default function Error({
         Something went wrong
       </h1>
       <p className="max-w-md text-sm text-muted-foreground">
-        An unexpected error occurred. You can try again, and if it keeps
-        happening, please contact support.
+        Please try again — and if it keeps happening, contact support.
       </p>
       <Button onClick={() => retry()}>Try again</Button>
     </main>

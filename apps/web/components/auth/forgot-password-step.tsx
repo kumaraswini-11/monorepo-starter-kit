@@ -95,7 +95,7 @@ function SentConfirmation({
             onResend();
           }}
         >
-          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend link"}
+          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend email"}
         </Button>
       </div>
     </>
