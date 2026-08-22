@@ -33,6 +33,11 @@
       "cache": false,
       "env": ["DATABASE_URL"]
     },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["CI"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

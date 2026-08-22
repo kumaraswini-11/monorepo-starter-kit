@@ -129,3 +129,39 @@ jobs:
         # env (DATABASE_URL from the container + throwaway secret) is set by the shared harness
         # (@workspace/db/testing), so no CI secrets are required. (ADR 0029 §11)
         run: pnpm exec turbo run test:integration
+
+  e2e:
+    name: Test (e2e — Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # `turbo test:e2e` builds apps/web first (dependsOn ^build); CI has no secrets, so skip
+      # env validation for that build (ADR 0021). The e2e server itself gets throwaway env from
+      # playwright.config; static pages need no DB (ADR 0029).
+      SKIP_ENV_VALIDATION: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser (chromium)
+        run: pnpm --filter e2e exec playwright install --with-deps chromium
+
+      - name: Run e2e tests
+        run: pnpm exec turbo run test:e2e
+        # TODO: upload the Playwright HTML report as an artifact on failure once
+        # actions/upload-artifact is added (with a Dependabot-pinned SHA, per ADR 0009).

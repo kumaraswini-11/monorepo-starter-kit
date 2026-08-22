@@ -30,6 +30,8 @@ catalog:
   "@vitest/coverage-v8": ^4.1.10
   # Testcontainers — ephemeral real Postgres for integration tests (ADR 0029)
   "@testcontainers/postgresql": ^11.7.1
+  # Playwright — end-to-end tests (apps/e2e), ADR 0029
+  "@playwright/test": ^1.62.1
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   "@testing-library/jest-dom": ^6.9.1
