@@ -92,3 +92,25 @@ installed with the same CLI but pinned and hash-locked:
 
 This supersedes the blanket rejection: **community registries out; reputable,
 hash-pinned, first-party/known-author skill sets in.**
+
+### Vendored vs. local skills (matters for template reuse)
+
+`.agents/skills/` holds **two kinds** of skill, and the distinction is deliberate:
+
+- **Vendored** (e.g. `frontend-design`, mattpocock, better-auth) — fetched from an
+  external repo, recorded in `skills-lock.json` with a hash. `skills-lock.json` is a
+  **manifest of external sources to re-fetch**; `npx skills experimental_install`
+  _restores_ these. Re-vendor with `skills add --copy` so they land as real committed
+  files (not Windows-fragile symlinks) — this repo keeps them committed.
+- **Local / authored** (e.g. `interface-guidelines`, created via `skills init`) — our
+  own content, the file **is** the source of truth, committed to git, and deliberately
+  **not** in `skills-lock.json` (there is nothing external to fetch). Each such skill
+  says so at the top.
+
+**Why a clone/template inherits everything:** both kinds are committed files, so a
+clone already has them — nothing "installs" them. The CLI has **no prune step**: a
+later `install`/`update`/`sync` only re-fetches the _vendored_ entries in the lock and
+never deletes a local authored skill (removal is only the explicit `skills remove`). So
+`interface-guidelines` survives every re-install untouched. Agents also only discover
+skills under `.agents/skills/` (and `.claude/skills/`) — never `docs/` — so authored
+skills live here, not as documentation elsewhere.
