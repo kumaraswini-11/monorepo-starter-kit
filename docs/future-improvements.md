@@ -9,12 +9,18 @@ already built.
 
 ## CI / CD
 
-- **Testing** — the full strategy is now decided in
+- **Testing** — the full strategy is in
   [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
-  Playwright e2e, real-Postgres integration via Testcontainers/pglite, `@workspace/vitest-config`,
-  Turbo task split, coverage report-only → gated, and a monorepo/backend-split-aware
-  architecture). Vitest (unit) is wired today; the phased rollout (Foundation → Integration →
-  E2E → contract/MSW hardening) and its CI jobs are the remaining work.
+  Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
+  Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
+  Phase 1 (unit + component + CI test job + coverage) and Phase 2 (db integration vs real
+  Postgres via Testcontainers). **Remaining:** Playwright e2e (`apps/e2e`), contract/MSW
+  hardening, and flipping coverage report-only → thresholds.
+  - **Extract the shared integration-test harness** — the Testcontainers container+migrate+
+    env-inject setup currently lives in `packages/db/test/`. When `packages/auth` gains
+    integration tests (Better Auth flows vs real Postgres), extract it to a reusable location
+    (`@workspace/db/testing` export or a small test-support package) instead of copying
+    (rule of three; one consumer today — ADR 0029 §11 Q3).
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into

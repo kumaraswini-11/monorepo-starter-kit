@@ -17,19 +17,32 @@ export default async function setup(ctx: {
   provide: (key: "DATABASE_URL", value: string) => void;
 }) {
   const container = await new PostgreSqlContainer("postgres:17").start();
-  const connectionString = container.getConnectionUri();
 
-  const pool = new Pool({ connectionString });
-  await migrate(drizzle(pool), {
-    migrationsFolder: fileURLToPath(new URL("../migrations", import.meta.url)),
-  });
-  await pool.end();
+  try {
+    const connectionString = container.getConnectionUri();
 
-  ctx.provide("DATABASE_URL", connectionString);
+    // Apply migrations on a short-lived pool, always closed even if migration fails.
+    const pool = new Pool({ connectionString });
+    try {
+      await migrate(drizzle(pool), {
+        migrationsFolder: fileURLToPath(
+          new URL("../migrations", import.meta.url)
+        ),
+      });
+    } finally {
+      await pool.end();
+    }
 
-  return async () => {
+    ctx.provide("DATABASE_URL", connectionString);
+
+    return async () => {
+      await container.stop();
+    };
+  } catch (error) {
+    // Never leak the container if setup fails before the teardown is returned.
     await container.stop();
-  };
+    throw error;
+  }
 }
 
 declare module "vitest" {

@@ -371,8 +371,8 @@ apps/
 
 1. **Integration DB provisioning:** Testcontainers (highest fidelity; needs Docker/WSL2 on
    the Windows dev box) **vs** pglite (in-process, Windows-friendly; different driver + PG
-   feature subset). → **Rec:** Testcontainers as CI source-of-truth, pglite as fast local
-   fallback.
+   feature subset). → **DECIDED (2026-08-22): Testcontainers** (prod `node-postgres` parity),
+   implemented in `packages/db`; pglite remains the documented no-Docker fallback. See §11 Q2.
 2. **Better Auth `testUtils()`** (session factories/OTP) lands in **≥1.7**; repo is on
    **1.6.26**. → **Rec:** use `auth.api.*` now; bump opportunistically.
 3. **Shared contract package** (§9) now vs at-split. → **Rec:** a lightweight zod contract
@@ -450,19 +450,23 @@ pglite is great DX but not yet the full-fidelity default.
 
 ### Q3 — Isn't integration-testing the DB over-engineering _right now_? (2026-08-22)
 
-**Recommendation (awaiting confirmation): defer Phase 2** until real _domain_ data logic
-exists. Today the bespoke,
-only-a-real-DB-can-verify surface is tiny — `isNewDeviceSignIn` (one branching query) and the
-`account-exists` plugin; everything else is either **Better Auth** (a tested library — testing
-it tests their code) or trivial (`getUserById` = a one-line select). Standing up the full
-Testcontainers harness (containers, migrations, isolation, a CI Postgres lane, maintenance)
-to guard two thin functions is a poor value/effort ratio; the harness cost is fixed
-regardless of test count. **Trigger to revisit:** the first real domain repository — billing
-ledgers (multi-row ACID), RBAC/permission queries, multi-tenant isolation, custom joins —
-exactly what the `packages/db` boundary was built for (ADR 0019). Phase 1 (unit + component)
-already covers where the bespoke logic actually lives today. This keeps the repo's
-"minimal, no premature abstraction" ethos. The provisioning verdict in Q2 stands as the
-_ready_ plan for when the trigger fires.
+**Decided: implement Phase 2 now — _template_ rationale.** For a normal app the answer would
+be "defer": today's bespoke, only-a-real-DB-can-verify surface is tiny — `isNewDeviceSignIn`
+(one branching query) and the `account-exists` plugin; the rest is **Better Auth** (a tested
+library) or trivial (`getUserById` = a one-line select). But this repo is a **starter
+template built for future scope** — its job is to ship reusable _patterns_, not just cover
+today's code. Downstream projects will have real domain logic (billing ledgers with multi-row
+ACID, RBAC/permission queries, multi-tenant isolation, custom joins — what the `packages/db`
+boundary exists for, ADR 0019), and they should **inherit a ready DB-testing harness + worked
+examples** instead of re-solving it. Doing it now (Docker available, context fresh) is cheaper
+than later, and the example tests double as documentation. Implemented with the Q2 verdict —
+**Testcontainers** over the prod `node-postgres` driver.
+
+**Reusability trigger (recorded):** the harness (container + migrate + env-inject) currently
+lives in `packages/db/test/`. When `packages/auth` gains its own integration tests (Better
+Auth flows against real Postgres), **extract the shared harness** to a reusable location
+(e.g. a `@workspace/db/testing` export or a small test-support package) rather than copying —
+rule of three, one consumer today. Logged in `future-improvements.md`.
 
 ## Consequences
 
