@@ -14,9 +14,19 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: CI,
   retries: CI ? 2 : 0,
-  reporter: CI ? [["blob"], ["list"]] : "list",
+  // Cap workers in CI (slower shared runners); unbounded locally. (playwright-best-practices)
+  workers: CI ? "50%" : undefined,
+  // `github` = inline PR annotations; `list` = console. Switch to `blob` + a merge job if/when
+  // we shard (blob alone, unmerged, isn't useful).
+  reporter: CI ? [["github"], ["list"]] : "list",
+  timeout: 30_000,
+  expect: { timeout: 5_000 },
   use: {
     baseURL,
+    // Bound action/navigation waits so a hung step fails fast instead of stalling to the
+    // global timeout (default actionTimeout is unbounded). (playwright-best-practices)
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
