@@ -304,15 +304,22 @@ excluded from the default fast `test` include.
 **Turborepo tasks — split by type** (different cache semantics):
 
 ```jsonc
-"test":             { "dependsOn": ["^build"], "outputs": ["coverage/**"] },  // unit — cacheable
-"test:integration": { "dependsOn": ["^build"], "cache": false, "env": ["DATABASE_URL"] },
-"test:e2e":         { "dependsOn": ["build"],  "cache": false }               // needs the app build
+"test":             { "outputs": ["coverage/**"] },                            // unit — cacheable, NO build dep
+"test:integration": { "cache": false, "env": ["DATABASE_URL"] },              // real Postgres container
+"test:e2e":         { "dependsOn": ["^build"], "cache": false }               // needs the app build
 ```
 
-Add a root `"test": "turbo run test"`. Change the current `dependsOn: ["build"]` →
-`["^build"]` so unit tests of `packages/auth` don't wait on `apps/web`'s `.next`. Unit stays
-**cacheable**; integration/e2e stay **uncached** (they depend on live Postgres/servers Turbo
-can't fingerprint). `globalPassThroughEnv` already forwards `DATABASE_URL` / `BETTER_AUTH_*`.
+Add a root `"test": "turbo run test"`. **`test` + `test:integration` take NO build
+dependency** — our packages are **source-only** (ADR 0022, no build step; Vitest transforms
+TS source directly), and integration runs against a real Postgres container, so nothing to
+build. A `^build` here is not just wasteful — it drags the _apps'_ builds (`web`/`storybook`)
+into the test lane via turbo's task graph, and a CI `web#build` without secrets fails env
+validation (it only "passed" locally because `apps/web/.env.local` exists). **Only
+`test:e2e` keeps `dependsOn: ["^build"]`** — it genuinely serves `apps/web`'s `.next` via
+`next start`. (If a package ever gains a real build step producing artifacts other packages
+import, reinstate `^build` on the tests that consume them.) Unit stays **cacheable**;
+integration/e2e stay **uncached** (they depend on live Postgres/servers Turbo can't
+fingerprint). `globalPassThroughEnv` forwards `DATABASE_URL` / `BETTER_AUTH_*`.
 
 **Coverage — `@vitest/coverage-v8`** (already the repo's provider via Storybook). Merge
 across packages with the blob pattern (`reporters: ["default", "blob"]` → a `report` task
