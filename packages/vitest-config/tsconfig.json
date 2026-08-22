@@ -1,11 +1,5 @@
 {
   "extends": "@workspace/typescript-config/base.json",
-  "compilerOptions": {
-    // These are source-only config files consumed by Vitest (which resolves `.ts`
-    // natively); allow the explicit `.ts` import NodeNext requires, without emitting.
-    "allowImportingTsExtensions": true,
-    "noEmit": true
-  },
   "include": ["."],
   "exclude": ["node_modules", "dist"]
 }

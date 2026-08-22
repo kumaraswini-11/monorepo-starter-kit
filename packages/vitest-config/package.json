@@ -9,8 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "./base": "./base.ts",
-    "./dom": "./dom.ts",
+    ".": "./index.ts",
     "./setup": "./setup.ts"
   },
   "dependencies": {
