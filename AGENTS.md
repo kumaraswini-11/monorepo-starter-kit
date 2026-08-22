@@ -31,6 +31,14 @@ Before treating a change as done, run
 `prettier --check .` and `turbo run lint typecheck build`, and fails on any error
 **or warning**.
 
+**Audit before every commit.** The gate is necessary but not sufficient — beyond it,
+self-review the diff against: coding standards & best practices; **DRY / SOLID**;
+reusability, scalability, maintainability; **full compatibility with the involved
+libraries' official docs** and their best practices; and **enterprise concerns**
+(robustness, resource cleanup, error paths, CI, security). Fix what it surfaces, then
+commit. This is a private, compliance-bound, template-reusable monorepo — every commit is
+held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:integration`.)
+
 ## Stack
 
 - **pnpm 10** workspaces + **Turborepo**; **Node ≥ 24** LTS (pnpm pinned via `packageManager`; Node via `.nvmrc`/`engines`)
