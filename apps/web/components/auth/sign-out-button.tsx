@@ -27,6 +27,9 @@ export function SignOutButton() {
         title: "Couldn't sign you out",
         description: "Please try again.",
         type: "error",
+        // Errors persist until dismissed (better-accessibility) and announce assertively.
+        timeout: 0,
+        priority: "high",
       });
       // Re-enable only on failure; a successful sign-out unmounts this screen.
       setPending(false);

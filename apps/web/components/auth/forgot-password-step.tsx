@@ -39,6 +39,9 @@ export function ForgotPasswordStep() {
               title: "Couldn't resend the email",
               description: "Please try again in a moment.",
               type: "error",
+              // Errors persist until dismissed (better-accessibility) and announce assertively.
+              timeout: 0,
+              priority: "high",
             });
           });
         }}
