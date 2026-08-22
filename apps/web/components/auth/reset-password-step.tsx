@@ -57,6 +57,20 @@ export function ResetPasswordStep() {
           router.push("/auth/sign-in");
         }}
       />
+      {/*
+       * Always-visible recovery path: if the token turns out to be invalid/expired only on
+       * submit, the FormError points here so the user isn't stranded (they'd otherwise have
+       * to back out through Sign in → Forgot password).
+       */}
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        This link expired?{" "}
+        <Link
+          href="/auth/forgot-password"
+          className="underline underline-offset-4 hover:text-foreground"
+        >
+          Request a new one
+        </Link>
+      </p>
     </>
   );
 }

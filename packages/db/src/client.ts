@@ -12,8 +12,16 @@ import { env } from "@workspace/env";
  * Pooled Postgres connection. `DATABASE_URL` is validated by `@workspace/env`
  * (fail-fast — ADR 0021); `pg` still connects lazily (on first query), so a CI
  * `next build` with `SKIP_ENV_VALIDATION=1` stays safe. (ADR 0019.)
+ *
+ * Cached on `globalThis` so Turbopack HMR doesn't leak a new pool on every edit
+ * ("too many clients" in dev); prod evaluates this module once, so the cache is a
+ * harmless no-op there. (Unconditional — reading `process.env.NODE_ENV` here would trip
+ * the repo's `no-restricted-syntax` env choke-point rule.)
  */
-const pool = new Pool({ connectionString: env.DATABASE_URL });
+const globalForDb = globalThis as unknown as { __workspaceDbPool?: Pool };
+const pool = (globalForDb.__workspaceDbPool ??= new Pool({
+  connectionString: env.DATABASE_URL,
+}));
 
 export const db = drizzle(pool, { schema });
 export { pool, schema };

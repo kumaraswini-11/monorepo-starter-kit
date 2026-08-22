@@ -33,7 +33,7 @@ Before treating a change as done, run
 
 ## Stack
 
-- **pnpm 10** workspaces + **Turborepo**; **Node ≥ 20** (pinned via `packageManager`)
+- **pnpm 10** workspaces + **Turborepo**; **Node ≥ 24** LTS (pnpm pinned via `packageManager`; Node via `.nvmrc`/`engines`)
 - **Next.js 16** (Turbopack) · **React 19** · **Tailwind CSS v4**
 - UI: **shadcn/ui** built on **Base UI** (`@base-ui/react`) — not Radix (ADR 0007)
 - **TypeScript 5** · **ESLint 9** (flat config) · **Prettier 3**

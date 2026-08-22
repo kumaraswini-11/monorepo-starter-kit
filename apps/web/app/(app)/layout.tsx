@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
 import { getSession } from "@/lib/session";
 
 /**
- * The authed area is per-user and reads the session (cookies) on every request, so
- * there's no useful static shell — opt it out of prerendering (Cache Components /
- * ADR 0023). Public pages (`/auth`) stay static and stream normally.
+ * The authed area reads the session (`headers()`) on every request, so it's dynamic with
+ * no useful static shell. `instant = false` opts this segment out of instant-navigation
+ * validation (Cache Components / ADR 0023) — it deliberately blocks on the server guard.
+ * Public pages (`/auth`) stay static and stream normally.
  */
 export const instant = false;
 
@@ -23,5 +25,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/auth");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {!session.user.emailVerified && (
+        <VerifyEmailBanner email={session.user.email} />
+      )}
+      {children}
+    </>
+  );
 }

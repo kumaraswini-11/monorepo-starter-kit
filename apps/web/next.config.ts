@@ -36,10 +36,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   // Don't advertise the framework/version (small info-leak reduction).
   poweredByHeader: false,
-  // Type-safe <Link> hrefs. Enable once ALL linked routes exist — it errors on links
-  // to not-yet-created routes. Remaining: /terms and /privacy (linked from /auth).
-  // Uncomment then:
-  // typedRoutes: true,
+  // Type-safe <Link> hrefs + router pushes — checked against real routes at build.
+  // (/terms + /privacy are external links to the marketing site, so they don't count.)
+  typedRoutes: true,
   // Images: `next/image` already optimizes local images (AVIF/WebP) with no config.
   // Add remote hosts + formats here when the app first loads external images:
   //   images: {
@@ -52,6 +51,7 @@ const nextConfig: NextConfig = {
     "@workspace/db",
     "@workspace/email",
     "@workspace/env",
+    "@workspace/utils",
   ],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

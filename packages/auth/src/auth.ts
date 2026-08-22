@@ -7,7 +7,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { describeDevice, resolveLocation } from "@workspace/auth/device";
 import { accountExists } from "@workspace/auth/plugins/account-exists";
-import { db, getUserById, isNewDeviceSignIn, schema } from "@workspace/db";
+import { getUserById, isNewDeviceSignIn } from "@workspace/db";
+// Raw Drizzle handle + schema namespace come from the narrow adapter subpath (only the
+// auth package needs them); repositories come from the db barrel (ADR 0019).
+import { db, schema } from "@workspace/db/client";
 import {
   sendNewDeviceEmail,
   sendPasswordChangedEmail,
@@ -126,7 +129,13 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // refresh at most once per day
+    freshAge: 60 * 60, // 1h — sensitive flows (change email/password, delete) need a fresh session
     cookieCache: { enabled: true, maxAge: 5 * 60 }, // 5-min cookie cache (perf)
+  },
+  // Behind a proxy/CDN (Vercel/Cloudflare), read the client IP from forwarded headers so
+  // rate limiting keys per-IP rather than one shared bucket (security best-practices).
+  advanced: {
+    ipAddress: { ipAddressHeaders: ["x-forwarded-for", "x-real-ip"] },
   },
   telemetry: { enabled: false }, // ADR 0016 — no PII leaves the box
 });

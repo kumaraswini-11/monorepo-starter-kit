@@ -9,11 +9,12 @@ already built.
 
 ## CI / CD
 
-- **Testing** — Vitest (unit) is wired (co-located `src/*.test.ts` per package, run
-  by the turbo `test` task). Remaining: a CI **`test` job**, **Playwright** (e2e), a
-  report-only **coverage** job that later flips to thresholds, and (if useful) a shared
-  `@workspace/vitest-config`. The deeper strategy — DB integration tests + mocking,
-  component tests — is designed when those needs land.
+- **Testing** — the full strategy is now decided in
+  [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
+  Playwright e2e, real-Postgres integration via Testcontainers/pglite, `@workspace/vitest-config`,
+  Turbo task split, coverage report-only → gated, and a monorepo/backend-split-aware
+  architecture). Vitest (unit) is wired today; the phased rollout (Foundation → Integration →
+  E2E → contract/MSW hardening) and its CI jobs are the remaining work.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
@@ -97,11 +98,13 @@ The auth **UI** is complete and now **wired to Better Auth** (ADR 0027): the app
 existence check, and sends **sign-up → auto-login → `/dashboard`** and **reset → sign in**
 (sessions revoked, [decisions/0016](decisions/0016-authentication-strategy.md)). Remaining:
 
-- **Rate-limit storage** — the identifier-first existence check is a Better Auth **plugin
-  endpoint** (`packages/auth/src/plugins/account-exists.ts`), so BA rate-limits it alongside
-  its own endpoints. BA's rate-limit store defaults to **in-memory** (per-instance); set
-  `rateLimit.storage` to `"database"` / secondary storage before production. Identifier-first
-  is an intentional enumeration trade-off (ADR 0027 §3).
+- **Rate-limit / secondary storage** — BA rate-limits its endpoints (incl. the
+  `account-exists` plugin) by default, but the store defaults to **in-memory** (per-instance).
+  **Decided:** Redis (`secondary-storage`) is the production store, wired at the deploy/scale
+  trigger — turnkey steps in
+  [decisions/0028](decisions/0028-rate-limiting-and-secondary-storage.md). Dev stays on the
+  default (rate limiting is off in dev). Identifier-first is an intentional enumeration
+  trade-off (ADR 0027 §3).
 - **Change password (Settings)** — a future settings screen needs current + new password
   (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
   `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
@@ -109,9 +112,32 @@ existence check, and sends **sign-up → auto-login → `/dashboard`** and **res
   change-password end up duplicating the "new password + strength" block, extract a shared
   field then (rule of three). Better Auth: `authClient.changePassword({ currentPassword,
 newPassword, revokeOtherSessions })`.
-- **Verify-email banner, lightweight onboarding, OAuth (Google) callback** — later phases
-  per the [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
-  [decisions/0016](decisions/0016-authentication-strategy.md).
+- **Verify-email banner** — ✅ done: `VerifyEmailBanner` in the authed-area layout prompts
+  signed-in-but-unverified users with a rate-limited resend; the emailed link is handled by
+  BA's route handler (progressive verification, ADR 0016).
+- **Lightweight onboarding, OAuth (Google) callback** — later phases per the
+  [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
+  [decisions/0016](decisions/0016-authentication-strategy.md). The `/auth` "Continue with
+  Google" button is intentionally presentational until then (ADR 0025).
+
+### Auth hardening — deploy-time + follow-ups (from the 2026-08-22 audit)
+
+- **New-device email is on the sign-in critical path.** The `databaseHooks.session.create.after`
+  hook (`packages/auth/src/auth.ts`) is awaited by Better Auth, so on a new device it runs a
+  query + an SMTP send before the sign-in response returns. Harmless with the console stub, but
+  when a real email transport is wired, move the send off the response path (a queue/background
+  worker; framework `after()` isn't reachable from the framework-neutral auth package). Pair
+  this with the "real email transport" step.
+- **Cookie/proxy hardening (deployment-dependent):** set `advanced.useSecureCookies: true` in
+  production (guards against a misconfigured `http` `BETTER_AUTH_URL` silently dropping
+  `Secure`); and once the trusted proxy is known, set
+  `advanced.ipAddress.trustedProxyHeaders: true` together with an `ipv6Subnet` — the leftmost
+  `x-forwarded-for` is client-spoofable until strictly behind a
+  trusted proxy, which would let a caller poison/bypass the per-IP rate-limit key. Fold into the
+  deploy checklist alongside Redis (ADR 0028) and the real email transport.
+- **Audit logging (compliance):** beyond the new-device email, a compliance-bound product will
+  want durable audit events (sign-in, email change, password reset) via Better Auth
+  `databaseHooks`. Not needed yet; recorded so it isn't forgotten.
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 

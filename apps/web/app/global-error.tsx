@@ -8,14 +8,15 @@ import "@workspace/ui/globals.css";
  * Catches errors thrown by the root layout itself. It *replaces* the root layout
  * when active, so it must render its own `<html>`/`<body>` and can't rely on the
  * app's providers (theme, fonts). Kept deliberately minimal. Must be a Client
- * Component (Next 16 — prop is `unstable_retry`, not `reset`).
+ * Component. `retry` re-renders the segment — stable in Next 16.3 (it supersedes the
+ * earlier `unstable_retry` name).
  */
 export default function GlobalError({
   error,
-  unstable_retry,
+  retry,
 }: {
   error: Error & { digest?: string };
-  unstable_retry: () => void;
+  retry: () => void;
 }) {
   useEffect(() => {
     // TODO(deploy): report critical root-layout errors to a monitoring service.
@@ -33,7 +34,7 @@ export default function GlobalError({
         </p>
         <button
           type="button"
-          onClick={() => unstable_retry()}
+          onClick={() => retry()}
           className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           Try again

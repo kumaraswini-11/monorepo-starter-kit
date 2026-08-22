@@ -51,7 +51,7 @@ export function ResetPasswordForm({
         />
 
         <SubmitButton control={form.control} pendingLabel="Updating…">
-          Reset password
+          Set new password
         </SubmitButton>
       </FieldGroup>
     </Form>

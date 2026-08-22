@@ -7,4 +7,13 @@
 export const brand = {
   /** Product name, lowercase by design. Also the logo's accessible name. */
   name: "efferd",
+  /**
+   * Legal / policy pages — external (marketing site or a legal-doc host). Named rather
+   * than derived from a base URL: legal URLs rarely share a uniform path and the set grows
+   * (cookie policy, DPA, …). Point each at its real URL; replace when you rebrand.
+   */
+  legal: {
+    terms: "https://example.com/terms",
+    privacy: "https://example.com/privacy",
+  },
 } as const;

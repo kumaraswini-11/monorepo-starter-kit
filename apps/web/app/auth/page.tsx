@@ -4,6 +4,7 @@ import { MailIcon } from "lucide-react";
 
 import { GoogleIcon } from "@workspace/ui/components/icons/google-icon";
 import { Button, buttonVariants } from "@workspace/ui/components/shadcn/button";
+import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { AuthHeader } from "@/components/auth/auth-header";
@@ -55,19 +56,23 @@ export default function AuthEntryPage() {
 
       <p className="mt-2 text-sm text-pretty text-muted-foreground">
         By continuing, you agree to our{" "}
-        <Link
-          href="/terms"
+        <a
+          href={brand.legal.terms}
+          target="_blank"
+          rel="noreferrer"
           className="underline underline-offset-4 hover:text-foreground"
         >
           Terms of Service
-        </Link>{" "}
+        </a>{" "}
         and{" "}
-        <Link
-          href="/privacy"
+        <a
+          href={brand.legal.privacy}
+          target="_blank"
+          rel="noreferrer"
           className="underline underline-offset-4 hover:text-foreground"
         >
           Privacy Policy
-        </Link>
+        </a>
         .
       </p>
     </div>

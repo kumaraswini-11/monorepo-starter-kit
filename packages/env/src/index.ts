@@ -22,7 +22,8 @@ export const env = createEnv({
     // Connection string — presence is what matters (pg validates the format on
     // connect); `z.url()` is too strict for the `postgresql://…?sslmode=…` form.
     DATABASE_URL: z.string().min(1),
-    BETTER_AUTH_SECRET: z.string().min(1),
+    // ≥32 chars — Better Auth warns below that (weak-secret guard, ADR 0016).
+    BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
     BETTER_AUTH_TELEMETRY: z.string().optional(),
   },

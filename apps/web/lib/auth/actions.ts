@@ -44,7 +44,9 @@ export async function signUpWithEmail(params: {
     // The email step routed here because the account didn't exist; a race can still land
     // an "already exists" (safe to reveal at sign-up — the identifier-first trade-off).
     if (error.status === 422) {
-      throw new FormSubmitError("An account with this email already exists.");
+      throw new FormSubmitError(
+        "An account with this email already exists. Sign in instead."
+      );
     }
     throw new FormSubmitError(
       "Could not create your account. Please try again."
@@ -75,7 +77,9 @@ export async function resetPassword(
 ): Promise<void> {
   const { error } = await authClient.resetPassword({ token, newPassword });
   if (error) {
-    throw new FormSubmitError("This reset link is invalid or has expired.");
+    throw new FormSubmitError(
+      "This reset link is invalid or has expired. Request a new one below."
+    );
   }
 }
 
@@ -95,4 +99,30 @@ export async function resolveAuthRoute(
     );
   }
   return data?.exists ? "sign-in" : "sign-up";
+}
+
+/**
+ * Resend the email-verification link (progressive verification, ADR 0016). Throws on failure
+ * so the caller (the verify-email banner) can surface it via a toast.
+ */
+export async function resendVerificationEmail(email: string): Promise<void> {
+  const { error } = await authClient.sendVerificationEmail({
+    email,
+    callbackURL: "/dashboard",
+  });
+  if (error) {
+    throw new Error("Could not resend the verification email.");
+  }
+}
+
+/**
+ * Sign out the current session. Throws on failure so the caller (the sign-out button) can
+ * surface a toast and keep the user on the page — a failed sign-out must never navigate away
+ * and leave an active session behind an auth screen.
+ */
+export async function signOut(): Promise<void> {
+  const { error } = await authClient.signOut();
+  if (error) {
+    throw new Error("Could not sign you out.");
+  }
 }

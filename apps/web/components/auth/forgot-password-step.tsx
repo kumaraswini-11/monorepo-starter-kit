@@ -39,6 +39,9 @@ export function ForgotPasswordStep() {
               title: "Couldn't resend the email",
               description: "Please try again in a moment.",
               type: "error",
+              // Errors persist until dismissed (better-accessibility) and announce assertively.
+              timeout: 0,
+              priority: "high",
             });
           });
         }}
@@ -88,13 +91,14 @@ function SentConfirmation({
           type="button"
           variant="outline"
           size="lg"
+          className="tabular-nums"
           disabled={cooldown > 0}
           onClick={() => {
             setCooldown(RESEND_COOLDOWN_SECONDS);
             onResend();
           }}
         >
-          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend link"}
+          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend email"}
         </Button>
       </div>
     </>
