@@ -410,6 +410,60 @@ repo/team split needs no test migration.
 4. **Hardening for the split** — shared **contract package** + **MSW** seam tests; flip on
    coverage **thresholds**.
 
+## 11. Implementation Q&A & decision log
+
+Questions raised while implementing this strategy, with the answers and decisions, so the
+_why_ is preserved (dates are when the decision was taken).
+
+### Q1 — Aren't Vitest, Playwright, "jest-dom", jsdom all "testing libraries"? Why not one? (2026-08-22)
+
+**Decided.** There are only two _frameworks_ — **Vitest** (unit + component + integration,
+in Node) and **Playwright** (e2e, real browser); we do **not** use Jest. RTL / jest-dom /
+jsdom are helper libraries, not frameworks. Two frameworks because fast-simulated and
+real-browser are different jobs (the test pyramid). Full reasoning + table in the **FAQ**
+under "Decision (summary)" above.
+
+### Q2 — How should integration tests provision Postgres? Every option, every aspect. (2026-08-22)
+
+**Decided: Testcontainers** as the primary integration-test DB (local + CI); **Neon
+branch-per-PR** complementary later for preview/e2e/migration rehearsal (Phase 3+);
+**pglite** an optional no-Docker fallback. Rationale: it's the de-facto enterprise standard
+for testing the data layer, and it's **prod-identical** — real `postgres:17` over our actual
+`node-postgres` driver (ADR 0019), ephemeral and isolated, and it scales unchanged into any
+cloud/devops pipeline. For a compliance-bound product, fidelity wins for the layer whose job
+is "does our SQL/auth actually work against real Postgres." (`node-postgres` = our prod
+driver, self-hosted Postgres with Neon a reversible option — ADR 0019.)
+
+| Option                                       | Fidelity (vs prod)         | Speed (inner loop)     | Isolation               | Local / Windows     | CI                        | Cloud/devops fit           | Cost                 | Driver parity\*                              |
+| -------------------------------------------- | -------------------------- | ---------------------- | ----------------------- | ------------------- | ------------------------- | -------------------------- | -------------------- | -------------------------------------------- |
+| **Testcontainers** (throwaway `postgres:17`) | ★★★★★ real PG, real wire   | ★★★★ (container reuse) | ★★★★★ per-run/per-file  | needs Docker daemon | ★★★★★ runners have Docker | ★★★★★ maps to any pipeline | free                 | ✅ `node-postgres` (prod driver)             |
+| **pglite** (WASM, in-process)                | ★★★ real engine, no server | ★★★★★ sub-second       | ★★★★★ fresh instance    | ★★★★★ zero infra    | ★★★★★ no service          | ★★★                        | free                 | ❌ `drizzle-orm/pglite` (not prod)           |
+| **CI `services:` Postgres**                  | ★★★★★ real PG              | ★★★★                   | ★★★ one shared DB/job   | ✗ CI-only           | ★★★★                      | ★★★★                       | free                 | ✅ node-postgres                             |
+| **docker-compose (shared local)**            | ★★★★★ real PG              | ★★★                    | ★★ shared, manual reset | needs Docker        | ✗ awkward                 | ★★★                        | free                 | ✅ node-postgres                             |
+| **Neon branch (cloud, per-run)**             | ★★★★★ real managed PG      | ★★ network latency     | ★★★★★ branch per PR/run | ✗ needs net + token | ★★★★ needs secrets        | ★★★★★ _is_ the cloud       | $ per branch/compute | ⚠️ node-postgres TCP ✅ / serverless HTTP ❌ |
+
+\* Prod is self-hosted Postgres via **node-postgres** (`pg`) + Drizzle (ADR 0019); Neon is a
+reversible dev/preview option. **What enterprises do (2026):** Testcontainers is the
+mainstream standard for DB-layer integration tests; cloud branching (Neon/Supabase) is the
+_preview/e2e_ tool, not the fast inner loop; `services:` is the older CI-only pattern;
+pglite is great DX but not yet the full-fidelity default.
+
+### Q3 — Isn't integration-testing the DB over-engineering _right now_? (2026-08-22)
+
+**Recommendation (awaiting confirmation): defer Phase 2** until real _domain_ data logic
+exists. Today the bespoke,
+only-a-real-DB-can-verify surface is tiny — `isNewDeviceSignIn` (one branching query) and the
+`account-exists` plugin; everything else is either **Better Auth** (a tested library — testing
+it tests their code) or trivial (`getUserById` = a one-line select). Standing up the full
+Testcontainers harness (containers, migrations, isolation, a CI Postgres lane, maintenance)
+to guard two thin functions is a poor value/effort ratio; the harness cost is fixed
+regardless of test count. **Trigger to revisit:** the first real domain repository — billing
+ledgers (multi-row ACID), RBAC/permission queries, multi-tenant isolation, custom joins —
+exactly what the `packages/db` boundary was built for (ADR 0019). Phase 1 (unit + component)
+already covers where the bespoke logic actually lives today. This keeps the repo's
+"minimal, no premature abstraction" ethos. The provisioning verdict in Q2 stands as the
+_ready_ plan for when the trigger fires.
+
 ## Consequences
 
 **Positive:** a real, fast test pyramid; high-fidelity data/auth tests (real Postgres);
