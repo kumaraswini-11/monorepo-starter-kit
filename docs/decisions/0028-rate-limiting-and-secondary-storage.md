@@ -103,8 +103,23 @@ shared sessions or caching.
 - Better Auth — secondary storage holds sessions + rate limits; the local
   `better-auth-security-best-practices` skill.
 
+## Update — 2026-08-22: Better Auth 1.7 changed the secondary-storage / rate-limit API
+
+The repo upgraded to Better Auth **1.7** (ADR 0029 §11). Its 1.7 upgrade guide changes the
+adapter contracts this ADR's Redis snippet targets, so **when the Redis store is actually
+wired, use the 1.7 API**, not the 1.6 shape above:
+
+- **Secondary storage** must now implement **`increment()`** and **`getAndDelete()`** (the
+  latter is new in 1.7; previously `get`/`set`/`delete` + `increment`).
+- **Rate-limit storage** replaces separate `get`/`set` with a single **`consume(key, rule)`**
+  method.
+
+No code change today (dev stays on the in-memory default; Redis is a deploy-time task) — this
+is a note so the deferred wiring uses the correct 1.7 contract.
+
 ## See also
 
 [0027](0027-backend-architecture-fullstack-and-migration.md) (auth wiring + the
 `account-exists` plugin), [0019](0019-data-layer-postgres-drizzle.md) (Postgres = durable
-data), and [../future-improvements.md](../future-improvements.md).
+data), [0029](0029-testing-strategy.md) (the 1.7 bump), and
+[../future-improvements.md](../future-improvements.md).

@@ -65,6 +65,38 @@ scalability, enterprise, monorepo, and don't assume):
 data layer (tests the mock, not the SQL), `happy-dom` as default (faster but less complete
 than jsdom — a fidelity risk).
 
+### FAQ: why more than one testing tool — aren't Vitest / Playwright / "jest-dom" all the same thing?
+
+**Q — These all look like "testing libraries." Why not just pick one?**
+
+**A — There are really only _two_ test frameworks here (Vitest + Playwright), and we do
+NOT use Jest at all.** The rest are helper libraries with confusing names:
+
+| Name                        | A test framework? | What it actually is                                                                                                             |
+| --------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Vitest**                  | ✅ yes            | The test _runner_ for unit + component + integration. Runs in Node. One tool, three layers.                                     |
+| **Playwright**              | ✅ yes            | Runs **end-to-end** tests in a _real browser_.                                                                                  |
+| React Testing Library       | ❌ no             | A helper to query/interact with rendered components (`getByRole`…). Plugs into Vitest.                                          |
+| `@testing-library/jest-dom` | ❌ no             | Just extra assertion **matchers** (`toBeInTheDocument`). The "jest" in the name is legacy — it works with Vitest. **Not Jest.** |
+| jsdom                       | ❌ no             | A **fake DOM** so component tests run in Node without a real browser. A dependency, not a tool.                                 |
+
+**Why two frameworks and not one** — because there are two fundamentally different things
+to test, and neither tool does the other's job:
+
+- **Fast + simulated (Vitest):** Node + a fake DOM (jsdom). Tests finish in milliseconds,
+  so we run thousands on every save — ideal for logic, component behavior, and DB queries.
+- **Real browser + whole app (Playwright):** launches actual Chrome/Firefox/Safari and
+  drives the _running_ app like a user — real navigation, cookies, redirects, cross-browser.
+  The only way to prove "sign-in on Chrome truly lands on `/dashboard` with a real session."
+  But each test takes seconds, so we keep them few.
+
+Use _only_ Playwright and every trivial check boots a browser → painfully slow and flaky.
+Use _only_ Vitest/jsdom and you never verify the _real_ app (jsdom has no real layout,
+routing, cookies, or cross-browser). That trade-off is exactly the **test pyramid** (§5):
+many fast Vitest tests at the base, a few real-browser Playwright tests at the top — not
+redundancy, different jobs. (Analogy: Vitest tests car parts on a workbench; Playwright
+test-drives the assembled car on a real road. You need both.)
+
 ---
 
 ## Detailed decisions, R&D & best practices
@@ -257,9 +289,11 @@ Cover sign-in, password reset (assert `revokeSessionsOnPasswordReset` cleared ot
 sessions), the `account-exists` plugin (`{ exists }` + its 10/min limit), and the new-device
 hook (seed a first session → hook must not fire; sign in with a new UA → assert the **mocked**
 `sendNewDeviceEmail` fired once). Seed users through `auth.api.signUpEmail` (real hashing),
-not raw inserts. **Version flag:** Better Auth ships a `testUtils()` plugin (session
-factories, OTP capture) in **≥1.7**; the repo is on **1.6.26**, so use `auth.api.*` today and
-bump opportunistically (keep `testUtils` in a test-only auth factory, never prod config).
+not raw inserts. **Adopted (2026-08-22):** the repo bumped to Better Auth **1.7.1** and the
+auth integration tests use `testUtils()` (session factories + `login()`) from a **test-only**
+auth instance for seeding, alongside `auth.api.*` for flow assertions — `testUtils` is never
+added to the production config. (The 1.7 bump also required an `account.issuer` schema +
+migration; see §8 #2.)
 
 **Location.** `*.integration.test.ts` beside the code, in `packages/db` and `packages/auth`;
 run via a **separate `test:integration`** project/script (container + migrate global-setup),
@@ -270,15 +304,22 @@ excluded from the default fast `test` include.
 **Turborepo tasks — split by type** (different cache semantics):
 
 ```jsonc
-"test":             { "dependsOn": ["^build"], "outputs": ["coverage/**"] },  // unit — cacheable
-"test:integration": { "dependsOn": ["^build"], "cache": false, "env": ["DATABASE_URL"] },
-"test:e2e":         { "dependsOn": ["build"],  "cache": false }               // needs the app build
+"test":             { "outputs": ["coverage/**"] },                            // unit — cacheable, NO build dep
+"test:integration": { "cache": false, "env": ["DATABASE_URL"] },              // real Postgres container
+"test:e2e":         { "dependsOn": ["^build"], "cache": false }               // needs the app build
 ```
 
-Add a root `"test": "turbo run test"`. Change the current `dependsOn: ["build"]` →
-`["^build"]` so unit tests of `packages/auth` don't wait on `apps/web`'s `.next`. Unit stays
-**cacheable**; integration/e2e stay **uncached** (they depend on live Postgres/servers Turbo
-can't fingerprint). `globalPassThroughEnv` already forwards `DATABASE_URL` / `BETTER_AUTH_*`.
+Add a root `"test": "turbo run test"`. **`test` + `test:integration` take NO build
+dependency** — our packages are **source-only** (ADR 0022, no build step; Vitest transforms
+TS source directly), and integration runs against a real Postgres container, so nothing to
+build. A `^build` here is not just wasteful — it drags the _apps'_ builds (`web`/`storybook`)
+into the test lane via turbo's task graph, and a CI `web#build` without secrets fails env
+validation (it only "passed" locally because `apps/web/.env.local` exists). **Only
+`test:e2e` keeps `dependsOn: ["^build"]`** — it genuinely serves `apps/web`'s `.next` via
+`next start`. (If a package ever gains a real build step producing artifacts other packages
+import, reinstate `^build` on the tests that consume them.) Unit stays **cacheable**;
+integration/e2e stay **uncached** (they depend on live Postgres/servers Turbo can't
+fingerprint). `globalPassThroughEnv` forwards `DATABASE_URL` / `BETTER_AUTH_*`.
 
 **Coverage — `@vitest/coverage-v8`** (already the repo's provider via Storybook). Merge
 across packages with the blob pattern (`reporters: ["default", "blob"]` → a `report` task
@@ -339,10 +380,12 @@ apps/
 
 1. **Integration DB provisioning:** Testcontainers (highest fidelity; needs Docker/WSL2 on
    the Windows dev box) **vs** pglite (in-process, Windows-friendly; different driver + PG
-   feature subset). → **Rec:** Testcontainers as CI source-of-truth, pglite as fast local
-   fallback.
-2. **Better Auth `testUtils()`** (session factories/OTP) lands in **≥1.7**; repo is on
-   **1.6.26**. → **Rec:** use `auth.api.*` now; bump opportunistically.
+   feature subset). → **DECIDED (2026-08-22): Testcontainers** (prod `node-postgres` parity),
+   implemented in `packages/db`; pglite remains the documented no-Docker fallback. See §11 Q2.
+2. **Better Auth `testUtils()`** (session factories/OTP) — **DONE (2026-08-22):** bumped to
+   **1.7.1** and adopted via a test-only auth instance (§11 Q2). The 1.7 upgrade also required
+   an `account.issuer` column + unique `(issuer, accountId)` index (BA 1.7 "account identity is
+   scoped by issuer" — the compatibility gate caught it; schema + migration updated).
 3. **Shared contract package** (§9) now vs at-split. → **Rec:** a lightweight zod contract
    now — cheap insurance that de-risks the split.
 
@@ -378,6 +421,64 @@ repo/team split needs no test migration.
 4. **Hardening for the split** — shared **contract package** + **MSW** seam tests; flip on
    coverage **thresholds**.
 
+## 11. Implementation Q&A & decision log
+
+Questions raised while implementing this strategy, with the answers and decisions, so the
+_why_ is preserved (dates are when the decision was taken).
+
+### Q1 — Aren't Vitest, Playwright, "jest-dom", jsdom all "testing libraries"? Why not one? (2026-08-22)
+
+**Decided.** There are only two _frameworks_ — **Vitest** (unit + component + integration,
+in Node) and **Playwright** (e2e, real browser); we do **not** use Jest. RTL / jest-dom /
+jsdom are helper libraries, not frameworks. Two frameworks because fast-simulated and
+real-browser are different jobs (the test pyramid). Full reasoning + table in the **FAQ**
+under "Decision (summary)" above.
+
+### Q2 — How should integration tests provision Postgres? Every option, every aspect. (2026-08-22)
+
+**Decided: Testcontainers** as the primary integration-test DB (local + CI); **Neon
+branch-per-PR** complementary later for preview/e2e/migration rehearsal (Phase 3+);
+**pglite** an optional no-Docker fallback. Rationale: it's the de-facto enterprise standard
+for testing the data layer, and it's **prod-identical** — real `postgres:17` over our actual
+`node-postgres` driver (ADR 0019), ephemeral and isolated, and it scales unchanged into any
+cloud/devops pipeline. For a compliance-bound product, fidelity wins for the layer whose job
+is "does our SQL/auth actually work against real Postgres." (`node-postgres` = our prod
+driver, self-hosted Postgres with Neon a reversible option — ADR 0019.)
+
+| Option                                       | Fidelity (vs prod)         | Speed (inner loop)     | Isolation               | Local / Windows     | CI                        | Cloud/devops fit           | Cost                 | Driver parity\*                              |
+| -------------------------------------------- | -------------------------- | ---------------------- | ----------------------- | ------------------- | ------------------------- | -------------------------- | -------------------- | -------------------------------------------- |
+| **Testcontainers** (throwaway `postgres:17`) | ★★★★★ real PG, real wire   | ★★★★ (container reuse) | ★★★★★ per-run/per-file  | needs Docker daemon | ★★★★★ runners have Docker | ★★★★★ maps to any pipeline | free                 | ✅ `node-postgres` (prod driver)             |
+| **pglite** (WASM, in-process)                | ★★★ real engine, no server | ★★★★★ sub-second       | ★★★★★ fresh instance    | ★★★★★ zero infra    | ★★★★★ no service          | ★★★                        | free                 | ❌ `drizzle-orm/pglite` (not prod)           |
+| **CI `services:` Postgres**                  | ★★★★★ real PG              | ★★★★                   | ★★★ one shared DB/job   | ✗ CI-only           | ★★★★                      | ★★★★                       | free                 | ✅ node-postgres                             |
+| **docker-compose (shared local)**            | ★★★★★ real PG              | ★★★                    | ★★ shared, manual reset | needs Docker        | ✗ awkward                 | ★★★                        | free                 | ✅ node-postgres                             |
+| **Neon branch (cloud, per-run)**             | ★★★★★ real managed PG      | ★★ network latency     | ★★★★★ branch per PR/run | ✗ needs net + token | ★★★★ needs secrets        | ★★★★★ _is_ the cloud       | $ per branch/compute | ⚠️ node-postgres TCP ✅ / serverless HTTP ❌ |
+
+\* Prod is self-hosted Postgres via **node-postgres** (`pg`) + Drizzle (ADR 0019); Neon is a
+reversible dev/preview option. **What enterprises do (2026):** Testcontainers is the
+mainstream standard for DB-layer integration tests; cloud branching (Neon/Supabase) is the
+_preview/e2e_ tool, not the fast inner loop; `services:` is the older CI-only pattern;
+pglite is great DX but not yet the full-fidelity default.
+
+### Q3 — Isn't integration-testing the DB over-engineering _right now_? (2026-08-22)
+
+**Decided: implement Phase 2 now — _template_ rationale.** For a normal app the answer would
+be "defer": today's bespoke, only-a-real-DB-can-verify surface is tiny — `isNewDeviceSignIn`
+(one branching query) and the `account-exists` plugin; the rest is **Better Auth** (a tested
+library) or trivial (`getUserById` = a one-line select). But this repo is a **starter
+template built for future scope** — its job is to ship reusable _patterns_, not just cover
+today's code. Downstream projects will have real domain logic (billing ledgers with multi-row
+ACID, RBAC/permission queries, multi-tenant isolation, custom joins — what the `packages/db`
+boundary exists for, ADR 0019), and they should **inherit a ready DB-testing harness + worked
+examples** instead of re-solving it. Doing it now (Docker available, context fresh) is cheaper
+than later, and the example tests double as documentation. Implemented with the Q2 verdict —
+**Testcontainers** over the prod `node-postgres` driver.
+
+**Reusability trigger (recorded):** the harness (container + migrate + env-inject) currently
+lives in `packages/db/test/`. When `packages/auth` gains its own integration tests (Better
+Auth flows against real Postgres), **extract the shared harness** to a reusable location
+(e.g. a `@workspace/db/testing` export or a small test-support package) rather than copying —
+rule of three, one consumer today. Logged in `future-improvements.md`.
+
 ## Consequences
 
 **Positive:** a real, fast test pyramid; high-fidelity data/auth tests (real Postgres);
@@ -401,7 +502,9 @@ confirmed when Phase 1/2 land.
 - **Playwright ~1.61–1.62** — pin the exact catalog version under `minimumReleaseAge`; Next
   16's `@next/playwright` "testmode" (network interception) is optional/newer — adopt only if
   needed.
-- **Better Auth `testUtils()`** — **≥1.7** (repo on 1.6.26); use `auth.api.*` until a bump.
+- **Better Auth** — repo on **1.7.1**; `testUtils()` adopted (test-only instance). 1.7 added
+  `account.issuer` (schema + migration updated); ADR 0028's Redis snippet needs the 1.7
+  secondary-storage API (`increment` + `getAndDelete`) when wired.
 - **Next.js 16** — async Server Components are **not** unit-testable (→ e2e).
 - **Turborepo 2.10** — `transit`/`merge-reports` wiring are recent 2.x features; verify
   against the installed version.

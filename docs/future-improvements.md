@@ -9,12 +9,36 @@ already built.
 
 ## CI / CD
 
-- **Testing** — the full strategy is now decided in
+- **Testing** — the full strategy is in
   [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
-  Playwright e2e, real-Postgres integration via Testcontainers/pglite, `@workspace/vitest-config`,
-  Turbo task split, coverage report-only → gated, and a monorepo/backend-split-aware
-  architecture). Vitest (unit) is wired today; the phased rollout (Foundation → Integration →
-  E2E → contract/MSW hardening) and its CI jobs are the remaining work.
+  Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
+  Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
+  Phase 1 (unit + component + CI test job + coverage) and Phase 2 (db **and** auth integration
+  vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`, plus a
+  CI **integration** job — Testcontainers on the runner), plus **Phase 3 (e2e)** — a Playwright
+  harness + smoke test (`apps/e2e`) + CI job, aligned to the vendored `playwright-best-practices`
+  skill. **Remaining:** e2e DB-backed journeys (sign-in, protected-route redirect) with a
+  seeded Postgres + `storageState`; **MSW seam tests** + a shared contract package; and flipping
+  coverage report-only → thresholds.
+  - **MSW seam tests (deferred, Phase 4).** Goal: mock the auth transport at the **HTTP
+    boundary** (`/api/auth/*`) so the seam's contract (enumeration-safe mapping, identifier-first
+    routing) is proven **without a real backend** and survives the ADR 0027 split (ADR 0029 §9).
+    Blocker hit on first attempt: the browser auth client is **same-origin** (relative URLs, no
+    `baseURL`), and MSW didn't intercept Better Auth's fetch under Vitest+jsdom (request escaped
+    to the network). Fix path for the follow-up: run these in the **node** environment with the
+    client given an absolute test `baseURL` (which also mirrors the split-time change — only
+    `lib/auth-client.ts`'s baseURL moves), or configure MSW/Vitest interception explicitly. The
+    architecture is already **verified split-ready** (seam is the sole transport owner; no test
+    couples to internals; integration tests live with `packages/{auth,db}`; e2e `webServer` is
+    an array) — the MSW layer is the additional test-proof, not the enabler.
+  - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
+    setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
+    `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
+    if a **non-db** consumer ever needs it (ADR 0029 §11).
+  - **Better Auth `testUtils()`** — ✅ done: bumped to **1.7.1** and adopted (session
+    factories + `login()` from a test-only auth instance). The 1.7 bump also required an
+    `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0028's Redis
+    secondary-storage snippet needs the 1.7 API (`increment` + `getAndDelete`) when wired.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
