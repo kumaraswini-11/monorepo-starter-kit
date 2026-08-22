@@ -32,6 +32,16 @@ export const base = defineConfig({
 export const dom = mergeConfig(
   base,
   defineConfig({
+    // Force the automatic JSX runtime for tests regardless of the consumer's on-disk
+    // tsconfig. apps/web extends Next's config (`jsx: "preserve"`), which would otherwise
+    // leave JSX untransformed and fail the parse. Vite 8 is rolldown/oxc-based, so JSX
+    // settings live under `oxc.jsx` (the `esbuild` key is ignored here). (ADR 0029)
+    oxc: {
+      jsx: {
+        runtime: "automatic",
+        importSource: "react",
+      },
+    },
     test: {
       environment: "jsdom",
       include: ["src/**/*.test.{ts,tsx}"],
