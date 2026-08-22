@@ -33,21 +33,23 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   `tabular-nums`, `text-wrap: balance`/`pretty`, semantic colour tokens, `:focus-visible`,
   24/44px hit areas, `prefers-reduced-motion`, gap 2× between groups, verb-first button
   labels…). Much already matches our conventions (ADR 0024 a11y, the RHF form pattern, OKLCH
-  tokens); the rest is a ready checklist for UI reviews. **Distilled into the local
-  `interface-guidelines` skill** (`.agents/skills/interface-guidelines/`, adapted to our
-  stack + ADRs).
+  tokens). Now **adopted first-party**: Jakub publishes these as free agent skills on GitHub
+  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0011) — so the rules are
+  applied directly in-repo, no hand-written copy needed.
+- [Jakub Krehel](https://jakub.kr/) — personal site of the **interfaces.dev** author
+  (design engineer). Source of the `better-*` interface skills we vendor; follow for
+  design-engineering craft.
 - [Interfaces](https://interfaces.dev/) — Jakub Krehel's subscription **design-engineering
   magazine** (animation, typography, OKLCH colour, UI polish, accessibility as craft;
-  interactive demos + code + its own agent skills + Discord; ~$8/mo). Follow/learn — the
-  bundled skills are subscription content, not something we install (we hand-write our own
-  vetted skills).
+  interactive demos + code + Discord; ~$8/mo). The **magazine** is paid subscription content;
+  the **agent skills are free/OSS** (`jakubkrehel/skills`) and are what we vendor. Follow the
+  magazine for craft, read the skills in-repo.
 - [UI Skills](https://www.ui-skills.com/) — by **ibelick** (motion-primitives, prompt-kit): a
   bundle of **4 design-engineering agent skills** (`SKILL.md`) for distinctive, non-generic UI
   — animation-duration + typography-scale enforcement, accessibility + layout-anti-pattern
-  checks, GSAP motion + microinteractions. Same category as the interface cheat-sheet above.
-  **Browse for ideas, don't install** (community skills; we hand-write this layer). Its best
-  ideas are folded — with the interfaces.dev cheat-sheet — into the local
-  `interface-guidelines` skill (`.agents/skills/interface-guidelines/`).
+  checks, GSAP motion + microinteractions. Same domain as the vendored `better-*` skills above,
+  which now cover this ground first-party. **Browse for extra ideas** (community skills); no
+  need to adopt.
 
 ## Agent-skill registries & tools (evaluated — NOT adopted)
 

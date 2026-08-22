@@ -7,6 +7,12 @@
       "skillPath": "skills/engineering/ask-matt/SKILL.md",
       "computedHash": "e5404aef8525ca0c8fc76692567a38dfdd5d0cc1a9f8d47c02c18f29f60d92a6"
     },
+    "better-accessibility": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-accessibility/SKILL.md",
+      "computedHash": "501d84d8077a1b3c201f11a15901a9de5b1bff3536e98ca23b5e7cfb372f5ce3"
+    },
     "better-auth-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
@@ -18,6 +24,42 @@
       "sourceType": "github",
       "skillPath": "security/SKILL.md",
       "computedHash": "087c1094fa5f1834af4785c058dcc8c9abe4c1321b853883c76ea46c93a21cfe"
+    },
+    "better-colors": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-colors/SKILL.md",
+      "computedHash": "290e10e73c835cd21d016b60e16a6bb0562040903b9e56d15ad25ebb5e9cc762"
+    },
+    "better-interface": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-interface/SKILL.md",
+      "computedHash": "84b67f6b6c06337d47a56cfae89fd90eb893e04c14d60f9b3eeaca2804b86351"
+    },
+    "better-layout": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-layout/SKILL.md",
+      "computedHash": "4d38dfb87825bba2d8359759a3cb25b3da065f7bd8ff41cf72b9936f83c82903"
+    },
+    "better-typography": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-typography/SKILL.md",
+      "computedHash": "0cd871f48bb1a411e0724b48226c69bb768f1c903930ae6d333e234d46f0a9d2"
+    },
+    "better-ui": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-ui/SKILL.md",
+      "computedHash": "703f24c7577f514d37f773c1b32b75cda53b98603f8ba841e9d57bacfa5b83cd"
+    },
+    "better-writing": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-writing/SKILL.md",
+      "computedHash": "76d1a669e9f0e8fe08973fcb06676e6dcedeedbfd99e6cb75d41451405725b01"
     },
     "claude-handoff": {
       "source": "mattpocock/skills",
@@ -60,6 +102,12 @@
       "sourceType": "github",
       "skillPath": "better-auth/emailAndPassword/SKILL.md",
       "computedHash": "7786d722fa682b3d6a99793e73a9d51b59becefa595676134a993020633e068f"
+    },
+    "explain-interface": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/explain-interface/SKILL.md",
+      "computedHash": "59694c7cf64d5b5dcc3bdc8940e835772e21fe76bdd8855c31e0a528626aa610"
     },
     "frontend-design": {
       "source": "anthropics/skills",
@@ -114,6 +162,12 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
       "computedHash": "016f12709bff30a27419e8add978a9be70f5ca1fb6738b3be6793038e0aba631"
+    },
+    "interface-review": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/interface-review/SKILL.md",
+      "computedHash": "aab59f3bfdbb0191bd675ee3a42dce032c5cb9b7566d7205e4e48853db1ee590"
     },
     "loop-me": {
       "source": "mattpocock/skills",
@@ -222,6 +276,12 @@
       "sourceType": "github",
       "skillPath": "better-auth/twoFactor/SKILL.md",
       "computedHash": "cfe69aad10d4d7b397fbc101630afd9361b385b5f6f83056f33f36ab3b736fcb"
+    },
+    "variant": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/variant/SKILL.md",
+      "computedHash": "1bc099808d53ef9bbd55de668df9601e4399560366ea9154b6f18e00c6d0f932"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
