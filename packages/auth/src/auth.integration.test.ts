@@ -1,11 +1,15 @@
 import { randomUUID } from "node:crypto";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { testUtils } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { auth } from "@workspace/auth";
-import { db, pool } from "@workspace/db/client";
-import { account, user } from "@workspace/db/schema";
+import { db, pool, schema } from "@workspace/db/client";
+import { account, session, user } from "@workspace/db/schema";
 import { resetDb } from "@workspace/db/testing/reset";
+import { env } from "@workspace/env";
 
 /**
  * Integration tests for the Better Auth email/password flow + our `account-exists` plugin
@@ -17,6 +21,20 @@ import { resetDb } from "@workspace/db/testing/reset";
  */
 
 const PASSWORD = "correct-horse-battery-staple";
+
+/**
+ * Test-only auth instance: same secret + db adapter as production, plus Better Auth's
+ * `testUtils()` seeding helpers — kept OUT of the production config, per the Better Auth docs
+ * (adding them there ships privileged `ctx.test` helpers). Users/sessions it creates
+ * interoperate with the prod `auth` instance because they share the DB + secret. (ADR 0029 §11)
+ */
+const testAuth = betterAuth({
+  baseURL: env.BETTER_AUTH_URL,
+  secret: env.BETTER_AUTH_SECRET,
+  database: drizzleAdapter(db, { provider: "pg", schema }),
+  emailAndPassword: { enabled: true },
+  plugins: [testUtils()],
+});
 
 beforeEach(resetDb);
 afterAll(async () => {
@@ -59,5 +77,27 @@ describe("Better Auth email/password (real Postgres)", () => {
       body: { email: `nobody-${randomUUID()}@example.com` },
     });
     expect(unknown.exists).toBe(false);
+  });
+});
+
+describe("testUtils seeding helpers (test-only, Better Auth 1.7)", () => {
+  it("createUser + login persists a user and mints a real session", async () => {
+    const { test } = await testAuth.$context;
+
+    const seeded = await test.saveUser(
+      test.createUser({
+        name: "Test User",
+        email: `mint-${randomUUID()}@example.com`,
+      })
+    );
+    const { token } = await test.login({ userId: seeded.id });
+    expect(token).toBeTruthy();
+
+    // The minted session is a real row (usable to seed authenticated state without the UI).
+    const [sessionRow] = await db
+      .select()
+      .from(session)
+      .where(eq(session.userId, seeded.id));
+    expect(sessionRow).toBeTruthy();
   });
 });

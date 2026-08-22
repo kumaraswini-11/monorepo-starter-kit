@@ -21,10 +21,10 @@ already built.
     setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
     `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
     if a **non-db** consumer ever needs it (ADR 0029 §11).
-  - **Better Auth `testUtils()` plugin** — adopt its session factories / `login()` / OTP
-    capture for cleaner auth-test seeding when we bump Better Auth to **≥1.7** (repo is on
-    1.6.26; today's tests use `auth.api.*`, which works). Gate the bump on the usual
-    changelog-review + full-gate dependency-update policy (ADR 0029 §11 Q2).
+  - **Better Auth `testUtils()`** — ✅ done: bumped to **1.7.1** and adopted (session
+    factories + `login()` from a test-only auth instance). The 1.7 bump also required an
+    `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0028's Redis
+    secondary-storage snippet needs the 1.7 API (`increment` + `getAndDelete`) when wired.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into

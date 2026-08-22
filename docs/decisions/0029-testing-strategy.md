@@ -289,9 +289,11 @@ Cover sign-in, password reset (assert `revokeSessionsOnPasswordReset` cleared ot
 sessions), the `account-exists` plugin (`{ exists }` + its 10/min limit), and the new-device
 hook (seed a first session → hook must not fire; sign in with a new UA → assert the **mocked**
 `sendNewDeviceEmail` fired once). Seed users through `auth.api.signUpEmail` (real hashing),
-not raw inserts. **Version flag:** Better Auth ships a `testUtils()` plugin (session
-factories, OTP capture) in **≥1.7**; the repo is on **1.6.26**, so use `auth.api.*` today and
-bump opportunistically (keep `testUtils` in a test-only auth factory, never prod config).
+not raw inserts. **Adopted (2026-08-22):** the repo bumped to Better Auth **1.7.1** and the
+auth integration tests use `testUtils()` (session factories + `login()`) from a **test-only**
+auth instance for seeding, alongside `auth.api.*` for flow assertions — `testUtils` is never
+added to the production config. (The 1.7 bump also required an `account.issuer` schema +
+migration; see §8 #2.)
 
 **Location.** `*.integration.test.ts` beside the code, in `packages/db` and `packages/auth`;
 run via a **separate `test:integration`** project/script (container + migrate global-setup),
@@ -373,8 +375,10 @@ apps/
    the Windows dev box) **vs** pglite (in-process, Windows-friendly; different driver + PG
    feature subset). → **DECIDED (2026-08-22): Testcontainers** (prod `node-postgres` parity),
    implemented in `packages/db`; pglite remains the documented no-Docker fallback. See §11 Q2.
-2. **Better Auth `testUtils()`** (session factories/OTP) lands in **≥1.7**; repo is on
-   **1.6.26**. → **Rec:** use `auth.api.*` now; bump opportunistically.
+2. **Better Auth `testUtils()`** (session factories/OTP) — **DONE (2026-08-22):** bumped to
+   **1.7.1** and adopted via a test-only auth instance (§11 Q2). The 1.7 upgrade also required
+   an `account.issuer` column + unique `(issuer, accountId)` index (BA 1.7 "account identity is
+   scoped by issuer" — the compatibility gate caught it; schema + migration updated).
 3. **Shared contract package** (§9) now vs at-split. → **Rec:** a lightweight zod contract
    now — cheap insurance that de-risks the split.
 
@@ -491,7 +495,9 @@ confirmed when Phase 1/2 land.
 - **Playwright ~1.61–1.62** — pin the exact catalog version under `minimumReleaseAge`; Next
   16's `@next/playwright` "testmode" (network interception) is optional/newer — adopt only if
   needed.
-- **Better Auth `testUtils()`** — **≥1.7** (repo on 1.6.26); use `auth.api.*` until a bump.
+- **Better Auth** — repo on **1.7.1**; `testUtils()` adopted (test-only instance). 1.7 added
+  `account.issuer` (schema + migration updated); ADR 0028's Redis snippet needs the 1.7
+  secondary-storage API (`increment` + `getAndDelete`) when wired.
 - **Next.js 16** — async Server Components are **not** unit-testable (→ e2e).
 - **Turborepo 2.10** — `transit`/`merge-reports` wiring are recent 2.x features; verify
   against the installed version.
