@@ -65,6 +65,38 @@ scalability, enterprise, monorepo, and don't assume):
 data layer (tests the mock, not the SQL), `happy-dom` as default (faster but less complete
 than jsdom — a fidelity risk).
 
+### FAQ: why more than one testing tool — aren't Vitest / Playwright / "jest-dom" all the same thing?
+
+**Q — These all look like "testing libraries." Why not just pick one?**
+
+**A — There are really only _two_ test frameworks here (Vitest + Playwright), and we do
+NOT use Jest at all.** The rest are helper libraries with confusing names:
+
+| Name                        | A test framework? | What it actually is                                                                                                             |
+| --------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Vitest**                  | ✅ yes            | The test _runner_ for unit + component + integration. Runs in Node. One tool, three layers.                                     |
+| **Playwright**              | ✅ yes            | Runs **end-to-end** tests in a _real browser_.                                                                                  |
+| React Testing Library       | ❌ no             | A helper to query/interact with rendered components (`getByRole`…). Plugs into Vitest.                                          |
+| `@testing-library/jest-dom` | ❌ no             | Just extra assertion **matchers** (`toBeInTheDocument`). The "jest" in the name is legacy — it works with Vitest. **Not Jest.** |
+| jsdom                       | ❌ no             | A **fake DOM** so component tests run in Node without a real browser. A dependency, not a tool.                                 |
+
+**Why two frameworks and not one** — because there are two fundamentally different things
+to test, and neither tool does the other's job:
+
+- **Fast + simulated (Vitest):** Node + a fake DOM (jsdom). Tests finish in milliseconds,
+  so we run thousands on every save — ideal for logic, component behavior, and DB queries.
+- **Real browser + whole app (Playwright):** launches actual Chrome/Firefox/Safari and
+  drives the _running_ app like a user — real navigation, cookies, redirects, cross-browser.
+  The only way to prove "sign-in on Chrome truly lands on `/dashboard` with a real session."
+  But each test takes seconds, so we keep them few.
+
+Use _only_ Playwright and every trivial check boots a browser → painfully slow and flaky.
+Use _only_ Vitest/jsdom and you never verify the _real_ app (jsdom has no real layout,
+routing, cookies, or cross-browser). That trade-off is exactly the **test pyramid** (§5):
+many fast Vitest tests at the base, a few real-browser Playwright tests at the top — not
+redundancy, different jobs. (Analogy: Vitest tests car parts on a workbench; Playwright
+test-drives the assembled car on a real road. You need both.)
+
 ---
 
 ## Detailed decisions, R&D & best practices
