@@ -27,6 +27,7 @@ catalog:
   server-only: ^0.0.1
   # Vitest — unit test runner, shared by apps/storybook + packages/*
   vitest: ^4.1.10
+  "@vitest/coverage-v8": ^4.1.10
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   "@testing-library/jest-dom": ^6.9.1

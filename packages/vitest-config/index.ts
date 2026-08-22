@@ -14,6 +14,18 @@ export const base = defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // Coverage is inert until `--coverage` is passed. Report-only for now (ADR 0029):
+    // thresholds are added once a baseline exists. v8 provider (matches the repo).
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html"],
+      exclude: [
+        "**/*.test.{ts,tsx}",
+        "**/*.config.{ts,js,mjs,cjs}",
+        "**/vitest.d.ts",
+        "**/*.stories.tsx",
+      ],
+    },
   },
 });
 
