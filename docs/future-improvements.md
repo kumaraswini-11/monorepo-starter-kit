@@ -9,11 +9,12 @@ already built.
 
 ## CI / CD
 
-- **Testing** — Vitest (unit) is wired (co-located `src/*.test.ts` per package, run
-  by the turbo `test` task). Remaining: a CI **`test` job**, **Playwright** (e2e), a
-  report-only **coverage** job that later flips to thresholds, and (if useful) a shared
-  `@workspace/vitest-config`. The deeper strategy — DB integration tests + mocking,
-  component tests — is designed when those needs land.
+- **Testing** — the full strategy is now decided in
+  [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
+  Playwright e2e, real-Postgres integration via Testcontainers/pglite, `@workspace/vitest-config`,
+  Turbo task split, coverage report-only → gated, and a monorepo/backend-split-aware
+  architecture). Vitest (unit) is wired today; the phased rollout (Foundation → Integration →
+  E2E → contract/MSW hardening) and its CI jobs are the remaining work.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
