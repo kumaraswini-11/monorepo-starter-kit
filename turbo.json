@@ -26,10 +26,9 @@
       "cache": false
     },
     "test": {
-      "dependsOn": ["^build"]
+      "outputs": ["coverage/**"]
     },
     "test:integration": {
-      "dependsOn": ["^build"],
       "cache": false,
       "env": ["DATABASE_URL"]
     },
