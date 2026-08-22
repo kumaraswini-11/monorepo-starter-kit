@@ -158,4 +158,22 @@
   input::-ms-clear {
     display: none;
   }
+
+  /*
+   * Global reduced-motion honor: tw-animate-css entrances/exits (dialogs, tooltips,
+   * toasts, dropdowns) and any transition/animation don't self-disable, so neutralize
+   * them to near-instant for users who ask for reduced motion (WCAG 2.3.3 —
+   * better-accessibility). Essential motion can opt back in per-component with a
+   * `motion-safe:` variant.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

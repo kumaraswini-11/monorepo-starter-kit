@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AuthFlowProvider } from "@/components/auth/auth-flow-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
  * Shell for the auth screens under `/auth/*` (see ADR 0024). Layout conventions
@@ -18,6 +19,9 @@ import { AuthFlowProvider } from "@/components/auth/auth-flow-provider";
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex min-h-svh flex-col bg-background">
+      <div className="absolute end-4 top-4 z-10">
+        <ThemeToggle />
+      </div>
       <main className="flex flex-1 flex-col items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md">
           <AuthFlowProvider>{children}</AuthFlowProvider>
