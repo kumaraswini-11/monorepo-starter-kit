@@ -114,3 +114,15 @@ export async function resendVerificationEmail(email: string): Promise<void> {
     throw new Error("Could not resend the verification email.");
   }
 }
+
+/**
+ * Sign out the current session. Throws on failure so the caller (the sign-out button) can
+ * surface a toast and keep the user on the page — a failed sign-out must never navigate away
+ * and leave an active session behind an auth screen.
+ */
+export async function signOut(): Promise<void> {
+  const { error } = await authClient.signOut();
+  if (error) {
+    throw new Error("Could not sign you out.");
+  }
+}

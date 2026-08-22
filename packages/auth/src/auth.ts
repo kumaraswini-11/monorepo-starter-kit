@@ -7,7 +7,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { describeDevice, resolveLocation } from "@workspace/auth/device";
 import { accountExists } from "@workspace/auth/plugins/account-exists";
-import { db, getUserById, isNewDeviceSignIn, schema } from "@workspace/db";
+import { getUserById, isNewDeviceSignIn } from "@workspace/db";
+// Raw Drizzle handle + schema namespace come from the narrow adapter subpath (only the
+// auth package needs them); repositories come from the db barrel (ADR 0019).
+import { db, schema } from "@workspace/db/client";
 import {
   sendNewDeviceEmail,
   sendPasswordChangedEmail,

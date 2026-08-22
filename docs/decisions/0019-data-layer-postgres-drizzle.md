@@ -207,7 +207,12 @@ reversible for dev/preview; stay on the plain `pg` driver so nothing couples us 
   for blast-radius, not magic (see Q2).
 - **One exception:** Better Auth talks to the DB through _its own_ adapter
   (`drizzleAdapter(db)`), not our repository — that coupling lives inside
-  `packages/auth` and swaps via Better Auth's adapter set.
+  `packages/auth` and swaps via Better Auth's adapter set. To keep that exception from
+  becoming a general escape hatch, the raw Drizzle handle (`db`), `pool`, and the `schema`
+  namespace are exported **only** from the narrow `@workspace/db/client` (adapter) subpath —
+  **not** the default `@workspace/db` barrel, which exposes repositories + domain types. So
+  the choke-point below is structural (a consumer would have to import the adapter subpath by
+  name), not merely convention.
 - **Cost (named deliberately):** consumers can't write ad-hoc Drizzle queries inline —
   they go through `packages/db`'s API. A little more boilerplate, and some of Drizzle's
   inline ergonomics traded away, in exchange for the drop-in replaceability above.
