@@ -64,6 +64,12 @@ browse-only — kept for skill _ideas_, not `npx`-installed into this repo
 (private/proprietary + supply-chain caution — see
 [decisions/0011-project-mcp-servers.md](decisions/0011-project-mcp-servers.md)).
 
+- [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — by
+  **VoltAgent**: a curated **"awesome list"** of 1000+ agent skills, organized by provider
+  (Anthropic, Google, Stripe, Vercel, Microsoft…) and hand-picked from real engineering
+  teams rather than mass AI-generated. Not a registry/installer — a directory. **Best
+  starting point to discover reputable first-party skills** worth vendoring (per ADR 0011);
+  browse, then `skills add` the vetted ones.
 - [autoskills.sh](https://www.autoskills.sh/) — by midudev; `npx autoskills`
   auto-detects your stack and installs curated, SHA-256-verified skills.
   Best-hygiene of the registries; worth skimming for per-stack skill ideas
