@@ -116,7 +116,27 @@ newPassword, revokeOtherSessions })`.
   BA's route handler (progressive verification, ADR 0016).
 - **Lightweight onboarding, OAuth (Google) callback** — later phases per the
   [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
-  [decisions/0016](decisions/0016-authentication-strategy.md).
+  [decisions/0016](decisions/0016-authentication-strategy.md). The `/auth` "Continue with
+  Google" button is intentionally presentational until then (ADR 0025).
+
+### Auth hardening — deploy-time + follow-ups (from the 2026-08-22 audit)
+
+- **New-device email is on the sign-in critical path.** The `databaseHooks.session.create.after`
+  hook (`packages/auth/src/auth.ts`) is awaited by Better Auth, so on a new device it runs a
+  query + an SMTP send before the sign-in response returns. Harmless with the console stub, but
+  when a real email transport is wired, move the send off the response path (a queue/background
+  worker; framework `after()` isn't reachable from the framework-neutral auth package). Pair
+  this with the "real email transport" step.
+- **Cookie/proxy hardening (deployment-dependent):** set `advanced.useSecureCookies: true` in
+  production (guards against a misconfigured `http` `BETTER_AUTH_URL` silently dropping
+  `Secure`); and once the trusted proxy is known, set
+  `advanced.ipAddress.trustedProxyHeaders: true` together with an `ipv6Subnet` — the leftmost
+  `x-forwarded-for` is client-spoofable until strictly behind a
+  trusted proxy, which would let a caller poison/bypass the per-IP rate-limit key. Fold into the
+  deploy checklist alongside Redis (ADR 0028) and the real email transport.
+- **Audit logging (compliance):** beyond the new-device email, a compliance-bound product will
+  want durable audit events (sign-in, email change, password reset) via Better Auth
+  `databaseHooks`. Not needed yet; recorded so it isn't forgotten.
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 
