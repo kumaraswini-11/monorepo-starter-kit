@@ -10,14 +10,41 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
 ## AI & agent engineering
 
 - [AI Hero](https://www.aihero.dev/) — Matt Pocock's (Total TypeScript, ex-Vercel)
-  AI-engineering education: "5 Agent Skills I Use Every Day," designing codebases
-  so agents perform well, MCP tutorials. **Best reference here for how to write
-  good skills.** Follow/learn, don't install.
+  AI-engineering education: designing codebases so agents perform well, MCP tutorials.
+  **Best reference here for how to write good skills.** Its
+  [Skills collection](https://www.aihero.dev/skills) ships free, editable engineering
+  **workflow** skills — `/grill-me`, `/domain-model`, `/to-prd`, `/to-issues`, `/tdd`,
+  `/triage` (grouped Shaping / Upkeep / Productivity; `npx skills add mattpocock/skills`).
+  Follow/learn + mine for ideas — don't install (hand-write-our-own policy); the authoring
+  principles are the real value.
 - [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/)
   — a course on **AI agent engineering**: how to build reliable "harnesses" that
   constrain and manage coding agents (e.g. Claude) to complete dev tasks. Covers
   why capable models still fail, and how to design the environment, manage state,
   and verify work.
+
+## Design engineering & UI craft
+
+- [Interface cheat-sheet](https://interfaces.dev/cheat-sheet) — **free, high-signal**
+  checklist of design-engineering rules across UI, animation, typography, colour, a11y,
+  layout, and writing (concentric radius, optical alignment, no `transition: all`,
+  `tabular-nums`, `text-wrap: balance`/`pretty`, semantic colour tokens, `:focus-visible`,
+  24/44px hit areas, `prefers-reduced-motion`, gap 2× between groups, verb-first button
+  labels…). Much already matches our conventions (ADR 0024 a11y, the RHF form pattern, OKLCH
+  tokens); the rest is a ready checklist for UI reviews. **Strong candidate to encode as a
+  local, hand-written skill** — see the registries note below.
+- [Interfaces](https://interfaces.dev/) — Jakub Krehel's subscription **design-engineering
+  magazine** (animation, typography, OKLCH colour, UI polish, accessibility as craft;
+  interactive demos + code + its own agent skills + Discord; ~$8/mo). Follow/learn — the
+  bundled skills are subscription content, not something we install (we hand-write our own
+  vetted skills).
+- [UI Skills](https://www.ui-skills.com/) — by **ibelick** (motion-primitives, prompt-kit): a
+  bundle of **4 design-engineering agent skills** (`SKILL.md`) for distinctive, non-generic UI
+  — animation-duration + typography-scale enforcement, accessibility + layout-anti-pattern
+  checks, GSAP motion + microinteractions. Same category as the interface cheat-sheet above.
+  **Browse for ideas, don't install** (community skills; our policy is hand-write our own).
+  Best distilled — together with the interfaces.dev cheat-sheet — into one local
+  `interface-guidelines` skill.
 
 ## Agent-skill registries & tools (evaluated — NOT adopted)
 
