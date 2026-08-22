@@ -114,3 +114,22 @@ never deletes a local authored skill (removal is only the explicit `skills remov
 `interface-guidelines` survives every re-install untouched. Agents also only discover
 skills under `.agents/skills/` (and `.claude/skills/`) — never `docs/` — so authored
 skills live here, not as documentation elsewhere.
+
+### Local authored skills (registry)
+
+The **canonical list of skills we wrote ourselves** — hand-authored, committed, and
+_not_ in `skills-lock.json`. Everything under `.agents/skills/` **not** listed here is
+vendored (its origin is in `skills-lock.json`). **When you add a new manual skill,
+add a row here** so it stays easy to tell ours from the vendored ones.
+
+| Skill                  | Path                                   | Purpose                                                                                                                                              | Distilled from                                                                   |
+| ---------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `interface-guidelines` | `.agents/skills/interface-guidelines/` | Concrete, checkable UI rules (radius, motion, type, OKLCH tokens, a11y, copy); the implementation-rules layer beside the vendored `frontend-design`. | interfaces.dev cheat-sheet + ui-skills.com, adapted to our stack + ADR 0024/0026 |
+
+**Conventions for a new manual skill:**
+
+1. Scaffold with `npx skills init <name>` (creates `.agents/skills/<name>/SKILL.md`).
+2. Start the file with the `> Local, hand-authored skill …` note so it's self-identifying.
+3. A precise `description:` (that's what triggers auto-invocation) and, where relevant,
+   cross-references to the ADRs it encodes.
+4. Add a row above. Do **not** add it to `skills-lock.json`.
