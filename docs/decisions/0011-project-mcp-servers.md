@@ -67,11 +67,12 @@ registries** (`skills.sh`, `skillsmp.com`, aggregating anyone's skills — see
 adopt is narrower and vetted: **reputable first-party and known-author skill sets**,
 installed with the same CLI but pinned and hash-locked:
 
-| Skill set                                              | Source (GitHub)                         | Why                                                                             |
-| ------------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------- |
-| shadcn, vercel-react                                   | `shadcn/ui`, `vercel-labs/agent-skills` | First-party for our UI + React 19 stack                                         |
-| better-auth (\*-best-practices, create-auth, 2FA, org) | `better-auth/skills`                    | First-party for our auth core (ADR 0016)                                        |
-| engineering / productivity                             | `mattpocock/skills`                     | Well-known author (Total TypeScript); design, ADR/domain, research, review, TDD |
+| Skill set                                              | Source (GitHub)                         | Why                                                                              |
+| ------------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------- |
+| frontend-design                                        | `anthropics/skills`                     | First-party (Anthropic, Apache-2.0); distinctive, non-templated UI/visual design |
+| shadcn, vercel-react                                   | `shadcn/ui`, `vercel-labs/agent-skills` | First-party for our UI + React 19 stack                                          |
+| better-auth (\*-best-practices, create-auth, 2FA, org) | `better-auth/skills`                    | First-party for our auth core (ADR 0016)                                         |
+| engineering / productivity                             | `mattpocock/skills`                     | Well-known author (Total TypeScript); design, ADR/domain, research, review, TDD  |
 
 **Guardrails that make this acceptable despite the supply-chain caution:**
 
