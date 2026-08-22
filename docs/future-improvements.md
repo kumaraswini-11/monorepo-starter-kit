@@ -14,9 +14,9 @@ already built.
   Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
   Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
   Phase 1 (unit + component + CI test job + coverage) and Phase 2 (db **and** auth integration
-  vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`).
-  **Remaining:** Playwright e2e (`apps/e2e`), contract/MSW hardening, a CI **integration** job
-  (Testcontainers/Docker on the runner), and flipping coverage report-only → thresholds.
+  vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`, plus a
+  CI **integration** job — Testcontainers on the runner). **Remaining:** Playwright e2e
+  (`apps/e2e`), contract/MSW hardening, and flipping coverage report-only → thresholds.
   - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
     setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
     `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
