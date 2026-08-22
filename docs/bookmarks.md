@@ -66,6 +66,23 @@ browse-only — kept for skill _ideas_, not `npx`-installed into this repo
 - [skillsmp.com](https://skillsmp.com/) — community registry aggregating 2M+
   skills from GitHub; **no curation/vetting** — lowest trust.
 
+## UI libraries to evaluate
+
+Candidate **client runtime** deps — so bundle size matters (ADR-adjacent dep-weight
+policy: keep server-only where possible, lazy-load heavy ones via `next/dynamic`). Not
+adopted; listed for when a real need lands.
+
+- [Liveline](https://benji.org/liveline) — lightweight, **zero-dependency** (React 18+)
+  real-time animated line chart on a **single `<canvas>`**: smooth 60fps interpolation,
+  momentum arrows, value overlays, time windows, candlesticks, multi-series. For live
+  feeds (prices, prediction markets) where a heavy charting lib is overkill. Canvas +
+  no deps means it's cheap and easy to lazy-load behind `next/dynamic`.
+- [React Virtuoso](https://virtuoso.dev/) — the most complete React **virtualization**
+  library: lists, grids, tables (variable-size items, sticky columns, row grouping),
+  masonry, and chat/Message List. Reach for it when a list/table grows long enough to
+  need windowing. **Mostly MIT**; premium chat features are commercially licensed —
+  check the license per component before adopting.
+
 ## Techniques to revisit
 
 - [wayfinder-maps](https://github.com/rengwu/wayfinder-maps) — implements Matt
