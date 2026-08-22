@@ -301,6 +301,12 @@
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
       "computedHash": "f53b17850d8d4d68e8b861cfc7de69580335851d7fe7bc3acdf37505f46c9940"
     },
+    "webapp-testing": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/webapp-testing/SKILL.md",
+      "computedHash": "3f14af7f5690695209c22fbf8c8d133769a86d64892602c09bb13f135e14e857"
+    },
     "wizard": {
       "source": "mattpocock/skills",
       "sourceType": "github",

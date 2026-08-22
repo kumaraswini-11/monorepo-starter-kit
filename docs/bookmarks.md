@@ -50,6 +50,11 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   checks, GSAP motion + microinteractions. Same domain as the vendored `better-*` skills above,
   which now cover this ground first-party. **Browse for extra ideas** (community skills); no
   need to adopt.
+- [Animations on the Web](https://animations.dev/) — **Emil Kowalski**'s (design engineer,
+  Linear/ex-Vercel) interactive course on web animation: easing/spring/timing, CSS +
+  **Motion (Framer Motion)**, performance, a11y, gestures, SVG, motion psychology; bundles
+  ~12 AI skills + Discord (paid). The authority on motion craft for our stack (Motion/React).
+  Follow/learn — the bundled skills are course content, not something we vendor.
 
 ## Agent-skill registries & tools (evaluated — NOT adopted)
 
