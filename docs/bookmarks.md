@@ -33,8 +33,9 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   `tabular-nums`, `text-wrap: balance`/`pretty`, semantic colour tokens, `:focus-visible`,
   24/44px hit areas, `prefers-reduced-motion`, gap 2× between groups, verb-first button
   labels…). Much already matches our conventions (ADR 0024 a11y, the RHF form pattern, OKLCH
-  tokens); the rest is a ready checklist for UI reviews. **Strong candidate to encode as a
-  local, hand-written skill** — see the registries note below.
+  tokens); the rest is a ready checklist for UI reviews. **Distilled into the local
+  `interface-guidelines` skill** (`.agents/skills/interface-guidelines/`, adapted to our
+  stack + ADRs).
 - [Interfaces](https://interfaces.dev/) — Jakub Krehel's subscription **design-engineering
   magazine** (animation, typography, OKLCH colour, UI polish, accessibility as craft;
   interactive demos + code + its own agent skills + Discord; ~$8/mo). Follow/learn — the
@@ -44,9 +45,9 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   bundle of **4 design-engineering agent skills** (`SKILL.md`) for distinctive, non-generic UI
   — animation-duration + typography-scale enforcement, accessibility + layout-anti-pattern
   checks, GSAP motion + microinteractions. Same category as the interface cheat-sheet above.
-  **Browse for ideas, don't install** (community skills; our policy is hand-write our own).
-  Best distilled — together with the interfaces.dev cheat-sheet — into one local
-  `interface-guidelines` skill.
+  **Browse for ideas, don't install** (community skills; we hand-write this layer). Its best
+  ideas are folded — with the interfaces.dev cheat-sheet — into the local
+  `interface-guidelines` skill (`.agents/skills/interface-guidelines/`).
 
 ## Agent-skill registries & tools (evaluated — NOT adopted)
 
