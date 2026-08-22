@@ -98,15 +98,19 @@ rules that bind `@workspace/utils`) exporting two presets:
 
 ```ts
 // base.ts — pure logic, node
-import react from "@vitejs/plugin-react";
-// dom.ts — components, jsdom
-import { defineConfig, defineConfig, mergeConfig } from "vitest/config";
-
-import { base } from "./base";
+import { defineConfig } from "vitest/config";
 
 export const base = defineConfig({
   test: { environment: "node", include: ["src/**/*.test.ts"] },
 });
+```
+
+```ts
+// dom.ts — components, jsdom
+import react from "@vitejs/plugin-react";
+import { defineConfig, mergeConfig } from "vitest/config";
+
+import { base } from "./base";
 
 export const dom = mergeConfig(
   base,
