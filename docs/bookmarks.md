@@ -14,9 +14,11 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   **Best reference here for how to write good skills.** Its
   [Skills collection](https://www.aihero.dev/skills) ships free, editable engineering
   **workflow** skills — `/grill-me`, `/domain-model`, `/to-prd`, `/to-issues`, `/tdd`,
-  `/triage` (grouped Shaping / Upkeep / Productivity; `npx skills add mattpocock/skills`).
-  Follow/learn + mine for ideas — don't install (hand-write-our-own policy); the authoring
-  principles are the real value.
+  `/triage` (grouped Shaping / Upkeep / Productivity). **Adopted** — vendored + hash-pinned
+  via `npx skills add mattpocock/skills` (`skills-lock.json`), alongside the first-party
+  better-auth / shadcn / vercel sets, per the refined policy in
+  [decisions/0011](decisions/0011-project-mcp-servers.md) (reputable first-party/known-author
+  skill sets in; unvetted community registries below stay browse-only).
 - [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/)
   — a course on **AI agent engineering**: how to build reliable "harnesses" that
   constrain and manage coding agents (e.g. Claude) to complete dev tasks. Covers
@@ -48,11 +50,11 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
 
 ## Agent-skill registries & tools (evaluated — NOT adopted)
 
-We hand-write our own vetted skills instead of installing third-party ones
+We adopt only **reputable first-party / known-author** skill sets, vendored and
+hash-pinned (`skills-lock.json`); these **unvetted community registries** stay
+browse-only — kept for skill _ideas_, not `npx`-installed into this repo
 (private/proprietary + supply-chain caution — see
 [decisions/0011-project-mcp-servers.md](decisions/0011-project-mcp-servers.md)).
-Kept as alternatives and to browse for skill _ideas_ only — do not `npx`-install
-into this repo.
 
 - [autoskills.sh](https://www.autoskills.sh/) — by midudev; `npx autoskills`
   auto-detects your stack and installs curated, SHA-256-verified skills.

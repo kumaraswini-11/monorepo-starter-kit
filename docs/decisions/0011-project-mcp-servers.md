@@ -58,3 +58,36 @@ It **overlaps `context7`**'s docs retrieval, but is the authoritative,
 auth-specific source. Keyless remote HTTP, so the same no-secrets, trust-gated
 posture above applies. Drop it if the redundancy isn't worth the extra tool
 surface.
+
+## Update — 2026-08-22: agent skills adopted via the skills CLI (refines the rejection above)
+
+The original "rejected `npx skills add`" line was aimed at the **unvetted community
+registries** (`skills.sh`, `skillsmp.com`, aggregating anyone's skills — see
+[../bookmarks.md](../bookmarks.md)); that stance still holds for those. What we **do**
+adopt is narrower and vetted: **reputable first-party and known-author skill sets**,
+installed with the same CLI but pinned and hash-locked:
+
+| Skill set                                              | Source (GitHub)                         | Why                                                                             |
+| ------------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------- |
+| shadcn, vercel-react                                   | `shadcn/ui`, `vercel-labs/agent-skills` | First-party for our UI + React 19 stack                                         |
+| better-auth (\*-best-practices, create-auth, 2FA, org) | `better-auth/skills`                    | First-party for our auth core (ADR 0016)                                        |
+| engineering / productivity                             | `mattpocock/skills`                     | Well-known author (Total TypeScript); design, ADR/domain, research, review, TDD |
+
+**Guardrails that make this acceptable despite the supply-chain caution:**
+
+- **Vendored + committed**, never fetched at runtime — the skill bodies live in
+  `.agents/skills/` and are reviewed in the PR diff like any other code.
+- **Hash-pinned** in `skills-lock.json` (SHA-256 per skill); an upstream change can't
+  alter a committed skill silently, and re-adds are diffable.
+- **Dev tooling, not shipped product** — like devDependencies, they never enter the
+  app bundle, so the UNLICENSED/proprietary constraint ([0001](0001-proprietary-license-unlicensed.md))
+  isn't touched (their own upstream licenses still govern the vendored copies).
+- **Inert until invoked** — a skill runs only when explicitly called. Notably,
+  `setup-pre-commit` (Husky) and `git-guardrails` install side effects **only if run**;
+  both stay unrun for now (pre-commit is deliberately deferred — see
+  [../future-improvements.md](../future-improvements.md)). Several mattpocock skills are
+  upstream **in-progress** (`implement-spec`, `loop-me`, `writing-*`, `setup-ts-deep-modules`,
+  `claude-handoff`) — usable but treat as experimental.
+
+This supersedes the blanket rejection: **community registries out; reputable,
+hash-pinned, first-party/known-author skill sets in.**
