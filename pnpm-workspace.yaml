@@ -27,6 +27,8 @@ catalog:
   server-only: ^0.0.1
   # Vitest — unit test runner, shared by apps/storybook + packages/*
   vitest: ^4.1.10
+  # Testing Library jest-dom matchers — used by the @workspace/vitest-config `dom` setup
+  "@testing-library/jest-dom": ^6.9.1
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.6.26
   # Language & lint tooling

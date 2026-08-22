@@ -1,0 +1,27 @@
+{
+  "name": "@workspace/vitest-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint --max-warnings 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./base": "./base.ts",
+    "./dom": "./dom.ts",
+    "./setup": "./setup.ts"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "catalog:",
+    "vitest": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}
