@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig, mergeConfig } from "vitest/config";
+import { configDefaults, defineConfig, mergeConfig } from "vitest/config";
 
 /**
  * Shared Vitest presets (ADR 0029). Both live in one file so neither needs a relative
@@ -26,6 +26,10 @@ export const base = defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // Integration tests (`*.integration.test.ts`) also end in `.test.ts`, so exclude them
+    // from the fast unit/component run — they need the container harness and run under the
+    // separate `test:integration` config (ADR 0029 §11).
+    exclude: [...configDefaults.exclude, "**/*.integration.test.ts"],
     // Coverage is inert until `--coverage` is passed. Report-only for now (ADR 0029):
     // thresholds are added once a baseline exists. v8 provider (matches the repo).
     coverage: {
@@ -74,3 +78,22 @@ export const dom = mergeConfig(
     },
   })
 );
+
+/**
+ * Integration preset (ADR 0029 §11) — Node, matches only `*.integration.test.ts`, runs
+ * serially (a shared real DB), and allows time for container start + migrations. Deliberately
+ * **standalone** (reuses `base`'s server-only alias but NOT its unit `include` — merging that
+ * in would pull the fast unit tests into the integration run, since `mergeConfig` concatenates
+ * `include`). Consumers add their own `globalSetup` / `setupFiles` (the Testcontainers harness
+ * lives in `@workspace/db/testing`), so this preset stays free of a `@workspace/db` dependency.
+ */
+export const integration = defineConfig({
+  resolve: base.resolve,
+  test: {
+    environment: "node",
+    include: ["src/**/*.integration.test.ts"],
+    fileParallelism: false,
+    testTimeout: 30_000,
+    hookTimeout: 120_000,
+  },
+});

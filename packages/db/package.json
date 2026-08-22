@@ -17,7 +17,10 @@
     ".": "./src/index.ts",
     "./schema": "./src/schema.ts",
     "./client": "./src/client.ts",
-    "./queries/*": "./src/queries/*.ts"
+    "./queries/*": "./src/queries/*.ts",
+    "./testing/global-setup": "./test/global-setup.ts",
+    "./testing/setup-env": "./test/setup-env.ts",
+    "./testing/reset": "./test/reset.ts"
   },
   "devDependencies": {
     "@testcontainers/postgresql": "catalog:",
@@ -34,7 +37,7 @@
   },
   "dependencies": {
     "@workspace/env": "workspace:*",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "catalog:",
     "pg": "^8.22.0",
     "server-only": "catalog:"
   }

@@ -38,6 +38,8 @@ catalog:
   jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.6.26
+  # Drizzle ORM — packages/db runtime + packages/auth integration tests (DB assertions)
+  drizzle-orm: ^0.45.2
   # Language & lint tooling
   typescript: ^5.9.3
   eslint: ^9.39.5

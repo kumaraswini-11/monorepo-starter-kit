@@ -1,22 +1,16 @@
 import { randomUUID } from "node:crypto";
-import { sql } from "drizzle-orm";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { isNewDeviceSignIn } from "@workspace/db";
 import { db, pool } from "@workspace/db/client";
 import { session, user } from "@workspace/db/schema";
+import { resetDb } from "@workspace/db/testing/reset";
 
 /**
  * Integration tests for `isNewDeviceSignIn` against real Postgres (ADR 0029 §11) — this
  * verifies the actual SQL (the `userId = X AND id != current` filter and the user-agent
  * comparison), which a mocked db could never prove. Truncate between tests for isolation.
  */
-
-async function truncate() {
-  await db.execute(
-    sql`TRUNCATE "user", "session", "account", "verification" RESTART IDENTITY CASCADE`
-  );
-}
 
 async function seedUser() {
   const id = randomUUID();
@@ -38,7 +32,7 @@ async function seedSession(userId: string, userAgent: string | null) {
   return id;
 }
 
-beforeEach(truncate);
+beforeEach(resetDb);
 afterAll(async () => {
   await pool.end();
 });

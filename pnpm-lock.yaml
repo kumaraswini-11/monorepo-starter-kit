@@ -42,6 +42,9 @@ catalogs:
     better-auth:
       specifier: ^1.6.26
       version: 1.6.26
+    drizzle-orm:
+      specifier: ^0.45.2
+      version: 0.45.2
     eslint:
       specifier: ^9.39.5
       version: 9.39.5
@@ -308,6 +311,9 @@ importers:
       '@workspace/vitest-config':
         specifier: workspace:*
         version: link:../vitest-config
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.2(@types/pg@8.20.4)(kysely@0.29.4)(pg@8.22.0)
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)
@@ -324,7 +330,7 @@ importers:
         specifier: workspace:*
         version: link:../env
       drizzle-orm:
-        specifier: ^0.45.2
+        specifier: 'catalog:'
         version: 0.45.2(@types/pg@8.20.4)(kysely@0.29.4)(pg@8.22.0)
       pg:
         specifier: ^8.22.0

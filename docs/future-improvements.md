@@ -13,14 +13,18 @@ already built.
   [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
   Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
   Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
-  Phase 1 (unit + component + CI test job + coverage) and Phase 2 (db integration vs real
-  Postgres via Testcontainers). **Remaining:** Playwright e2e (`apps/e2e`), contract/MSW
-  hardening, and flipping coverage report-only → thresholds.
-  - **Extract the shared integration-test harness** — the Testcontainers container+migrate+
-    env-inject setup currently lives in `packages/db/test/`. When `packages/auth` gains
-    integration tests (Better Auth flows vs real Postgres), extract it to a reusable location
-    (`@workspace/db/testing` export or a small test-support package) instead of copying
-    (rule of three; one consumer today — ADR 0029 §11 Q3).
+  Phase 1 (unit + component + CI test job + coverage) and Phase 2 (db **and** auth integration
+  vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`).
+  **Remaining:** Playwright e2e (`apps/e2e`), contract/MSW hardening, a CI **integration** job
+  (Testcontainers/Docker on the runner), and flipping coverage report-only → thresholds.
+  - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
+    setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
+    `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
+    if a **non-db** consumer ever needs it (ADR 0029 §11).
+  - **Better Auth `testUtils()` plugin** — adopt its session factories / `login()` / OTP
+    capture for cleaner auth-test seeding when we bump Better Auth to **≥1.7** (repo is on
+    1.6.26; today's tests use `auth.api.*`, which works). Gate the bump on the usual
+    changelog-review + full-gate dependency-update policy (ADR 0029 §11 Q2).
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
