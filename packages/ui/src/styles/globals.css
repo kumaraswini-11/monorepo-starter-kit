@@ -25,6 +25,10 @@
   --accent-foreground: oklch(0.216 0.006 56.043);
   /* a11y: darkened from stock shadcn 0.577 (3.98:1 as text on bg-destructive/10) to clear WCAG AA 4.5:1 */
   --destructive: oklch(0.51 0.245 27.325);
+  /* Semantic status hues (distinct from the neutral chart-* ramp) — used as fills for
+     status/strength UI so levels read as red → amber → green, not three grays. */
+  --warning: oklch(0.72 0.16 70);
+  --success: oklch(0.62 0.15 150);
   --border: oklch(0.923 0.003 48.717);
   --input: oklch(0.923 0.003 48.717);
   --ring: oklch(0.709 0.01 56.259);
@@ -60,6 +64,8 @@
   --accent: oklch(0.268 0.007 34.298);
   --accent-foreground: oklch(0.985 0.001 106.423);
   --destructive: oklch(0.704 0.191 22.216);
+  --warning: oklch(0.78 0.15 75);
+  --success: oklch(0.7 0.15 150);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.553 0.013 58.071);
@@ -94,6 +100,8 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -119,6 +127,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
 }
 
 @layer base {

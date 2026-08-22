@@ -88,6 +88,7 @@ function SentConfirmation({
           type="button"
           variant="outline"
           size="lg"
+          className="tabular-nums"
           disabled={cooldown > 0}
           onClick={() => {
             setCooldown(RESEND_COOLDOWN_SECONDS);

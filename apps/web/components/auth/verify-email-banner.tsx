@@ -64,7 +64,7 @@ export function VerifyEmailBanner({ email }: { email: string }) {
           type="button"
           variant="outline"
           size="sm"
-          className="ms-auto"
+          className="ms-auto tabular-nums"
           disabled={pending || cooldown > 0}
           onClick={resend}
         >

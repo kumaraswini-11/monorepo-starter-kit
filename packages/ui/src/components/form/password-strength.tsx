@@ -8,20 +8,29 @@ import { cn } from "@workspace/ui/lib/utils";
  * security control; the actual policy is enforced server-side. No zxcvbn dependency for a
  * UI cue. Generic (not auth-specific) — lives in `components/form/` with the field layer.
  */
+// Semantic status hues (red → amber → green), not the neutral chart-* ramp — so the
+// levels are actually distinguishable. Good and Strong share green, differentiated by
+// how many bars fill (3 vs 4) plus the text label.
 const LEVELS = [
   { label: "Weak", bar: "bg-destructive" },
-  { label: "Fair", bar: "bg-chart-4" },
-  { label: "Good", bar: "bg-chart-2" },
-  { label: "Strong", bar: "bg-chart-1" },
+  { label: "Fair", bar: "bg-warning" },
+  { label: "Good", bar: "bg-success" },
+  { label: "Strong", bar: "bg-success" },
 ] as const;
+
+// Hoisted so they're compiled once, not rebuilt on every keystroke.
+const HAS_LOWER = /[a-z]/;
+const HAS_UPPER = /[A-Z]/;
+const HAS_DIGIT = /\d/;
+const HAS_SYMBOL = /[^a-zA-Z0-9]/;
 
 /** 0–3, mapping to the four `LEVELS`. */
 function scorePassword(value: string): number {
   let score = 0;
   if (value.length >= 10) score++;
   if (value.length >= 14) score++;
-  if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++;
-  if (/\d/.test(value) && /[^a-zA-Z0-9]/.test(value)) score++;
+  if (HAS_LOWER.test(value) && HAS_UPPER.test(value)) score++;
+  if (HAS_DIGIT.test(value) && HAS_SYMBOL.test(value)) score++;
   return Math.min(score, LEVELS.length - 1);
 }
 
