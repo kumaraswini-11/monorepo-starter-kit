@@ -28,6 +28,11 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

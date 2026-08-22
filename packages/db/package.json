@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -19,14 +20,17 @@
     "./queries/*": "./src/queries/*.ts"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "catalog:",
     "@types/node": "catalog:",
     "@types/pg": "^8.20.4",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "@workspace/vitest-config": "workspace:*",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
     "@workspace/env": "workspace:*",

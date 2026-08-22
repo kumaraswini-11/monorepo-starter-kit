@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig, mergeConfig } from "vitest/config";
 
 /**
@@ -5,12 +6,23 @@ import { defineConfig, mergeConfig } from "vitest/config";
  * `./base` import — that would force `allowImportingTsExtensions` on every consumer's tsc.
  */
 
+// `server-only` / `client-only` are build-time environment guards that throw when resolved
+// outside their target (Node/Vitest has no `react-server` condition, so `server-only`
+// throws). They're irrelevant under test — alias both to an empty module.
+const noop = fileURLToPath(new URL("./noop.ts", import.meta.url));
+
 /**
  * Base preset — Node environment, co-located `src/**\/*.test.ts`. Pure, non-DOM packages
  * (`@workspace/utils`, `@workspace/auth`, …) use it:
  * `export { base as default } from "@workspace/vitest-config"`.
  */
 export const base = defineConfig({
+  resolve: {
+    alias: {
+      "server-only": noop,
+      "client-only": noop,
+    },
+  },
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
