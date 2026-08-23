@@ -41,7 +41,7 @@ catalog:
   "@testing-library/user-event": ^14.6.1
   jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
-  better-auth: ^1.7.0
+  better-auth: ^1.7.1
   # Drizzle ORM — packages/db runtime + packages/auth integration tests (DB assertions)
   drizzle-orm: ^0.45.2
   # Language & lint tooling

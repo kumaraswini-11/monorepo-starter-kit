@@ -46,8 +46,9 @@ export const account = pgTable(
     providerId: text("provider_id").notNull(),
     // Better Auth 1.7: account identity is scoped by issuer (credential accounts use
     // "local:credential"). Populated on every account create (ADR 0016; BA 1.7 upgrade
-    // guide). Existing deployments backfill nullable → NOT NULL per that guide; fresh
-    // installs create it NOT NULL directly.
+    // guide). The generated migration adds it NOT NULL directly — correct for fresh installs
+    // and our disposable test/e2e DBs. A deployment that ALREADY holds account rows must
+    // instead follow BA's guide (add nullable → backfill → SET NOT NULL) before applying it.
     issuer: text("issuer").notNull(),
     userId: text("user_id")
       .notNull()

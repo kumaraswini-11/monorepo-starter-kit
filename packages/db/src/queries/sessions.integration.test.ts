@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { isNewDeviceSignIn } from "@workspace/db";
-import { db, pool } from "@workspace/db/client";
+import { db } from "@workspace/db/client";
 import { session, user } from "@workspace/db/schema";
 import { resetDb } from "@workspace/db/testing/reset";
 
@@ -33,9 +33,6 @@ async function seedSession(userId: string, userAgent: string | null) {
 }
 
 beforeEach(resetDb);
-afterAll(async () => {
-  await pool.end();
-});
 
 describe("isNewDeviceSignIn (real Postgres)", () => {
   it("returns false for the user's first-ever session", async () => {

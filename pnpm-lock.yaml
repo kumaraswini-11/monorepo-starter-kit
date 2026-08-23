@@ -46,7 +46,7 @@ catalogs:
       specifier: ^4.1.11
       version: 4.1.11
     better-auth:
-      specifier: ^1.7.0
+      specifier: ^1.7.1
       version: 1.7.1
     drizzle-orm:
       specifier: ^0.45.2

@@ -9,7 +9,7 @@ import type { Page } from "@playwright/test";
 export const STORAGE_STATE = ".auth/user.json";
 
 /** Long enough for Better Auth's `minPasswordLength`; value is irrelevant to the assertions. */
-const E2E_PASSWORD = "correct-horse-battery-staple";
+export const E2E_PASSWORD = "correct-horse-battery-staple";
 
 /** A fresh, collision-proof address so every run is idempotent — no seeding or cleanup. */
 export function uniqueEmail(prefix = "e2e"): string {

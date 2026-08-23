@@ -12,7 +12,10 @@ export default mergeConfig(
   defineConfig({
     test: {
       globalSetup: ["@workspace/db/testing/global-setup"],
-      setupFiles: ["@workspace/db/testing/setup-env"],
+      setupFiles: [
+        "@workspace/db/testing/setup-env",
+        "@workspace/db/testing/teardown",
+      ],
     },
   })
 );

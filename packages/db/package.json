@@ -20,6 +20,7 @@
     "./queries/*": "./src/queries/*.ts",
     "./testing/global-setup": "./test/global-setup.ts",
     "./testing/setup-env": "./test/setup-env.ts",
+    "./testing/teardown": "./test/teardown.ts",
     "./testing/reset": "./test/reset.ts",
     "./testing/migrate": "./test/migrate.ts"
   },
