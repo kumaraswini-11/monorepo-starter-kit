@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { STORAGE_STATE } from "./support/auth.js";
+
 /**
  * End-to-end tests for apps/web (ADR 0029). A dedicated workspace so `@playwright/test` +
  * browsers never enter the app bundle. Runs against the production build (`next start`) for
@@ -55,5 +57,21 @@ export default defineConfig({
       },
     },
   ],
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    // Authenticate once; the authed project reuses the saved session (storageState).
+    { name: "setup", testMatch: /auth\.setup\.ts$/ },
+    {
+      // First-time-visitor journeys (sign-up, sign-out, redirects) — no stored session.
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+      testIgnore: /\.authed\.spec\.ts$/,
+    },
+    {
+      // Returning-authenticated journeys — start signed-in from the setup project's session.
+      name: "chromium-authed",
+      use: { ...devices["Desktop Chrome"], storageState: STORAGE_STATE },
+      dependencies: ["setup"],
+      testMatch: /\.authed\.spec\.ts$/,
+    },
+  ],
 });
