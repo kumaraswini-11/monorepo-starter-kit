@@ -218,6 +218,47 @@ warning** by switching imports to `react-email` — that would drag the CLI's he
 deps into the shipped bundle. Revisit if/when React Email ships tree-shakeable
 subpath exports for `react-email` (tracked by #3556).
 
+## Update — 2026-08-24: SMTP adapter implemented (Nodemailer); Resend as the first provider
+
+The "console stub now / provider deferred" position above is now realized — a **Nodemailer/SMTP
+adapter** lands as the production sender (env-selected); the console stub stays the dev/test default.
+
+**Clarity (recorded — it caused confusion): Nodemailer and Resend are different _layers_, not
+competitors.**
+
+- **Nodemailer** — a Node **library in our code** that _sends_ mail over SMTP (v9, **MIT-0**, zero
+  runtime deps, the Node de-facto). The **library is free**; it does not deliver mail.
+- **Resend** — a delivery **service/provider** (inbox delivery, IP reputation, DKIM/SPF). Reached
+  via its **SMTP endpoint** _or_ its API SDK. **Delivery is provider-priced** (Resend free tier
+  ≈ thousands/mo).
+- Sending is always "our client → a provider." Two client paths: **(A) Nodemailer/SMTP → any
+  provider** (switch by env creds) vs **(B) a provider's SDK** (switch = rewrite the adapter).
+
+**Decision — Path A (Nodemailer/SMTP), with Resend as the first provider.** Chosen for the repo's
+goals — scalable, reusable, isolated, **portable**, compliance-ready, and flexible for the
+separate-backend split (ADR 0027): one adapter serves every SMTP provider, so the provider stays a
+**deploy-time env choice with zero code lock-in** (Resend now → SES for EU-residency/scale/cost
+later, credentials only). Resend's **SDK (Path B) was evaluated and rejected as the default** — its
+extras (webhooks/batch) are marginal for transactional auth mail, its webhooks work over SMTP
+anyway, and it reintroduces the vendor lock-in the `sendEmail` port exists to avoid. The port keeps
+a provider-SDK adapter available later _if_ a hard need (e.g. batch) appears. ("Fast-start DX" is
+explicitly **not** a deciding factor — AGENTS.md, "Build for the enterprise.")
+
+**Official-docs best practices baked into the adapter** (nodemailer.com; resend.com/docs/send-with-smtp):
+
+- **One pooled transporter, created lazily and reused** (`pool: true` + `maxConnections`/
+  `maxMessages`) — never per-message (explicit Nodemailer guidance); lazy init keeps `next build`
+  credential-free (ADR 0021).
+- **Security by port:** 465/2465 → `secure: true` (implicit TLS); 25/587/2587 → STARTTLS
+  (`secure: false`). TLS cert validation stays **on** (never `rejectUnauthorized: false`);
+  `disableFileAccess`/`disableUrlAccess: true` (we only send pre-rendered HTML — no fs/URL fetches).
+- **`EMAIL_FROM`** default; `replyTo`/`headers` passed through from the `EmailMessage`.
+- Resend SMTP endpoint: `smtp.resend.com`, user `resend`, pass = API key, port 465.
+
+**Env (validated; all optional so dev + no-secret CI build still work — ADR 0021):** `SMTP_HOST`,
+`SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`. Selection: SMTP when
+`SMTP_HOST` is set, else the console stub.
+
 ## Revisit triggers
 
 - **Outlook-desktop-heavy B2B** becomes primary → evaluate **MJML** for templates.

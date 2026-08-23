@@ -4,6 +4,8 @@
   "globalPassThroughEnv": [
     "DATABASE_URL",
     "BETTER_AUTH_*",
+    "SMTP_*",
+    "EMAIL_FROM",
     "SKIP_ENV_VALIDATION",
     "ALLOW_DESTRUCTIVE_DB",
     "DOCKER_HOST",
