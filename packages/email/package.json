@@ -35,7 +35,7 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
-    "react-email": "^6.9.1",
+    "react-email": "^6.9.2",
     "typescript": "catalog:"
   }
 }
