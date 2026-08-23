@@ -110,7 +110,8 @@ browser tests ADR 0018 already mandated Vite for. Add **`@testing-library/react`
 **`@testing-library/jest-dom`** matchers. _Already in the lockfile_ (pulled transitively by
 Storybook's `addon-vitest`): `@testing-library/dom`, `jest-dom`, `user-event`,
 `@vitest/browser-playwright`, `@vitest/coverage-v8`, `playwright`. _Missing and to add:_
-`@testing-library/react`, `jsdom`, `@vitejs/plugin-react`.
+`@testing-library/react`, `jsdom` (`@vitejs/plugin-react` was in the original plan but proved
+unnecessary — see the "As implemented" note below).
 
 **React Compiler caveat:** the compiler runs via `babel-plugin-react-compiler` only in
 Next's build; Vitest uses its own Vite/esbuild transform, so component tests run
@@ -157,6 +158,13 @@ export const dom = mergeConfig(
   })
 );
 ```
+
+> **As implemented:** both presets ship in a **single** `packages/vitest-config/index.ts` (no
+> `./base` relative import — that would force `allowImportingTsExtensions` on every consumer's
+> tsc), JSX is configured via Vite 8's **`oxc.jsx`** (rolldown/oxc), **not** `@vitejs/plugin-react`
+> (so that dep was ultimately not added), and a third **`integration`** preset was added for the
+> real-Postgres suites. The samples above capture the design intent; the shipped shape is in
+> `packages/vitest-config/index.ts`.
 
 Consumers stay tiny: `packages/auth` → `base`; `@workspace/ui` + `apps/web` → `dom`. For a
 single package mixing node + jsdom, use Vitest **`test.projects`** (the former `workspace`
@@ -212,15 +220,16 @@ couples test deps to the shipped app and muddies caching.)
 **Config essentials** (`playwright.config.ts`): `webServer` runs the **production build**
 (`next start`, more realistic/stable than `next dev`; `reuseExistingServer: !CI`), real env
 
-- DB (**not** `SKIP_ENV_VALIDATION`); projects for chromium/firefox/webkit; `trace:
-"on-first-retry"`, `screenshot: "only-on-failure"`, `video: "retain-on-failure"`; `retries:
-2` in CI; `reporter: "blob"` in CI (merge shards) / `"html"` locally. **Design the
-  `webServer` as an array from day one** (one entry now — `apps/web`; add the backend entry at
-  the split, §9).
+- DB (**not** `SKIP_ENV_VALIDATION`); a **chromium** project now (add firefox/webkit when
+  cross-browser coverage is actually needed); `trace: "on-first-retry"`, `screenshot:
+"only-on-failure"`, `video: "retain-on-failure"`; `retries: 2` in CI; `reporter:
+["github","list"]` in CI (switch to `"blob"` + a merge job once we shard) / `"list"` locally.
+  **Design the `webServer` as an array from day one** (one entry now — `apps/web`; add the
+  backend entry at the split, §9).
 
-**Auth in e2e — sign in once, reuse via `storageState`.** A `setup` project (a project
-dependency) drives the real sign-in form once and writes `storageState`; every browser
-project loads it, so tests start authenticated with no re-login. This works with Better Auth
+**Auth in e2e — authenticate once, reuse via `storageState`.** A `setup` project (a project
+dependency) drives the real auth UI once (sign-up) and writes `storageState`; the authed
+project loads it, so those tests start authenticated with no re-login. This works with Better Auth
 cookies by value (no hard-coded names; the 5-min signed `cookieCache` is captured too). One
 JSON per role; `await page.waitForURL("/dashboard")` before saving so redirect-set cookies
 land. Provision the test user against the **real Postgres** before the suite (e2e is
@@ -260,11 +269,15 @@ materialized in `packages/db/src/schema.ts` (regenerated via the BA CLI), so mig
 Drizzle folder suffices; assert the generated schema is committed (drift guard) rather than
 running BA-generate in CI.
 
-**Isolation.** `packages/db` repository tests → **per-test transaction rollback** (`BEGIN`/
-`ROLLBACK`, fastest, perfectly isolated). `packages/auth` flow tests → **truncate between
-tests** (`TRUNCATE … RESTART IDENTITY CASCADE`), because `betterAuth()` binds a fixed `db`
-handle and opens its own transactions internally (rollback nesting fights it). Fresh
-container per file is cleanest but slowest — reserve for suites that need it; otherwise share
+**Isolation (as implemented).** Both layers use **truncate between tests** — a shared
+`resetDb()` (`@workspace/db/testing/reset`) that `TRUNCATE … RESTART IDENTITY CASCADE`s every
+`public` table (derived from `pg_tables` at runtime, so it never drifts as the schema grows).
+Per-test transaction rollback (`BEGIN`/`ROLLBACK`) was the original plan for the `packages/db`
+repository tests (fastest, perfectly isolated), but `betterAuth()` binds a fixed `db` handle and
+opens its own transactions internally (rollback nesting fights it), so a single truncate strategy
+across both layers is simpler and consistent; rollback stays a future optimization for the
+pure-repo tests if their volume ever warrants it. Fresh container per file is cleanest but
+slowest — reserve for suites that need it; otherwise share
 one container per run.
 
 **Testing the flows.** Drive the real instance server-side via `auth.api.*` with a `Headers`
@@ -362,7 +375,9 @@ apps/
   web/  components|lib/**/*.test.tsx   # feature-component + seam tests (MSW, §9)
   e2e/                          # NEW dedicated workspace
     playwright.config.ts        # webServer as an ARRAY (one entry now)
-    tests/…  setup/auth.setup.ts  .auth/ (gitignored)
+    tests/*.spec.ts  tests/auth.setup.ts   # journeys + the storageState setup project
+    support/auth.ts  support/db.ts          # shared flow helpers + the DB-URL default
+    .auth/ (gitignored)                     # persisted storageState
 ```
 
 ## 7. Enterprise scale — the maturity path (do NOT do it all at once)
@@ -371,8 +386,9 @@ apps/
   e2e) → sharding → Turbo remote cache. Split only when size warrants.
 - **Coverage:** report-only → global thresholds → per-package/glob gates. Never gate on day
   one (noise, false confidence).
-- **Speed/isolation at scale:** transaction-rollback for repo tests, truncate for auth flows,
-  one container per CI job; unit stays cacheable so most changes get sub-minute feedback.
+- **Speed/isolation at scale:** truncate-per-test for both integration layers (dynamic,
+  schema-agnostic), one container per CI job; unit stays cacheable so most changes get
+  sub-minute feedback.
 
 ---
 
@@ -386,8 +402,13 @@ apps/
    **1.7.1** and adopted via a test-only auth instance (§11 Q2). The 1.7 upgrade also required
    an `account.issuer` column + unique `(issuer, accountId)` index (BA 1.7 "account identity is
    scoped by issuer" — the compatibility gate caught it; schema + migration updated).
-3. **Shared contract package** (§9) now vs at-split. → **Rec:** a lightweight zod contract
-   now — cheap insurance that de-risks the split.
+3. **Shared contract package** (§9) now vs at-split. → **DECIDED (2026-08-23): defer to the
+   split.** A contract needs a counterparty; today there is one client and the request/response
+   types are already inferred (Better Auth's end-to-end types + the `account-exists` zod schema),
+   with the real-server behaviour pinned by the in-package integration tests and the app-side
+   status→error mapping pinned by the MSW seam test. A contract package now would be a
+   single-consumer abstraction with no second party — build it when a separate backend or a 2nd
+   client appears (full Pact only with a 2nd client/team). See §11 Q5 and future-improvements.
 
 ## 9. The separate-backend scenario ([ADR 0027](0027-backend-architecture-fullstack-and-migration.md))
 
@@ -405,7 +426,8 @@ split cheap rather than a rewrite:
 
 **Reusable vs rebuilt:** reusable — the whole Vitest/coverage/shared-config harness, MSW
 setup, the Playwright rig, the Postgres CI service, every package-local test. Rebuilt —
-`lib/session.ts` + its tests, plus CORS/cross-origin-cookie e2e cases that don't exist in
+`lib/session.ts` (currently covered only at the e2e layer — protected-route redirect + authed
+render — not in isolation), plus CORS/cross-origin-cookie e2e cases that don't exist in
 fullstack. **CI/ownership:** two deploy units → two pipelines (web: build+unit+component;
 api: build+integration) + a shared e2e job booting both; tests live with the code, so the
 repo/team split needs no test migration.
@@ -417,7 +439,9 @@ repo/team split needs no test migration.
    **CI unit job**.
 2. **Integration** — `packages/db` repos + `packages/auth` flows against Testcontainers/
    pglite; `test:integration` task; CI integration job.
-3. **E2E** — `apps/e2e` (Playwright, `storageState`, `webServer` array); CI e2e job (sharded).
+3. **E2E** — `apps/e2e` (Playwright, `storageState`, `webServer` array); CI e2e job with a
+   Postgres service (single chromium browser, unsharded now — shard + a blob-merge job when the
+   suite grows).
 4. **Hardening for the split** — **MSW** seam tests (**done**, §11 Q4); a shared **contract
    package** and coverage **thresholds** wait for their triggers (a 2nd client / a coverage
    baseline — see §8.3 and §7), so they are **not** built on day one.
@@ -474,11 +498,11 @@ examples** instead of re-solving it. Doing it now (Docker available, context fre
 than later, and the example tests double as documentation. Implemented with the Q2 verdict —
 **Testcontainers** over the prod `node-postgres` driver.
 
-**Reusability trigger (recorded):** the harness (container + migrate + env-inject) currently
-lives in `packages/db/test/`. When `packages/auth` gains its own integration tests (Better
-Auth flows against real Postgres), **extract the shared harness** to a reusable location
-(e.g. a `@workspace/db/testing` export or a small test-support package) rather than copying —
-rule of three, one consumer today. Logged in `future-improvements.md`.
+**Reusability trigger (done):** the harness (container + migrate + reset + env-inject + pool
+teardown) lives in `packages/db/test/` and is **exported as `@workspace/db/testing/*`** —
+consumed by both `packages/db` and `packages/auth`'s integration suites (two consumers), so the
+extraction is done. Split it into a standalone test-support package only if a **non-db** consumer
+ever appears. Tracked in `future-improvements.md`.
 
 ### Q4 — How do we MSW-test the auth seam without mocking the client? (2026-08-23)
 
@@ -498,6 +522,20 @@ attempt was reversed. The fix is ordering, not environment: call `server.listen(
 **dynamically `import()` the seam**, so the client captures MSW's intercepted fetch. Runs under
 the standard jsdom preset (the same-origin client reads `window.location.origin`); no node-env
 or bespoke baseURL needed. This resolves the Phase-4 MSW item (§10) ahead of the split.
+
+### Q5 — Build the shared contract package now, or defer it? (2026-08-23)
+
+**Decided: defer to the split** (resolving §8 #3). A contract package earns its keep only with a
+**counterparty** — two independently-deployed sides that can drift. Today there is one client and
+one server in one build: the request/response shapes are already the inferred Better Auth
+end-to-end types plus the `account-exists` zod schema; the **real server behaviour** is pinned by
+the in-package integration tests, and the **app-side status→error mapping** by the MSW seam test
+(Q4). The one honest residual is that the MSW handlers hand-encode response shapes with nothing
+binding them to the real server — acceptable now (integration covers the server side), but exactly
+what a shared zod/OpenAPI contract must fix **at the split**, when it feeds both the MSW handlers
+and the provider assertions (full Pact only once a 2nd client/team appears). Building it now would
+be a single-consumer abstraction — against the repo's "no premature abstraction" ethos. Logged in
+`future-improvements.md`.
 
 ## Consequences
 
