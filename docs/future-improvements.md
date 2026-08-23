@@ -47,6 +47,13 @@ already built.
     factories + `login()` from a test-only auth instance). The 1.7 bump also required an
     `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0028's Redis
     secondary-storage snippet needs the 1.7 API (`increment` + `getAndDelete`) when wired.
+  - **Real-SMTP email integration test (deferred).** The Nodemailer/SMTP adapter (ADR 0020) is
+    covered by unit tests (mocked transport). A follow-up should add one integration test that
+    starts a **Mailpit** container (Testcontainers `GenericContainer`, image `axllent/mailpit`,
+    SMTP 1025 / API 8025), points the adapter's env at it, sends, then asserts receipt via
+    Mailpit's `/api/v1/messages` — proving the real connect/TLS/wire path. Add `testcontainers`
+    (already in the tree) as a `packages/email` devDep + a `test:integration` script so
+    `turbo run test:integration` picks it up automatically.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
