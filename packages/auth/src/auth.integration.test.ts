@@ -3,13 +3,24 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { testUtils } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { auth } from "@workspace/auth";
-import { db, pool, schema } from "@workspace/db/client";
+import { db, schema } from "@workspace/db/client";
 import { account, session, user } from "@workspace/db/schema";
 import { resetDb } from "@workspace/db/testing/reset";
+import { sendNewDeviceEmail } from "@workspace/email";
 import { env } from "@workspace/env";
+
+// Mock only the true port — the email transport — so the security hooks can be asserted
+// without rendering/sending; the adapter writes, hashing, and session creation all run for
+// real. `vi.mock` is hoisted above the imports, so `auth`'s own `@workspace/email` import is
+// mocked too, and the `sendNewDeviceEmail` imported here is the spy. (ADR 0029 §3)
+vi.mock("@workspace/email", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@workspace/email")>()),
+  sendNewDeviceEmail: vi.fn().mockResolvedValue(undefined),
+  sendVerifyEmail: vi.fn().mockResolvedValue(undefined),
+}));
 
 /**
  * Integration tests for the Better Auth email/password flow + our `account-exists` plugin
@@ -36,9 +47,9 @@ const testAuth = betterAuth({
   plugins: [testUtils()],
 });
 
-beforeEach(resetDb);
-afterAll(async () => {
-  await pool.end();
+beforeEach(async () => {
+  vi.clearAllMocks();
+  await resetDb();
 });
 
 describe("Better Auth email/password (real Postgres)", () => {
@@ -77,6 +88,58 @@ describe("Better Auth email/password (real Postgres)", () => {
       body: { email: `nobody-${randomUUID()}@example.com` },
     });
     expect(unknown.exists).toBe(false);
+  });
+});
+
+describe("sign-in (real Postgres)", () => {
+  it("returns a session for valid credentials", async () => {
+    const email = `signin-${randomUUID()}@example.com`;
+    await auth.api.signUpEmail({
+      body: { name: "Nikola Tesla", email, password: PASSWORD },
+    });
+
+    const result = await auth.api.signInEmail({
+      body: { email, password: PASSWORD },
+    });
+
+    expect(result.token).toBeTruthy();
+    expect(result.user.email).toBe(email);
+  });
+
+  it("rejects an invalid password (server API throws)", async () => {
+    const email = `wrongpw-${randomUUID()}@example.com`;
+    await auth.api.signUpEmail({
+      body: { name: "Alan Turing", email, password: PASSWORD },
+    });
+
+    await expect(
+      auth.api.signInEmail({ body: { email, password: "not-the-password" } })
+    ).rejects.toThrow();
+  });
+});
+
+describe("new-device security email (session-create hook)", () => {
+  it("stays silent on the first session, fires once on a new-device sign-in", async () => {
+    const email = `device-${randomUUID()}@example.com`;
+    const firstDevice = new Headers({ "user-agent": "Mozilla/5.0 (Device A)" });
+    const newDevice = new Headers({ "user-agent": "Mozilla/5.0 (Device B)" });
+
+    // Sign-up auto-creates the first session → no prior device on record → no alert.
+    await auth.api.signUpEmail({
+      body: { name: "Ada Lovelace", email, password: PASSWORD },
+      headers: firstDevice,
+    });
+    expect(sendNewDeviceEmail).not.toHaveBeenCalled();
+
+    // A sign-in from an unseen user-agent → exactly one alert, addressed to the user.
+    await auth.api.signInEmail({
+      body: { email, password: PASSWORD },
+      headers: newDevice,
+    });
+    expect(sendNewDeviceEmail).toHaveBeenCalledTimes(1);
+    expect(sendNewDeviceEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: email })
+    );
   });
 });
 
