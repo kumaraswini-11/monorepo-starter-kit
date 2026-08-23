@@ -28,7 +28,7 @@
     "server-only": "catalog:"
   },
   "devDependencies": {
-    "@react-email/ui": "^6.9.1",
+    "@react-email/ui": "^6.9.2",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
