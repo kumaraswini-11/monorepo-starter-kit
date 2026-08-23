@@ -37,6 +37,11 @@ export const env = createEnv({
     SMTP_PASSWORD: z.string().min(1).optional(),
     // Default From (e.g. "efferd <noreply@yourdomain>"); a verified sender at the provider.
     EMAIL_FROM: z.string().min(1).optional(),
+    // Google OAuth (ADR 0016). Both optional: set both to enable "Continue with Google";
+    // absent → no social provider is registered (dev/CI build stay green). Create a Web OAuth
+    // client in Google Cloud Console with redirect URI <BETTER_AUTH_URL>/api/auth/callback/google.
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

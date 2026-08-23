@@ -26,6 +26,23 @@ export async function signInWithEmail(
   }
 }
 
+/**
+ * Start the Google OAuth flow (ADR 0016). On success the browser redirects to Google and back to
+ * `callbackURL`; only a pre-redirect failure (misconfig/network) surfaces here as a form error.
+ */
+export async function signInWithGoogle(): Promise<void> {
+  const { error } = await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "/dashboard",
+    errorCallbackURL: "/auth?error=oauth",
+  });
+  if (error) {
+    throw new FormSubmitError(
+      "Couldn't start Google sign-in. Please try again, or use your email."
+    );
+  }
+}
+
 /** Create a new account (Better Auth auto-signs-in on success). */
 export async function signUpWithEmail(params: {
   email: string;

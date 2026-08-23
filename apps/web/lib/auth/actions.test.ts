@@ -20,7 +20,7 @@ import { FormSubmitError } from "@workspace/ui/components/form/form-submit";
 const server = setupServer();
 server.listen({ onUnhandledRequest: "error" });
 
-const { resolveAuthRoute, signInWithEmail, signUpWithEmail } =
+const { resolveAuthRoute, signInWithEmail, signInWithGoogle, signUpWithEmail } =
   await import("./actions");
 
 afterEach(() => server.resetHandlers());
@@ -109,5 +109,16 @@ describe("auth seam — sign-up", () => {
     await expect(
       signUpWithEmail({ email: "new@example.com", password: "a-password-10" })
     ).rejects.toThrow(/could not create your account/i);
+  });
+});
+
+describe("auth seam — google", () => {
+  it("maps a failed social sign-in to a user-safe error", async () => {
+    server.use(
+      http.post("*/api/auth/sign-in/social", () =>
+        HttpResponse.json({ message: "nope" }, { status: 500 })
+      )
+    );
+    await expect(signInWithGoogle()).rejects.toThrow(/google sign-in/i);
   });
 });

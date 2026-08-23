@@ -201,3 +201,27 @@ breaking changes (SCIM, SAML, OAuth-provider, DPoP, Expo…) touch features we d
 knock-on: the Redis secondary-storage API changed — see [0028](0028-rate-limiting-and-secondary-storage.md).
 
 See [../references.md](../references.md) and [../future-improvements.md](../future-improvements.md).
+
+## Update — 2026-08-24: Google OAuth (Phase 2) implemented
+
+Social sign-in via Better Auth's first-party `socialProviders` (official docs). **Google first**;
+the same config pattern adds GitHub/others later.
+
+- **Enablement is env-gated** (deploy-time, like SMTP): `socialProviders.google` is registered
+  only when `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` are both set; absent (dev / no-secret CI
+  build), no provider is registered and the app still builds. Better Auth serves the callback at
+  `<BETTER_AUTH_URL>/api/auth/callback/google` — add that as the authorized redirect URI on the
+  Google Cloud OAuth client.
+- **Account linking — the security decision.** `account.accountLinking.enabled: true`, but we do
+  **not** add `email-password` to `trustedProviders`. Better Auth's default links a social sign-in
+  to an existing account **only on a verified email**; force-linking (via trustedProviders) would
+  link even an _unverified_ email/password account to a matching Google sign-in — an
+  **account-takeover** vector, since progressive verification (ADR 0016) lets email/password
+  accounts stay unverified. Google's `email_verified` makes new Google users verified, so
+  same-email linking happens only once the pre-existing account is verified.
+- **Seam unchanged in shape:** `signInWithGoogle()` in `lib/auth/actions.ts` calls
+  `authClient.signIn.social({ provider: "google", callbackURL, errorCallbackURL })` behind the
+  same enumeration-safe wrapper (ADR 0027 §1); the `/auth` page stays a static shell with the
+  button as a hydrated **client island** (ADR 0023/0025). Covered by an MSW seam test.
+- **Deferred:** a real end-to-end OAuth e2e (needs a mock OAuth provider) — logged in
+  future-improvements, alongside the email real-SMTP integration test.
