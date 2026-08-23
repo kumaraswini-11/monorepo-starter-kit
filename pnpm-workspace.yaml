@@ -18,16 +18,18 @@ catalog:
   "@types/react": ^19.2.18
   "@types/react-dom": ^19.2.4
   # Shared libraries
-  lucide-react: ^1.30.0
+  lucide-react: ^1.33.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.4.3
   # React Hook Form — packages/ui form layer + apps/web auth forms
   react-hook-form: ^7.85.0
   # server-only — build-time guard on server modules (db/auth/email)
   server-only: ^0.0.1
-  # Vitest — unit test runner, shared by apps/storybook + packages/*
-  vitest: ^4.1.10
-  "@vitest/coverage-v8": ^4.1.10
+  # Vitest — unit test runner, shared by apps/storybook + packages/*. The @vitest/* family
+  # must track vitest's exact version, so they live together in the catalog (drift-proof).
+  vitest: ^4.1.11
+  "@vitest/coverage-v8": ^4.1.11
+  "@vitest/browser-playwright": ^4.1.11
   # Testcontainers — ephemeral real Postgres for integration tests (ADR 0029)
   "@testcontainers/postgresql": ^11.7.1
   # Playwright — end-to-end tests (apps/e2e), ADR 0029
@@ -51,9 +53,11 @@ catalog:
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
   "@tailwindcss/vite": ^4.3.3
-  # Storybook — shared by packages/ui (co-located stories) + apps/storybook
-  storybook: ^10.5.7
-  "@storybook/nextjs-vite": ^10.5.7
+  # Storybook — shared by packages/ui (co-located stories) + apps/storybook. All Storybook
+  # packages MUST move in lockstep (same version); keep the core + framework aligned here and
+  # the apps/storybook addons at the same floor. (Dependabot bumped nextjs-vite alone → skew.)
+  storybook: ^10.5.10
+  "@storybook/nextjs-vite": ^10.5.10
 
 allowBuilds:
   sharp: true
