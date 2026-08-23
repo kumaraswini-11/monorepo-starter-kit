@@ -9,6 +9,9 @@
     "lint": "turbo lint",
     "format": "prettier --write --cache .",
     "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
     "deps:check": "taze -r"
   },
   "devDependencies": {

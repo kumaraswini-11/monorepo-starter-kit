@@ -8,6 +8,13 @@
       "when": 1786215962372,
       "tag": "0000_medical_tusk",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787418845594,
+      "tag": "0001_nifty_vertigo",
+      "breakpoints": true
     }
   ]
 }

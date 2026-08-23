@@ -190,4 +190,14 @@ Start simple, escalate only when forced:
 - OWASP (roll-your-own / MFA): CSRF & Credential-Stuffing cheat sheets
 - WorkOS pricing (free to 1M MAU): <https://workos.com/pricing>
 
+## Update — 2026-08-22: upgraded to Better Auth 1.7
+
+Bumped Better Auth **1.6.26 → 1.7.1** (verified via the integration gate — ADR 0029 §11). The
+one change affecting us: 1.7 scopes account identity by **issuer**, so the `account` table
+gains an `issuer` column (credential accounts use `local:credential`) + a unique
+`(issuer, accountId)` index — schema + migration updated (ADR 0019). The many other 1.7
+breaking changes (SCIM, SAML, OAuth-provider, DPoP, Expo…) touch features we don't use. 1.7's
+`testUtils()` plugin is now used in auth integration tests (test-only instance). One deferred
+knock-on: the Redis secondary-storage API changed — see [0028](0028-rate-limiting-and-secondary-storage.md).
+
 See [../references.md](../references.md) and [../future-improvements.md](../future-improvements.md).

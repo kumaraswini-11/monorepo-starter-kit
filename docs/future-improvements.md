@@ -9,12 +9,44 @@ already built.
 
 ## CI / CD
 
-- **Testing** — the full strategy is now decided in
+- **Testing** — the full strategy is in
   [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
-  Playwright e2e, real-Postgres integration via Testcontainers/pglite, `@workspace/vitest-config`,
-  Turbo task split, coverage report-only → gated, and a monorepo/backend-split-aware
-  architecture). Vitest (unit) is wired today; the phased rollout (Foundation → Integration →
-  E2E → contract/MSW hardening) and its CI jobs are the remaining work.
+  Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
+  Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
+  Phase 1 (unit + component + CI test job + coverage), Phase 2 (db **and** auth integration
+  vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`, plus a
+  CI **integration** job — Testcontainers on the runner), **Phase 3 (e2e)** — a Playwright
+  `apps/e2e` workspace + CI job (Postgres service): smoke, protected-route redirect, the full
+  **sign-up** and **sign-out** journeys, and a returning-authenticated journey via the
+  **`storageState`** pattern (a `setup` project authenticates once), aligned to the vendored
+  `playwright-best-practices` skill; and the **Phase 4 MSW seam tests** (ADR 0029 §11 Q4).
+  **Remaining (deferred to their triggers — deliberately not built on day one):** a shared
+  contract package and flipping coverage report-only → thresholds.
+  - **MSW seam tests — done (Phase 4, ADR 0029 §11 Q4).** The seam's HTTP contract
+    (enumeration-safe status→error mapping, identifier-first routing) is proven against
+    MSW-intercepted `/api/auth/*`, with **no** client internals mocked, so it survives the ADR
+    0027 split (only `lib/auth-client.ts`'s baseURL moves). The earlier interception failure was
+    root-caused: Better Auth snapshots `globalThis.fetch` into `customFetchImpl` at client
+    construction, so the seam is dynamically imported **after** `server.listen()` — under the
+    standard jsdom preset, no node-env or bespoke `baseURL` needed.
+  - **Shared contract package (deferred — needs a 2nd party).** A zod/OpenAPI contract feeding
+    both MSW handlers and provider assertions only earns its keep once a **separate backend or a
+    2nd client** exists (ADR 0029 §8.3, §9). Today there is one client and the request/response
+    types are already inferred (Better Auth types + the `account-exists` zod schema), so a
+    contract package now would be a single-consumer abstraction with no counterparty. Build it at
+    the split; full Pact only with a 2nd client/team.
+  - **Coverage thresholds (deferred — needs a baseline).** Coverage stays **report-only** until a
+    representative baseline exists; gating on day one either fails CI or bakes in a meaningless
+    bar (ADR 0029 §7 maturity path). Flip on global thresholds once the suite is broad, then
+    tighten to per-package/glob gates.
+  - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
+    setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
+    `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
+    if a **non-db** consumer ever needs it (ADR 0029 §11).
+  - **Better Auth `testUtils()`** — ✅ done: bumped to **1.7.1** and adopted (session
+    factories + `login()` from a test-only auth instance). The 1.7 bump also required an
+    `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0028's Redis
+    secondary-storage snippet needs the 1.7 API (`increment` + `getAndDelete`) when wired.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into
@@ -159,6 +191,22 @@ See [decisions/0004](decisions/0004-defer-typescript-7.md).
 - **Dependabot noise** — the npm ecosystem runs **quarterly** with the deferred
   majors above **ignored** in `.github/dependabot.yml` (so TS 7 / ESLint 10 stop
   reopening). Remove the relevant `ignore` entry when adopting each.
+- **Install-time deprecation warnings (benign — no action needed).** `pnpm install`
+  prints a few `deprecated` notices; all are either deliberate or upstream-only:
+  - `eslint@9.x` "no longer supported" — expected: ESLint marks every pre-10 line
+    deprecated now that ESLint 10 shipped, and we deliberately stay on 9 (see the
+    ESLint 10 entry above). Bumping within 9.x won't clear it; only the deferred
+    major would.
+  - `@react-email/components@1.0.12` — upstream deprecated its **own latest** version
+    (its siblings `@react-email/render`, `react-email`, `@react-email/ui` are **not**
+    deprecated, and there is no newer version to move to). It's a dev-time
+    email-template lib; build + typecheck are green. Nothing to action — revisit if
+    Resend ships a non-deprecated release.
+  - ~25 transitive "subdependencies" (the internal `@react-email/*` tree, plus
+    `glob@10`, `uuid@10`, `@esbuild-kit/*`, etc.) and the `valibot@^1.4.0` peer
+    warning (isolated inside the dev-only `@storybook/addon-mcp` tree) are **deps of
+    deps** — not declared by us and not shippable; they resolve away as those
+    upstreams update.
 
 ## Production readiness (when this backs a real product)
 

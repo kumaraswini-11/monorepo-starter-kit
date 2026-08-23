@@ -64,16 +64,20 @@ surface.
 The original "rejected `npx skills add`" line was aimed at the **unvetted community
 registries** (`skills.sh`, `skillsmp.com`, aggregating anyone's skills — see
 [../bookmarks.md](../bookmarks.md)); that stance still holds for those. What we **do**
-adopt is narrower and vetted: **reputable first-party and known-author skill sets**,
-installed with the same CLI but pinned and hash-locked:
+adopt is narrower and vetted: **reputable first-party, known-author, and vetted
+domain-specialist skill sets** — the guardrails below (vendored + committed, hash-pinned,
+inert until invoked) are what make a trusted third-party source acceptable, not just
+first-party ones — installed with the same CLI but pinned and hash-locked:
 
-| Skill set                                                                           | Source (GitHub)                         | Why                                                                                         |
-| ----------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------- |
-| frontend-design                                                                     | `anthropics/skills`                     | First-party (Anthropic, Apache-2.0); distinctive, non-templated UI/visual design            |
-| `better-*` interface skills (a11y, colors, layout, typography, ui, writing, review) | `jakubkrehel/skills`                    | First-party interfaces.dev author; concrete, checkable UI-quality rules + a review workflow |
-| shadcn, vercel-react                                                                | `shadcn/ui`, `vercel-labs/agent-skills` | First-party for our UI + React 19 stack                                                     |
-| better-auth (\*-best-practices, create-auth, 2FA, org)                              | `better-auth/skills`                    | First-party for our auth core (ADR 0016)                                                    |
-| engineering / productivity                                                          | `mattpocock/skills`                     | Well-known author (Total TypeScript); design, ADR/domain, research, review, TDD             |
+| Skill set                                                                           | Source (GitHub)                                | Why                                                                                                                      |
+| ----------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| frontend-design                                                                     | `anthropics/skills`                            | First-party (Anthropic, Apache-2.0); distinctive, non-templated UI/visual design                                         |
+| `better-*` interface skills (a11y, colors, layout, typography, ui, writing, review) | `jakubkrehel/skills`                           | First-party interfaces.dev author; concrete, checkable UI-quality rules + a review workflow                              |
+| shadcn, vercel-react                                                                | `shadcn/ui`, `vercel-labs/agent-skills`        | First-party for our UI + React 19 stack                                                                                  |
+| better-auth (\*-best-practices, create-auth, 2FA, org)                              | `better-auth/skills`                           | First-party for our auth core (ADR 0016)                                                                                 |
+| engineering / productivity                                                          | `mattpocock/skills`                            | Well-known author (Total TypeScript); design, ADR/domain, research, review, TDD                                          |
+| playwright-best-practices                                                           | `currents-dev/playwright-best-practices-skill` | Vetted domain specialist (Currents, a Playwright-testing vendor); concrete e2e best-practices for the ADR 0029 e2e layer |
+| monorepo-management                                                                 | `wshobson/agents`                              | Widely-used community agents collection; pnpm/Turborepo monorepo-workflow guidance for this repo's structure             |
 
 **Guardrails that make this acceptable despite the supply-chain caution:**
 

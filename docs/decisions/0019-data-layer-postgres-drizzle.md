@@ -66,9 +66,11 @@ defaults. Each item records a belief we explicitly pressure-tested:
 - **Data access — Drizzle** (a **typed query builder**, not a heavy ORM) over the
   plain **`pg` (node-postgres)** driver; **Drizzle Kit** for migrations. **Kysely** is
   the documented fallback (Better Auth's _built-in_ adapter). **Prisma is rejected.**
-- **Isolation — `packages/db` is the single, one-way data-access boundary.** It is the
-  _only_ package that imports `drizzle-orm`/`pg`; everything else depends on its
-  exported API, never on Drizzle/`pg` directly.
+- **Isolation — `packages/db` is the single, one-way data-access boundary.** In
+  **production code** it is the _only_ package that imports `drizzle-orm`/`pg`; everything
+  else depends on its exported API, never on Drizzle/`pg` directly. (One narrow, test-only
+  exception: integration tests may import `drizzle-orm` helpers — e.g. `eq` — as a
+  **devDependency** for direct DB assertions; runtime code stays behind the boundary. ADR 0029 §11.)
 - **Portability strategy** — commit to the SQL/Postgres paradigm; use the boundary for
   **testability + a single choke-point + a contained blast radius**, **not** to chase
   cross-paradigm swaps. Use Postgres's full power (joins, constraints, JSONB,

@@ -4,7 +4,12 @@
   "globalPassThroughEnv": [
     "DATABASE_URL",
     "BETTER_AUTH_*",
-    "SKIP_ENV_VALIDATION"
+    "SKIP_ENV_VALIDATION",
+    "ALLOW_DESTRUCTIVE_DB",
+    "DOCKER_HOST",
+    "DOCKER_TLS_VERIFY",
+    "DOCKER_CERT_PATH",
+    "TESTCONTAINERS_*"
   ],
   "tasks": {
     "build": {
@@ -26,7 +31,15 @@
       "cache": false
     },
     "test": {
-      "dependsOn": ["build"]
+      "outputs": ["coverage/**"]
+    },
+    "test:integration": {
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["CI"]
     },
     "dev": {
       "cache": false,

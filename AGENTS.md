@@ -17,19 +17,34 @@ package.** Prefer minimal, well-evidenced changes over broad rewrites.
 Run from the repo root. **This repo uses `pnpm` only** (enforced via
 `packageManager` + `engine-strict`) — never `npm` or `yarn`.
 
-| Task                           | Command          |
-| ------------------------------ | ---------------- |
-| Install                        | `pnpm install`   |
-| Dev server                     | `pnpm dev`       |
-| Production build               | `pnpm build`     |
-| Lint (hard gate: 0 warnings)   | `pnpm lint`      |
-| Typecheck                      | `pnpm typecheck` |
-| Format + sort imports (writes) | `pnpm format`    |
+| Task                           | Command                 |
+| ------------------------------ | ----------------------- |
+| Install                        | `pnpm install`          |
+| Dev server                     | `pnpm dev`              |
+| Production build               | `pnpm build`            |
+| Lint (hard gate: 0 warnings)   | `pnpm lint`             |
+| Typecheck                      | `pnpm typecheck`        |
+| Format + sort imports (writes) | `pnpm format`           |
+| Unit + component tests         | `pnpm test`             |
+| Integration tests (real pg)    | `pnpm test:integration` |
+| E2E tests (Playwright)         | `pnpm test:e2e`         |
+
+(`test:integration` needs Docker running — Testcontainers spins up an ephemeral `postgres:17`;
+`test:e2e` needs a **disposable** Postgres via `DATABASE_URL` — the docker-compose `app` DB
+locally, a service in CI — which global-setup wipes each run. See ADR 0029.)
 
 Before treating a change as done, run
 `pnpm format && pnpm lint && pnpm typecheck && pnpm build`. CI runs
 `prettier --check .` and `turbo run lint typecheck build`, and fails on any error
 **or warning**.
+
+**Audit before every commit.** The gate is necessary but not sufficient — beyond it,
+self-review the diff against: coding standards & best practices; **DRY / SOLID**;
+reusability, scalability, maintainability; **full compatibility with the involved
+libraries' official docs** and their best practices; and **enterprise concerns**
+(robustness, resource cleanup, error paths, CI, security). Fix what it surfaces, then
+commit. This is a private, compliance-bound, template-reusable monorepo — every commit is
+held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:integration`.)
 
 ## Stack
 

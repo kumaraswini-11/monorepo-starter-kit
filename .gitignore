@@ -62,4 +62,10 @@ apps/*/CLAUDE.md
 *.tsbuildinfo
 next-env.d.ts
 
+# playwright (apps/e2e) — reports, artifacts, and saved auth state (never commit sessions)
+playwright-report/
+blob-report/
+test-results/
+.auth/
+
 

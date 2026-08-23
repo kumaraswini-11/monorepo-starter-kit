@@ -25,10 +25,25 @@ catalog:
   react-hook-form: ^7.85.0
   # server-only — build-time guard on server modules (db/auth/email)
   server-only: ^0.0.1
-  # Vitest — unit test runner, shared by apps/storybook + packages/*
+  # Vitest — unit test runner, shared by apps/storybook + packages/*. The @vitest/* family
+  # must track vitest's exact version, so they live together in the catalog (drift-proof).
   vitest: ^4.1.11
+  "@vitest/coverage-v8": ^4.1.11
+  "@vitest/browser-playwright": ^4.1.11
+  # Testcontainers — ephemeral real Postgres for integration tests (ADR 0029)
+  "@testcontainers/postgresql": ^11.7.1
+  # Playwright — end-to-end tests (apps/e2e), ADR 0029
+  "@playwright/test": ^1.62.1
+  # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
+  # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
+  "@testing-library/jest-dom": ^6.9.1
+  "@testing-library/react": ^16.3.0
+  "@testing-library/user-event": ^14.6.1
+  jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
-  better-auth: ^1.6.26
+  better-auth: ^1.7.1
+  # Drizzle ORM — packages/db runtime + packages/auth integration tests (DB assertions)
+  drizzle-orm: ^0.45.2
   # Language & lint tooling
   typescript: ^5.9.3
   eslint: ^9.39.5
@@ -38,12 +53,24 @@ catalog:
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
   "@tailwindcss/vite": ^4.3.3
-  # Storybook — shared by packages/ui (co-located stories) + apps/storybook
-  storybook: ^10.5.7
-  "@storybook/nextjs-vite": ^10.5.9
+  # Storybook — shared by packages/ui (co-located stories) + apps/storybook. All Storybook
+  # packages MUST move in lockstep (same version); keep the core + framework aligned here and
+  # the apps/storybook addons at the same floor. (Dependabot bumped nextjs-vite alone → skew.)
+  storybook: ^10.5.10
+  "@storybook/nextjs-vite": ^10.5.10
 
 allowBuilds:
   sharp: true
   unrs-resolver: true
   esbuild: true
   msw: false
+
+# Security patches for transitive deps flagged by `pnpm audit --prod`. None are exploitable in
+# the shipped app (dev/CLI tooling or unreachable resolver branches — we use the zod resolver,
+# not ajv/valibot), but they're pinned to the fixed versions so the audit stays a clean signal.
+# Version selectors (`pkg@<x`) bump only the vulnerable range, leaving unrelated majors alone.
+overrides:
+  "fast-uri@<3.1.5": "^3.1.5" # GHSA-v2hh-gcrm-f6hx / GHSA-7p8r-x3mc-p8w7 (host confusion)
+  "valibot@<1.4.2": "^1.4.2" # GHSA-5qjj-4xww-7phc (flatten throws on inherited keys)
+  "esbuild@<0.25.0": "^0.25.0" # GHSA-67mh-4wv8-2f99 (dev-server request; via drizzle-kit CLI)
+  "nanoid@<3.3.18": "^3.3.18" # GHSA-2v37-7h3g-55p8 (infinite loop on size 0)
