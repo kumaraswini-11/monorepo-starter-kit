@@ -13,24 +13,32 @@ already built.
   [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
   Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
   Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
-  Phase 1 (unit + component + CI test job + coverage) and Phase 2 (db **and** auth integration
+  Phase 1 (unit + component + CI test job + coverage), Phase 2 (db **and** auth integration
   vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`, plus a
-  CI **integration** job — Testcontainers on the runner), plus **Phase 3 (e2e)** — a Playwright
-  harness + smoke test (`apps/e2e`) + CI job, aligned to the vendored `playwright-best-practices`
-  skill. **Remaining:** e2e DB-backed journeys (sign-in, protected-route redirect) with a
-  seeded Postgres + `storageState`; **MSW seam tests** + a shared contract package; and flipping
-  coverage report-only → thresholds.
-  - **MSW seam tests (deferred, Phase 4).** Goal: mock the auth transport at the **HTTP
-    boundary** (`/api/auth/*`) so the seam's contract (enumeration-safe mapping, identifier-first
-    routing) is proven **without a real backend** and survives the ADR 0027 split (ADR 0029 §9).
-    Blocker hit on first attempt: the browser auth client is **same-origin** (relative URLs, no
-    `baseURL`), and MSW didn't intercept Better Auth's fetch under Vitest+jsdom (request escaped
-    to the network). Fix path for the follow-up: run these in the **node** environment with the
-    client given an absolute test `baseURL` (which also mirrors the split-time change — only
-    `lib/auth-client.ts`'s baseURL moves), or configure MSW/Vitest interception explicitly. The
-    architecture is already **verified split-ready** (seam is the sole transport owner; no test
-    couples to internals; integration tests live with `packages/{auth,db}`; e2e `webServer` is
-    an array) — the MSW layer is the additional test-proof, not the enabler.
+  CI **integration** job — Testcontainers on the runner), **Phase 3 (e2e)** — a Playwright
+  `apps/e2e` workspace + CI job (Postgres service): smoke, protected-route redirect, the full
+  **sign-up** and **sign-out** journeys, and a returning-authenticated journey via the
+  **`storageState`** pattern (a `setup` project authenticates once), aligned to the vendored
+  `playwright-best-practices` skill; and the **Phase 4 MSW seam tests** (ADR 0029 §11 Q4).
+  **Remaining (deferred to their triggers — deliberately not built on day one):** a shared
+  contract package and flipping coverage report-only → thresholds.
+  - **MSW seam tests — done (Phase 4, ADR 0029 §11 Q4).** The seam's HTTP contract
+    (enumeration-safe status→error mapping, identifier-first routing) is proven against
+    MSW-intercepted `/api/auth/*`, with **no** client internals mocked, so it survives the ADR
+    0027 split (only `lib/auth-client.ts`'s baseURL moves). The earlier interception failure was
+    root-caused: Better Auth snapshots `globalThis.fetch` into `customFetchImpl` at client
+    construction, so the seam is dynamically imported **after** `server.listen()` — under the
+    standard jsdom preset, no node-env or bespoke `baseURL` needed.
+  - **Shared contract package (deferred — needs a 2nd party).** A zod/OpenAPI contract feeding
+    both MSW handlers and provider assertions only earns its keep once a **separate backend or a
+    2nd client** exists (ADR 0029 §8.3, §9). Today there is one client and the request/response
+    types are already inferred (Better Auth types + the `account-exists` zod schema), so a
+    contract package now would be a single-consumer abstraction with no counterparty. Build it at
+    the split; full Pact only with a 2nd client/team.
+  - **Coverage thresholds (deferred — needs a baseline).** Coverage stays **report-only** until a
+    representative baseline exists; gating on day one either fails CI or bakes in a meaningless
+    bar (ADR 0029 §7 maturity path). Flip on global thresholds once the suite is broad, then
+    tighten to per-package/glob gates.
   - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
     setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
     `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
