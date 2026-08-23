@@ -26,6 +26,17 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
     BETTER_AUTH_TELEMETRY: z.string().optional(),
+    // Email transport (ADR 0020). All optional: with none set, the console stub is used
+    // (dev/test); setting SMTP_HOST switches `packages/email` to the Nodemailer/SMTP sender.
+    // Any SMTP provider works (Resend/SES/Postmark/…) — it's a credentials-only choice.
+    SMTP_HOST: z.string().min(1).optional(),
+    SMTP_PORT: z.coerce.number().int().positive().optional(),
+    // Explicit override; when unset the adapter derives it from the port (465/2465 → true).
+    SMTP_SECURE: z.stringbool().optional(),
+    SMTP_USER: z.string().min(1).optional(),
+    SMTP_PASSWORD: z.string().min(1).optional(),
+    // Default From (e.g. "efferd <noreply@yourdomain>"); a verified sender at the provider.
+    EMAIL_FROM: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
