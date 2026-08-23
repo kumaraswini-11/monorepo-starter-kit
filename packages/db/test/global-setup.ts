@@ -1,8 +1,17 @@
-import { fileURLToPath } from "node:url";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { Pool } from "pg";
+
+import { applyMigrations } from "@workspace/db/testing/migrate";
+
+/**
+ * Type what this harness `provide`s so the workers' `inject("DATABASE_URL")` (in
+ * `setup-env.ts`) resolves to `string` instead of `never`. This is the officially-documented
+ * way to type the provide/inject channel; it augments the whole test tsc program. (ADR 0029)
+ */
+declare module "vitest" {
+  interface ProvidedContext {
+    DATABASE_URL: string;
+  }
+}
 
 /**
  * Integration-test harness (ADR 0029 §11): start one ephemeral, prod-identical Postgres
@@ -20,19 +29,7 @@ export default async function setup(ctx: {
 
   try {
     const connectionString = container.getConnectionUri();
-
-    // Apply migrations on a short-lived pool, always closed even if migration fails.
-    const pool = new Pool({ connectionString });
-    try {
-      await migrate(drizzle(pool), {
-        migrationsFolder: fileURLToPath(
-          new URL("../migrations", import.meta.url)
-        ),
-      });
-    } finally {
-      await pool.end();
-    }
-
+    await applyMigrations(connectionString);
     ctx.provide("DATABASE_URL", connectionString);
 
     return async () => {
@@ -42,11 +39,5 @@ export default async function setup(ctx: {
     // Never leak the container if setup fails before the teardown is returned.
     await container.stop();
     throw error;
-  }
-}
-
-declare module "vitest" {
-  interface ProvidedContext {
-    DATABASE_URL: string;
   }
 }

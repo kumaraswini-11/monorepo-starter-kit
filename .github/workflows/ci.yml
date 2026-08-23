@@ -136,9 +136,27 @@ jobs:
     timeout-minutes: 20
     env:
       # `turbo test:e2e` builds apps/web first (dependsOn ^build); CI has no secrets, so skip
-      # env validation for that build (ADR 0021). The e2e server itself gets throwaway env from
-      # playwright.config; static pages need no DB (ADR 0029).
+      # env validation for that build (ADR 0021). The e2e server gets throwaway env from
+      # playwright.config; the DB-backed journeys (sign-up) run against the service below. (ADR 0029)
       SKIP_ENV_VALIDATION: "1"
+      # global-setup migrates this and the app writes user/account/session to it; the schema is
+      # dropped + recreated each run, so a throwaway service DB is exactly right. (ADR 0029)
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/app
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        # Gate the job's steps on the DB being ready to accept connections.
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

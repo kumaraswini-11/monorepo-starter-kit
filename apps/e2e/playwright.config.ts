@@ -21,6 +21,8 @@ export default defineConfig({
   reporter: CI ? [["github"], ["list"]] : "list",
   timeout: 30_000,
   expect: { timeout: 5_000 },
+  // Apply Drizzle migrations to the e2e Postgres before the app starts (ADR 0029).
+  globalSetup: "./global-setup.ts",
   use: {
     baseURL,
     // Bound action/navigation waits so a hung step fails fast instead of stalling to the
@@ -39,12 +41,16 @@ export default defineConfig({
       url: baseURL,
       reuseExistingServer: !CI,
       timeout: 120_000,
-      // Static pages (e.g. /auth) render without a DB; provide valid-but-throwaway env so the
-      // app boots and @workspace/env validation passes. DB-backed journeys (sign-in, protected
-      // redirects) seed a real Postgres via a global-setup — added in the next e2e increment.
+      // Real Postgres for DB-backed journeys (sign-up hits the DB). `DATABASE_URL` is the
+      // docker-compose Postgres locally / a Postgres service in CI (defaulted to the compose
+      // creds); global-setup migrates it first. Throwaway auth secret — e2e signs up fresh users.
       env: {
-        DATABASE_URL: "postgres://e2e:e2e@127.0.0.1:5432/e2e",
-        BETTER_AUTH_SECRET: "e2e-secret-at-least-32-characters-long-00",
+        DATABASE_URL:
+          process.env.DATABASE_URL ??
+          "postgres://postgres:postgres@127.0.0.1:5432/app",
+        BETTER_AUTH_SECRET:
+          process.env.BETTER_AUTH_SECRET ??
+          "e2e-secret-at-least-32-characters-long-00",
         BETTER_AUTH_URL: baseURL,
       },
     },
