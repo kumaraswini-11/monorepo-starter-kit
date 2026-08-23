@@ -191,6 +191,22 @@ See [decisions/0004](decisions/0004-defer-typescript-7.md).
 - **Dependabot noise** — the npm ecosystem runs **quarterly** with the deferred
   majors above **ignored** in `.github/dependabot.yml` (so TS 7 / ESLint 10 stop
   reopening). Remove the relevant `ignore` entry when adopting each.
+- **Install-time deprecation warnings (benign — no action needed).** `pnpm install`
+  prints a few `deprecated` notices; all are either deliberate or upstream-only:
+  - `eslint@9.x` "no longer supported" — expected: ESLint marks every pre-10 line
+    deprecated now that ESLint 10 shipped, and we deliberately stay on 9 (see the
+    ESLint 10 entry above). Bumping within 9.x won't clear it; only the deferred
+    major would.
+  - `@react-email/components@1.0.12` — upstream deprecated its **own latest** version
+    (its siblings `@react-email/render`, `react-email`, `@react-email/ui` are **not**
+    deprecated, and there is no newer version to move to). It's a dev-time
+    email-template lib; build + typecheck are green. Nothing to action — revisit if
+    Resend ships a non-deprecated release.
+  - ~25 transitive "subdependencies" (the internal `@react-email/*` tree, plus
+    `glob@10`, `uuid@10`, `@esbuild-kit/*`, etc.) and the `valibot@^1.4.0` peer
+    warning (isolated inside the dev-only `@storybook/addon-mcp` tree) are **deps of
+    deps** — not declared by us and not shippable; they resolve away as those
+    upstreams update.
 
 ## Production readiness (when this backs a real product)
 
