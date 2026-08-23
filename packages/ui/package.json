@@ -32,7 +32,7 @@
   "devDependencies": {
     "@storybook/nextjs-vite": "catalog:",
     "@tailwindcss/postcss": "catalog:",
-    "@turbo/gen": "^2.10.8",
+    "@turbo/gen": "^2.10.11",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
