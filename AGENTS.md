@@ -12,6 +12,21 @@ Private, proprietary monorepo — the foundation for a product that will face
 compliance later. **License `UNLICENSED`; never open-source or publish any
 package.** Prefer minimal, well-evidenced changes over broad rewrites.
 
+## Build for the enterprise — and push back with evidence
+
+This is an enterprise-grade, compliance-bound, **template-reusable** foundation. Optimize every
+decision for the long term — **scalability, reusability, isolation, maintainability, standards,
+and a future separate-backend split (ADR 0027)** — **never** for "make it work for now,"
+"fast-start," or short-term convenience. When a path trades long-term correctness for speed, take
+correctness and record the trade-off.
+
+When the user proposes a tool, library, or approach, **do not just agree.** Research it against
+those goals (official docs + reputable, current comparisons), **critique it honestly** — steelman
+the alternatives and name the trade-offs, lock-in, and compliance/scale implications — then give
+the **best option as a clear, evidence-backed recommendation, even when it contradicts the
+proposal.** "Yes sir / no sir" is not the job; rigorous engineering judgment is. When asked for
+clarity, lead with the R&D and reasoning, then decide together.
+
 ## Commands
 
 Run from the repo root. **This repo uses `pnpm` only** (enforced via
