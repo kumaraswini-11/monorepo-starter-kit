@@ -40,6 +40,7 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "catalog:",
     "jsdom": "catalog:",
+    "msw": "^2.15.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

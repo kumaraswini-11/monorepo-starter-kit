@@ -418,8 +418,9 @@ repo/team split needs no test migration.
 2. **Integration** — `packages/db` repos + `packages/auth` flows against Testcontainers/
    pglite; `test:integration` task; CI integration job.
 3. **E2E** — `apps/e2e` (Playwright, `storageState`, `webServer` array); CI e2e job (sharded).
-4. **Hardening for the split** — shared **contract package** + **MSW** seam tests; flip on
-   coverage **thresholds**.
+4. **Hardening for the split** — **MSW** seam tests (**done**, §11 Q4); a shared **contract
+   package** and coverage **thresholds** wait for their triggers (a 2nd client / a coverage
+   baseline — see §8.3 and §7), so they are **not** built on day one.
 
 ## 11. Implementation Q&A & decision log
 
@@ -478,6 +479,25 @@ lives in `packages/db/test/`. When `packages/auth` gains its own integration tes
 Auth flows against real Postgres), **extract the shared harness** to a reusable location
 (e.g. a `@workspace/db/testing` export or a small test-support package) rather than copying —
 rule of three, one consumer today. Logged in `future-improvements.md`.
+
+### Q4 — How do we MSW-test the auth seam without mocking the client? (2026-08-23)
+
+**Decided: intercept real HTTP; import the seam _after_ MSW starts.** The seam
+(`apps/web/lib/auth/actions.ts`) is the sole owner of the Better Auth transport (ADR 0027 §1),
+so its contract test (`actions.test.ts`) drives the **real** `actions.ts` + the **real** shared
+`authClient` and lets **MSW** intercept `/api/auth/*`, asserting the status→user-safe-error
+mapping (401→"Invalid email or password.", 422→"already exists", 429→rate-limit copy, etc.). We
+mock **no** `authClient` internals, so the test survives the ADR 0027 split unchanged — only the
+client's `baseURL` moves, and the handlers already match any origin (leading-wildcard matchers).
+
+**The gotcha (root-caused):** Better Auth's client **snapshots `globalThis.fetch` into
+`customFetchImpl` when it is constructed** (at module import). If the seam is imported normally,
+the client captures the _un-patched_ fetch before MSW's `server.listen()` runs, so requests
+escape to the network (`ECONNREFUSED`) instead of being intercepted — this is why the first
+attempt was reversed. The fix is ordering, not environment: call `server.listen()` first, then
+**dynamically `import()` the seam**, so the client captures MSW's intercepted fetch. Runs under
+the standard jsdom preset (the same-origin client reads `window.location.origin`); no node-env
+or bespoke baseURL needed. This resolves the Phase-4 MSW item (§10) ahead of the split.
 
 ## Consequences
 
