@@ -18,7 +18,7 @@ catalog:
   "@types/react": ^19.2.18
   "@types/react-dom": ^19.2.4
   # Shared libraries
-  lucide-react: ^1.30.0
+  lucide-react: ^1.33.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.4.3
   # React Hook Form — packages/ui form layer + apps/web auth forms
@@ -26,7 +26,7 @@ catalog:
   # server-only — build-time guard on server modules (db/auth/email)
   server-only: ^0.0.1
   # Vitest — unit test runner, shared by apps/storybook + packages/*
-  vitest: ^4.1.10
+  vitest: ^4.1.11
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.6.26
   # Language & lint tooling

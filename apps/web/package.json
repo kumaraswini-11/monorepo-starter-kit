@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.8.0",
+    "@hookform/resolvers": "^5.9.1",
     "@workspace/auth": "workspace:*",
     "@workspace/env": "workspace:*",
     "@workspace/ui": "workspace:*",
