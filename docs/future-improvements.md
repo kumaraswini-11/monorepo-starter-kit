@@ -54,6 +54,10 @@ already built.
     Mailpit's `/api/v1/messages` — proving the real connect/TLS/wire path. Add `testcontainers`
     (already in the tree) as a `packages/email` devDep + a `test:integration` script so
     `turbo run test:integration` picks it up automatically.
+  - **OAuth end-to-end test (deferred).** Google sign-in (ADR 0016) is covered by an MSW seam
+    test (error mapping) + config, but a full browser e2e needs a **mock OAuth provider** (the
+    real Google login can't be automated). Add a Playwright e2e against a stub IdP (e.g. a mock
+    OAuth server / Better Auth's test helpers) when the OAuth surface grows.
 - **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
   build/lint cache across CI runs.
 - **Parallel CI jobs** — currently one job (cheapest at this size); split into

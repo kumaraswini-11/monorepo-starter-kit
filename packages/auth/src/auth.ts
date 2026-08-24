@@ -29,6 +29,21 @@ import { firstWord } from "@workspace/utils/string";
  * raw `process.env`. `pg` connects lazily and a CI `next build` sets
  * `SKIP_ENV_VALIDATION=1`, so building with no DB/secret stays safe.
  */
+/**
+ * Google OAuth is enabled only when both credentials are present — a deploy-time choice
+ * (ADR 0016), like the SMTP provider. Absent in dev / no-secret CI builds, so no social provider
+ * is registered and the app still builds and runs.
+ */
+const socialProviders =
+  env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+    ? {
+        google: {
+          clientId: env.GOOGLE_CLIENT_ID,
+          clientSecret: env.GOOGLE_CLIENT_SECRET,
+        },
+      }
+    : {};
+
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
   secret: env.BETTER_AUTH_SECRET,
@@ -126,6 +141,18 @@ export const auth = betterAuth({
   // Identifier-first existence check as a BA plugin endpoint — inherits BA's rate limiting
   // (ADR 0027 §3); read-only via the internal adapter, adds no schema.
   plugins: [accountExists()],
+  // Social login (ADR 0016). Registered only when credentials are set (see `socialProviders`
+  // above); Better Auth serves `/api/auth/callback/<provider>` automatically.
+  socialProviders,
+  // Account linking (security-critical): link a social sign-in to an existing account only on a
+  // VERIFIED email — Better Auth's default. We deliberately do NOT add "email-password" to
+  // `trustedProviders`: that would force-link even an *unverified* email/password account to a
+  // matching Google sign-in, enabling account takeover (progressive verification means our
+  // email/password accounts can be unverified). Google's `email_verified` makes new Google users
+  // verified, so a same-email link only happens once the pre-existing account is verified. (ADR 0016)
+  account: {
+    accountLinking: { enabled: true },
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // refresh at most once per day

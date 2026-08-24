@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MailIcon } from "lucide-react";
 
-import { GoogleIcon } from "@workspace/ui/components/icons/google-icon";
-import { Button, buttonVariants } from "@workspace/ui/components/shadcn/button";
+import { buttonVariants } from "@workspace/ui/components/shadcn/button";
 import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { AuthHeader } from "@/components/auth/auth-header";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 
 export const metadata: Metadata = { title: "Authentication" };
 
@@ -34,13 +34,10 @@ export default function AuthEntryPage() {
        */}
       <div className="flex flex-col gap-2">
         {/*
-         * Presentational for now — Google OAuth is wired later (ADR 0025 keeps the UI
-         * wiring-agnostic), so there is no handler yet and the page stays static.
+         * A client island (ADR 0023/0025): the page stays a static shell while just this button
+         * hydrates to start the Google OAuth redirect via the seam (lib/auth/actions.ts).
          */}
-        <Button type="button" variant="outline" size="lg" className="w-full">
-          <GoogleIcon data-icon="inline-start" />
-          <span className="min-w-38 text-start">Continue with Google</span>
-        </Button>
+        <GoogleSignInButton />
 
         <Link
           href="/auth/email"
