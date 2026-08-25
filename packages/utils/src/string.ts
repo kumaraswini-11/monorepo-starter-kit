@@ -34,3 +34,30 @@ export function firstWord(text: string): string | undefined {
 
   return start === end ? undefined : text.slice(start, end);
 }
+
+/**
+ * Initials of a name — the first letter of each of the first `max` whitespace-delimited words,
+ * uppercased. E.g. `"Ada Lovelace"` → `"AL"`, `"grace hopper"` → `"GH"`, `"Ada"` → `"A"`;
+ * `max` (default 2) caps how many, for avatar-style fallbacks. Empty/whitespace-only → `""`.
+ *
+ * Complexity: **O(k)** time — scans only up to the start of the `max`-th word, taking one letter
+ * per word, instead of `split`-ing and allocating the whole string. **O(1)** auxiliary space
+ * beyond the small result.
+ */
+export function getInitials(value: string, max = 2): string {
+  const length = value.length;
+  let initials = "";
+  let i = 0;
+
+  while (i < length && initials.length < max) {
+    // Skip whitespace to the start of the next word.
+    while (i < length && isWhitespace(value.charCodeAt(i))) i++;
+    if (i >= length) break;
+
+    // Take the word's first character, then advance past the rest of the word.
+    initials += value.charAt(i).toUpperCase();
+    while (i < length && !isWhitespace(value.charCodeAt(i))) i++;
+  }
+
+  return initials;
+}
