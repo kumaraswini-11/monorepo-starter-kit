@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { signUpViaUi, uniqueEmail } from "../support/auth.js";
+import { signOutViaUi, signUpViaUi, uniqueEmail } from "../support/auth.js";
 
 /**
  * Sign-out journey (ADR 0029). Runs in the public project with its own fresh user so it never
@@ -12,7 +12,7 @@ test("signing out clears the session and re-protects the app", async ({
 }) => {
   await signUpViaUi(page, uniqueEmail("e2e-signout"));
 
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOutViaUi(page);
   await expect(page).toHaveURL(/\/auth$/);
 
   // The session is gone server-side, so a protected route redirects to sign-in.

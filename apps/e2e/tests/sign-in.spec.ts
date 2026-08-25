@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { E2E_PASSWORD, signUpViaUi, uniqueEmail } from "../support/auth.js";
+import {
+  E2E_PASSWORD,
+  signOutViaUi,
+  signUpViaUi,
+  uniqueEmail,
+} from "../support/auth.js";
 
 /**
  * Returning-user credentials sign-in journey (ADR 0029 §2). The storageState path proves session
@@ -13,7 +18,7 @@ test("a returning user signs in with email + password", async ({ page }) => {
 
   // Arrange: create the account (auto-signed-in), then sign out so we start signed-out.
   await signUpViaUi(page, email);
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOutViaUi(page);
   await expect(page).toHaveURL(/\/auth$/);
 
   // Act: start the flow fresh — a full load resets the in-memory auth-flow state ("restart,

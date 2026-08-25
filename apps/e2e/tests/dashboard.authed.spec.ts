@@ -11,8 +11,10 @@ test("a returning authenticated user opens the dashboard directly", async ({
 }) => {
   await page.goto("/dashboard");
 
-  // Not bounced to /auth, and the authed UI renders.
+  // Not bounced to /auth, and the authed shell renders (the account menu holds sign-out).
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Account menu" })
+  ).toBeVisible();
 });

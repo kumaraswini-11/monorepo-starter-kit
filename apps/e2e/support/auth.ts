@@ -40,3 +40,12 @@ export async function signUpViaUi(
 
   await page.waitForURL(/\/dashboard$/);
 }
+
+/**
+ * Sign out through the header account menu (avatar → "Sign out"). Sign-out lives in a dropdown,
+ * so we open the menu first, then click the destructive menu item.
+ */
+export async function signOutViaUi(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Account menu" }).click();
+  await page.getByRole("menuitem", { name: "Sign out" }).click();
+}

@@ -9,6 +9,7 @@ import {
 } from "@workspace/ui/components/shadcn/sidebar";
 
 import { AppSidebar } from "@/components/app-shell/app-sidebar";
+import { UserMenu } from "@/components/app-shell/user-menu";
 import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { getSession } from "@/lib/session";
@@ -28,7 +29,7 @@ export const instant = false;
  *
  * The sidebar's open/collapsed state persists across reloads via the `sidebar_state` cookie —
  * read here so the server renders the correct initial state (no flash/hydration mismatch).
- * Global controls live in the shell (sign-out in the sidebar footer, theme toggle in the header)
+ * Global controls live in the shell header (theme toggle + the account menu, which holds sign-out)
  * so they're reachable from every page, including Settings.
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -40,16 +41,17 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   const defaultOpen = (await cookies()).get("sidebar_state")?.value !== "false";
 
+  const user = { name: session.user.name, email: session.user.email };
+
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar
-        user={{ name: session.user.name, email: session.user.email }}
-      />
+      <AppSidebar />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger />
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
+            <UserMenu user={user} />
           </div>
         </header>
 
