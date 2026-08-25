@@ -1,7 +1,16 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@workspace/ui/components/shadcn/sidebar";
+
+import { AppSidebar } from "@/components/app-shell/app-sidebar";
 import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getSession } from "@/lib/session";
 
 /**
@@ -13,10 +22,14 @@ import { getSession } from "@/lib/session";
 export const instant = false;
 
 /**
- * Guard for the authenticated area. The session is checked on the server before any
- * protected UI renders — no client-side auth flash, and the redirect happens before
- * bytes are sent. `getSession()` is `cache()`-memoized, so this lookup is shared with
- * the page it wraps (one call per request, not two).
+ * Authenticated app shell. Guards the session on the server (no auth flash; redirect before any
+ * bytes), then wraps every authed page in the shadcn `Sidebar` shell. `getSession()` is
+ * `cache()`-memoized, so this lookup is shared with the page it wraps (one call per request).
+ *
+ * The sidebar's open/collapsed state persists across reloads via the `sidebar_state` cookie —
+ * read here so the server renders the correct initial state (no flash/hydration mismatch).
+ * Global controls live in the shell (sign-out in the sidebar footer, theme toggle in the header)
+ * so they're reachable from every page, including Settings.
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await getSession();
@@ -25,12 +38,27 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/auth");
   }
 
+  const defaultOpen = (await cookies()).get("sidebar_state")?.value !== "false";
+
   return (
-    <>
-      {!session.user.emailVerified && (
-        <VerifyEmailBanner email={session.user.email} />
-      )}
-      {children}
-    </>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AppSidebar
+        user={{ name: session.user.name, email: session.user.email }}
+      />
+      <SidebarInset>
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger />
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
+          </div>
+        </header>
+
+        {!session.user.emailVerified && (
+          <VerifyEmailBanner email={session.user.email} />
+        )}
+
+        <div className="flex-1">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
