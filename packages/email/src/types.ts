@@ -12,6 +12,6 @@ export interface EmailMessage {
 /**
  * The email port. Every sender — the console stub, a Nodemailer/SMTP transport, or
  * a provider SDK — is interchangeable behind this one interface, so the provider is
- * a swappable, deploy-time choice (ADR 0020).
+ * a swappable, deploy-time choice (ADR 0014).
  */
 export type SendEmail = (message: EmailMessage) => Promise<void>;

@@ -10,7 +10,7 @@ import { toast } from "@workspace/ui/components/shadcn/toast";
 import { signInWithGoogle } from "@/lib/auth/actions";
 
 /**
- * "Continue with Google" — a client island on the otherwise-static `/auth` page (ADR 0023/0025),
+ * "Continue with Google" — a client island on the otherwise-static `/auth` page (ADR 0019/0025),
  * so the page still prerenders. Kicks off the OAuth redirect through the seam; a successful start
  * navigates away to Google, and a pre-redirect failure surfaces a toast and re-enables the button.
  */

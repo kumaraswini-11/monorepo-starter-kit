@@ -16,7 +16,7 @@ package.** Prefer minimal, well-evidenced changes over broad rewrites.
 
 This is an enterprise-grade, compliance-bound, **template-reusable** foundation. Optimize every
 decision for the long term — **scalability, reusability, isolation, maintainability, standards,
-and a future separate-backend split (ADR 0027)** — **never** for "make it work for now,"
+and a future separate-backend split (ADR 0017)** — **never** for "make it work for now,"
 "fast-start," or short-term convenience. When a path trades long-term correctness for speed, take
 correctness and record the trade-off.
 
@@ -46,7 +46,7 @@ Run from the repo root. **This repo uses `pnpm` only** (enforced via
 
 (`test:integration` needs Docker running — Testcontainers spins up an ephemeral `postgres:17`;
 `test:e2e` needs a **disposable** Postgres via `DATABASE_URL` — the docker-compose `app` DB
-locally, a service in CI — which global-setup wipes each run. See ADR 0029.)
+locally, a service in CI — which global-setup wipes each run. See ADR 0025.)
 
 Before treating a change as done, run
 `pnpm format && pnpm lint && pnpm typecheck && pnpm build`. CI runs
@@ -65,7 +65,7 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
 
 - **pnpm 10** workspaces + **Turborepo**; **Node ≥ 24** LTS (pnpm pinned via `packageManager`; Node via `.nvmrc`/`engines`)
 - **Next.js 16** (Turbopack) · **React 19** · **Tailwind CSS v4**
-- UI: **shadcn/ui** built on **Base UI** (`@base-ui/react`) — not Radix (ADR 0007)
+- UI: **shadcn/ui** built on **Base UI** (`@base-ui/react`) — not Radix (ADR 0021)
 - **TypeScript 5** · **ESLint 9** (flat config) · **Prettier 3**
 
 ## Layout
@@ -80,7 +80,7 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
 
 - **Prettier owns all formatting**, run once from the root. Import order is enforced
   by `@ianvs/prettier-plugin-sort-imports`; keep `prettier-plugin-tailwindcss`
-  **last**. Never hand-format or add ESLint stylistic rules. (ADR 0002, 0010)
+  **last**. Never hand-format or add ESLint stylistic rules. (ADR 0004, 0010)
 - **Cross-package dependency versions go through pnpm catalogs**: use `catalog:` in
   `package.json` and pin the version in `pnpm-workspace.yaml`. Package-only deps may
   be inlined. Never inline a version for something two packages share.
@@ -104,7 +104,7 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
   if it changes how we work. `taze` also reorders/tightens manifests — **audit its
   diff** before committing.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
-- **Component placement (atomic-design _lens_; ADR 0022 → Component placement):** categorize
+- **Component placement (atomic-design _lens_; ADR 0016 → Component placement):** categorize
   by atomic level to pick the home, but keep **reusability-tier packages + feature folders**
   (never literal `atoms/molecules/organisms` folders). **Atoms + agnostic molecules**
   (shadcn/Base UI primitives, `PasswordInput`, brand) → **`@workspace/ui`**, which stays
@@ -119,15 +119,15 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
   `docs/future-improvements.md`.
 - **Conventional Commits**, one logical change per commit.
 - Treat the **shadcn / create-turbo output as the baseline**; deviate only with
-  authoritative evidence, and write an ADR when you do. (ADR 0005)
+  authoritative evidence, and write an ADR when you do. (ADR 0001)
 
 ## Don't
 
 - Don't open-source, add public license text, or set `publishConfig` — every package
-  is private / `UNLICENSED`. (ADR 0001, 0008)
+  is private / `UNLICENSED`. (ADR 0002, 0008)
 - Don't bypass the lint gate, disable Prettier, or commit with failing checks.
 - Don't major-upgrade tooling (pnpm 11, TypeScript 7, ESLint 10) without checking
-  `docs/future-improvements.md` first — several are deliberately deferred. (ADR 0004)
+  `docs/future-improvements.md` first — several are deliberately deferred. (ADR 0006)
 
 ## More
 

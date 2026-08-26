@@ -13,9 +13,9 @@ import { emailFormSchema, type EmailFormValues } from "@/lib/validation";
 
 /**
  * Forgot-password request form — collects the email to send a reset link to.
- * Presentational per ADR 0025: the submit handler is injected. `defaultEmail` pre-fills
+ * Presentational per ADR 0022: the submit handler is injected. `defaultEmail` pre-fills
  * from the flow when the user arrived from the sign-in screen. Pending/submit behaviour is
- * the shared `Form` pattern (ADR 0026).
+ * the shared `Form` pattern (ADR 0022).
  */
 export function ForgotPasswordForm({
   defaultEmail = "",

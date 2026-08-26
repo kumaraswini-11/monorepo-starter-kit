@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 /**
  * Where the `setup` project persists an authenticated browser context so the authed projects
  * reuse the session instead of re-logging-in per test (Playwright `storageState`). Git-ignored
- * (`.auth/`) — a real session, never committed. (ADR 0029)
+ * (`.auth/`) — a real session, never committed. (ADR 0025)
  */
 export const STORAGE_STATE = ".auth/user.json";
 

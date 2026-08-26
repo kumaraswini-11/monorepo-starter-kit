@@ -17,7 +17,7 @@ import { resetPassword } from "@/lib/auth/actions";
  * single-use, short-lived token — the standard reset mechanism, not PII, so this is the
  * "resume via token" exception to the no-PII-in-URL rule). No token → an expired/invalid
  * state. On success we send the user to sign in with the new password (sessions are
- * revoked on reset — ADR 0016; not auto-logged-in, for security).
+ * revoked on reset — ADR 0011; not auto-logged-in, for security).
  */
 export function ResetPasswordStep() {
   const router = useRouter();

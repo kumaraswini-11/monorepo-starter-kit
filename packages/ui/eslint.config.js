@@ -6,7 +6,7 @@ import { config } from "@workspace/eslint-config/react-internal";
  * an effect — embla's API, `matchMedia` — which trips
  * `react-hooks/set-state-in-effect`. We relax that one rule for the vendored
  * source only; application code (apps/web) keeps the full hard gate.
- * See docs/decisions/0013-vendored-ui-lint-exception.md.
+ * See docs/decisions/0005-lint-gate-and-vendored-exception.md.
  *
  * @type {import("eslint").Linter.Config[]}
  */

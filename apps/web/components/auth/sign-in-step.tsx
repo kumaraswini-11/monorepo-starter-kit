@@ -10,9 +10,9 @@ import { signInWithEmail } from "@/lib/auth/actions";
 
 /**
  * Client wiring + guard for `/auth/sign-in`. Requires the email captured at `/auth/email`;
- * a refresh / direct nav without one restarts the flow there (ADR 0025 §4). Shows a
+ * a refresh / direct nav without one restarts the flow there (ADR 0023 §4). Shows a
  * skeleton while redirecting. On success → `/dashboard`; a failed sign-in surfaces via
- * `FormError` (the injected handler throws a `FormSubmitError`, ADR 0025 §2 / 0027).
+ * `FormError` (the injected handler throws a `FormSubmitError`, ADR 0022 / 0027).
  */
 export function SignInStep() {
   const router = useRouter();

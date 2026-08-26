@@ -10,7 +10,7 @@ import { submitWithFormError } from "@workspace/ui/components/form/form-submit";
 import { cn } from "@workspace/ui/lib/utils";
 
 /**
- * Shared form shell that owns the app-wide submit / pending-state pattern (ADR 0026):
+ * Shared form shell that owns the app-wide submit / pending-state pattern (ADR 0022):
  * renders the `<form>`, wires the injected `onSubmit` through `submitWithFormError`
  * (server errors → `root.serverError`, re-entrancy guard, clears stale root first), and
  * sets `aria-busy` while submitting. Fields stay enabled; only the `SubmitButton` disables.

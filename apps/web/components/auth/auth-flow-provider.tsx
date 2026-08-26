@@ -19,7 +19,7 @@ const AuthFlowContext = createContext<AuthFlow | null>(null);
 
 /**
  * Holds the in-flight auth-flow state (the email) in memory, so it never touches the URL —
- * no PII in logs / history / `Referer` (ADR 0025 §4). Mounted in the `/auth` layout, so it
+ * no PII in logs / history / `Referer` (ADR 0023 §4). Mounted in the `/auth` layout, so it
  * persists across the `/auth/email → /auth/sign-in|sign-up` client navigation but resets
  * on a full reload — the intended "restart, don't resume" behaviour for credential entry.
  *

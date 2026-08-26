@@ -11,7 +11,7 @@ import { sendEmail } from "@workspace/email/send-email";
 /**
  * Semantic senders — the ONLY email surface `packages/auth` (and future callers)
  * touch. Each renders a React Email template, applies the subject, and hands the
- * `{ html, text }` off to the swappable `sendEmail` port (ADR 0020). Consumers never
+ * `{ html, text }` off to the swappable `sendEmail` port (ADR 0014). Consumers never
  * import React Email or a transport, so `packages/email` stays the single email
  * choke-point (same one-way boundary as `packages/db`).
  *

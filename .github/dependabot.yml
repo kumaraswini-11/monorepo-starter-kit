@@ -27,7 +27,7 @@ updates:
   # proposes catalog deps; `taze` (`pnpm deps:check`) still handles routine catalog
   # refreshes. `quarterly` = every 3 months (GitHub Dependabot options reference;
   # GitHub Enterprise Server needs 3.19+). Majors for the deliberately-deferred
-  # tooling are IGNORED below (ADR 0004) so they stop reopening — adopt those
+  # tooling are IGNORED below (ADR 0006) so they stop reopening — adopt those
   # manually when the ecosystem is ready.
   - package-ecosystem: "npm"
     directory: "/"
@@ -45,7 +45,7 @@ updates:
         update-types: ["minor", "patch"]
     ignore:
       # TypeScript 7 / ESLint 10 — deferred until typescript-eslint / the ESLint
-      # plugin ecosystem support them (ADR 0004 / future-improvements.md).
+      # plugin ecosystem support them (ADR 0006 / future-improvements.md).
       # `@eslint/js` moves with eslint's major, not ahead of it.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]

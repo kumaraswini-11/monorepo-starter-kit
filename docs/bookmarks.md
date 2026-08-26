@@ -17,7 +17,7 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   `/triage` (grouped Shaping / Upkeep / Productivity). **Adopted** — vendored + hash-pinned
   via `npx skills add mattpocock/skills` (`skills-lock.json`), alongside the first-party
   better-auth / shadcn / vercel sets, per the refined policy in
-  [decisions/0011](decisions/0011-project-mcp-servers.md) (reputable first-party/known-author
+  [decisions/0010](decisions/0010-agent-skills-vendoring.md) (reputable first-party/known-author
   skill sets in; unvetted community registries below stay browse-only).
 - [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/)
   — a course on **AI agent engineering**: how to build reliable "harnesses" that
@@ -32,9 +32,9 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   layout, and writing (concentric radius, optical alignment, no `transition: all`,
   `tabular-nums`, `text-wrap: balance`/`pretty`, semantic colour tokens, `:focus-visible`,
   24/44px hit areas, `prefers-reduced-motion`, gap 2× between groups, verb-first button
-  labels…). Much already matches our conventions (ADR 0024 a11y, the RHF form pattern, OKLCH
+  labels…). Much already matches our conventions (ADR 0020 a11y, the RHF form pattern, OKLCH
   tokens). Now **adopted first-party**: Jakub publishes these as free agent skills on GitHub
-  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0011) — so the rules are
+  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0010) — so the rules are
   applied directly in-repo, no hand-written copy needed.
 - [Jakub Krehel](https://jakub.kr/) — personal site of the **interfaces.dev** author
   (design engineer). Source of the `better-*` interface skills we vendor; follow for
@@ -62,13 +62,13 @@ We adopt only **reputable first-party / known-author** skill sets, vendored and
 hash-pinned (`skills-lock.json`); these **unvetted community registries** stay
 browse-only — kept for skill _ideas_, not `npx`-installed into this repo
 (private/proprietary + supply-chain caution — see
-[decisions/0011-project-mcp-servers.md](decisions/0011-project-mcp-servers.md)).
+[decisions/0010-agent-skills-vendoring.md](decisions/0010-agent-skills-vendoring.md)).
 
 - [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — by
   **VoltAgent**: a curated **"awesome list"** of 1000+ agent skills, organized by provider
   (Anthropic, Google, Stripe, Vercel, Microsoft…) and hand-picked from real engineering
   teams rather than mass AI-generated. Not a registry/installer — a directory. **Best
-  starting point to discover reputable first-party skills** worth vendoring (per ADR 0011);
+  starting point to discover reputable first-party skills** worth vendoring (per ADR 0010);
   browse, then `skills add` the vetted ones.
 - [autoskills.sh](https://www.autoskills.sh/) — by midudev; `npx autoskills`
   auto-detects your stack and installs curated, SHA-256-verified skills.

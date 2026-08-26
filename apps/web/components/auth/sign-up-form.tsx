@@ -18,9 +18,9 @@ import { signUpFormSchema, type SignUpFormValues } from "@/lib/validation";
 /**
  * Sign-up credential form (new user). Optional name + password with a live strength meter
  * and the new-password policy (`passwordField`). No confirm field — show/hide covers
- * verification (spec §3.3). Presentational per ADR 0025: email prop + injected submit
+ * verification (spec §3.3). Presentational per ADR 0022: email prop + injected submit
  * (which may throw a `FormSubmitError`, e.g. "An account with this email already exists").
- * Pending/submit behaviour is the shared `Form` pattern (ADR 0026).
+ * Pending/submit behaviour is the shared `Form` pattern (ADR 0022).
  */
 export function SignUpForm({
   email,

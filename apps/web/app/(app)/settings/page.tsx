@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "Settings" };
 
 /**
- * Settings — placeholder for now (the real surface lands in a later phase; ADR 0016 roadmap).
+ * Settings — placeholder for now (the real surface lands in a later phase; ADR 0011 roadmap).
  * Reachable from the sidebar so the navigation is complete; content is intentionally empty.
  */
 export default function SettingsPage() {

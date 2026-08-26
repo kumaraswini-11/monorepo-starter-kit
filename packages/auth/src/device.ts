@@ -2,7 +2,7 @@ import { UAParser } from "ua-parser-js";
 
 /**
  * Helpers that turn raw sign-in metadata into the human-readable strings the
- * new-device security email shows (ADR 0020). Server-side only (auth hooks) — never
+ * new-device security email shows (ADR 0014). Server-side only (auth hooks) — never
  * shipped to the client.
  */
 

@@ -4,7 +4,7 @@ import { config } from "@workspace/eslint-config/base";
 export default [
   ...config,
   {
-    // @workspace/utils is a leaf: pure, isomorphic, zero-dependency (ADR 0022). It must not
+    // @workspace/utils is a leaf: pure, isomorphic, zero-dependency (ADR 0016). It must not
     // import any other internal package — that would invert the dependency direction.
     files: ["src/**/*.ts"],
     rules: {
@@ -15,7 +15,7 @@ export default [
             {
               group: ["@workspace/*"],
               message:
-                "@workspace/utils is a dependency-free leaf — it must not import other internal packages (ADR 0022).",
+                "@workspace/utils is a dependency-free leaf — it must not import other internal packages (ADR 0016).",
             },
           ],
         },

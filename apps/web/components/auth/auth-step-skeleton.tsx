@@ -2,7 +2,7 @@ import { Skeleton } from "@workspace/ui/components/shadcn/skeleton";
 
 /**
  * Placeholder for a credential step while its state resolves — the email-guard redirect
- * (ADR 0025 §4) on `/auth/sign-in` and `/auth/sign-up`, and the `useSearchParams` Suspense
+ * (ADR 0023 §4) on `/auth/sign-in` and `/auth/sign-up`, and the `useSearchParams` Suspense
  * boundary on `/auth/reset-password`. Avoids a flash of blank before the form renders or
  * the flow restarts at `/auth/email`. Mirrors the header + one field + submit shape.
  *

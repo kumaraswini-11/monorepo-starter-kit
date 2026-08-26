@@ -12,7 +12,7 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 export const metadata: Metadata = { title: "Authentication" };
 
 /**
- * Auth entry — the method chooser at `/auth`. Static Server Component shell (ADR 0023):
+ * Auth entry — the method chooser at `/auth`. Static Server Component shell (ADR 0019):
  * it reads no request data, so it prerenders and is edge-cacheable. `/` dispatches
  * visitors here (or to `/dashboard` when a session already exists).
  */
@@ -34,7 +34,7 @@ export default function AuthEntryPage() {
        */}
       <div className="flex flex-col gap-2">
         {/*
-         * A client island (ADR 0023/0025): the page stays a static shell while just this button
+         * A client island (ADR 0019/0025): the page stays a static shell while just this button
          * hydrates to start the Google OAuth redirect via the seam (lib/auth/actions.ts).
          */}
         <GoogleSignInButton />

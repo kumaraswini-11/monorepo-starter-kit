@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * Returning-authenticated journey (ADR 0029): a user with a persisted session (the `storageState`
+ * Returning-authenticated journey (ADR 0025): a user with a persisted session (the `storageState`
  * from the `setup` project) reaches a protected route directly — no login step. Read-only, so it
  * never mutates the shared session. The inverse (no session → redirect) is covered by
  * `protected-routes.spec.ts`.

@@ -1,6 +1,6 @@
 /**
  * Pure, isomorphic string helpers — zero dependencies, safe to import from any client
- * or server bundle (`@workspace/utils`, ADR 0022). No I/O, no globals, no side effects.
+ * or server bundle (`@workspace/utils`, ADR 0016). No I/O, no globals, no side effects.
  */
 
 /** Common ASCII/Unicode whitespace: tab–CR (9–13), space (32), non-breaking space (160). */

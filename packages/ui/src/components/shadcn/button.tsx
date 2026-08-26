@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@workspace/ui/lib/utils";
 
-// Deviation from stock shadcn (tracked — ADR 0005): named transition properties instead of
+// Deviation from stock shadcn (tracked — ADR 0001): named transition properties instead of
 // `transition-all`, matching the house style already set in `input.tsx` (better-ui). If a
 // `shadcn add --overwrite` ever restores `transition-all` here, re-apply this.
 const buttonVariants = cva(

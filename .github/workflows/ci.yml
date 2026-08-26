@@ -22,7 +22,7 @@ jobs:
     env:
       # @workspace/env validates at import, which runs during `next build`. CI has no
       # secrets, so skip validation here — real runtimes still fail-fast at startup
-      # (ADR 0021). lint/typecheck don't execute the module, so job-level is safe.
+      # (ADR 0013). lint/typecheck don't execute the module, so job-level is safe.
       SKIP_ENV_VALIDATION: "1"
       # Uncomment to enable Turborepo Remote Caching (Vercel):
       # TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: 15
     env:
       # Some component tests may transitively pull @workspace/env; CI has no secrets, so
-      # skip validation (real runtimes still fail-fast — ADR 0021).
+      # skip validation (real runtimes still fail-fast — ADR 0013).
       SKIP_ENV_VALIDATION: "1"
     steps:
       - name: Checkout
@@ -96,8 +96,8 @@ jobs:
 
       - name: Run unit + component tests (coverage, report-only)
         # Storybook's browser-mode tests are excluded here — they need Playwright browser
-        # binaries and belong with the visual/e2e CI lane (ADR 0018/0029). Coverage is
-        # report-only for now; thresholds come later (ADR 0029).
+        # binaries and belong with the visual/e2e CI lane (ADR 0024/0029). Coverage is
+        # report-only for now; thresholds come later (ADR 0025).
         run: pnpm exec turbo run test --filter='!storybook' -- --coverage
 
   integration:
@@ -127,7 +127,7 @@ jobs:
         # Testcontainers manages an ephemeral postgres:17; the Docker daemon on ubuntu-latest
         # runners is available out of the box, so no `services:` container is needed. The test
         # env (DATABASE_URL from the container + throwaway secret) is set by the shared harness
-        # (@workspace/db/testing), so no CI secrets are required. (ADR 0029 §11)
+        # (@workspace/db/testing), so no CI secrets are required. (ADR 0025 §11)
         run: pnpm exec turbo run test:integration
 
   e2e:
@@ -136,11 +136,11 @@ jobs:
     timeout-minutes: 20
     env:
       # `turbo test:e2e` builds apps/web first (dependsOn ^build); CI has no secrets, so skip
-      # env validation for that build (ADR 0021). The e2e server gets throwaway env from
-      # playwright.config; the DB-backed journeys (sign-up) run against the service below. (ADR 0029)
+      # env validation for that build (ADR 0013). The e2e server gets throwaway env from
+      # playwright.config; the DB-backed journeys (sign-up) run against the service below. (ADR 0025)
       SKIP_ENV_VALIDATION: "1"
       # global-setup migrates this and the app writes user/account/session to it; the schema is
-      # dropped + recreated each run, so a throwaway service DB is exactly right. (ADR 0029)
+      # dropped + recreated each run, so a throwaway service DB is exactly right. (ADR 0025)
       DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/app
     services:
       postgres:

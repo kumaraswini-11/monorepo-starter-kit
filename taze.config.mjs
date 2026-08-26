@@ -12,7 +12,7 @@ import { defineConfig } from "taze";
  *   touch it.
  * - `githubActions: false` — taze 20 rewrites action refs in `.github/workflows/*`. Dependabot
  *   already owns the `github-actions` ecosystem (SHA-pinned, weekly, `.github/dependabot.yml`),
- *   so letting taze rewrite them too would fight that single owner (ADR 0009).
+ *   so letting taze rewrite them too would fight that single owner (ADR 0007).
  *
  * This keeps `taze -r` scoped to npm dependencies + the pnpm catalog — its original job.
  */

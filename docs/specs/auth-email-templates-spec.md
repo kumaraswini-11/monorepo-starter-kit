@@ -11,22 +11,22 @@
 Companion to the [Auth UI/UX spec](auth-ui-ux-spec.md): that spec covers the **web
 screens**; this one covers the **transactional emails** those flows send. These
 templates are implemented per
-[ADR 0020](../decisions/0020-email-transactional-messaging.md) as **React Email**
+[ADR 0014](../decisions/0014-email-transactional-messaging.md) as **React Email**
 components in `packages/email`, rendered to HTML + plain-text and delivered through the
 `sendEmail` port — triggered by Better Auth
-([ADR 0016](../decisions/0016-authentication-strategy.md)) callbacks/hooks
+([ADR 0011](../decisions/0011-authentication-strategy.md)) callbacks/hooks
 (`sendVerificationEmail`, `sendResetPassword`, and session/security events).
 
 **Alignment notes — reconcile at implementation:**
 
 - **Author as React Email** components in `packages/email` (not raw HTML); one
-  `render()` yields both the HTML and the plain-text fallback (ADR 0020).
+  `render()` yields both the HTML and the plain-text fallback (ADR 0014).
 - **Map `[Product]`, colours, and buttons to our design tokens** (shadcn stone theme in
   `globals.css`) — don't hardcode a separate palette. Tone matches the UI spec.
 - **Keep copy ↔ config in sync:** the expiry windows below (24h verify, 15–30 min
   reset) are set in Better Auth (`emailVerification` / `emailAndPassword`), not just in
   prose — change them in one place and mirror the other.
-- **Provider-agnostic:** delivery follows ADR 0020 (console stub in dev → SES/Resend/
+- **Provider-agnostic:** delivery follows ADR 0014 (console stub in dev → SES/Resend/
   SMTP later); these templates don't depend on the provider.
 - **Security emails** (password-changed, new-device) fire from Better Auth hooks;
   password change must invalidate other sessions (matches §3).

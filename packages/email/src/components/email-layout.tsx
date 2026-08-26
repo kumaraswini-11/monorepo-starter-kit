@@ -10,7 +10,7 @@ import {
 } from "@react-email/components";
 
 /**
- * Shared shell for every auth email (ADR 0020). Styles are inline — email clients
+ * Shared shell for every auth email (ADR 0014). Styles are inline — email clients
  * don't reliably support external CSS — and map to the app's stone/neutral palette
  * so the emails read as part of the product.
  */

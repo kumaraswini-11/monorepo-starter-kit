@@ -17,7 +17,7 @@ import { getSession } from "@/lib/session";
 /**
  * The authed area reads the session (`headers()`) on every request, so it's dynamic with
  * no useful static shell. `instant = false` opts this segment out of instant-navigation
- * validation (Cache Components / ADR 0023) — it deliberately blocks on the server guard.
+ * validation (Cache Components / ADR 0019) — it deliberately blocks on the server guard.
  * Public pages (`/auth`) stay static and stream normally.
  */
 export const instant = false;

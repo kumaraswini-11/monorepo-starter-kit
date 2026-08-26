@@ -11,7 +11,7 @@ import { resendVerificationEmail } from "@/lib/auth/actions";
 const RESEND_COOLDOWN_SECONDS = 30;
 
 /**
- * Top banner for signed-in but unverified users — progressive verification (ADR 0016): the
+ * Top banner for signed-in but unverified users — progressive verification (ADR 0011): the
  * account works, we just nudge them to verify. Better Auth sends the link on sign-up; this
  * lets them resend (throttled by BA's rate limiter + a local cooldown). Clicking the emailed
  * link is handled by BA's route handler, which redirects to the callbackURL.

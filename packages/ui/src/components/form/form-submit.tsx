@@ -34,7 +34,7 @@ export function toFormErrorMessage(error: unknown): string {
  *    clicks, this covers the Enter key (RHF does not promise to block concurrent submits).
  *
  * Field validation is handled by the zod resolver; `formState.isSubmitting` stays the
- * pending state (RHF owns the async lifecycle). (ADR 0026.)
+ * pending state (RHF owns the async lifecycle). (ADR 0022.)
  */
 export function submitWithFormError<T extends FieldValues>(
   form: UseFormReturn<T>,

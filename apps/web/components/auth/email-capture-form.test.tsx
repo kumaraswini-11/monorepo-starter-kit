@@ -30,7 +30,7 @@ describe("EmailCaptureForm", () => {
     expect(onSubmit).toHaveBeenCalledWith("you@company.com");
   });
 
-  it("surfaces a thrown FormSubmitError in the error banner (ADR 0026)", async () => {
+  it("surfaces a thrown FormSubmitError in the error banner (ADR 0022)", async () => {
     const user = userEvent.setup();
     render(
       <EmailCaptureForm

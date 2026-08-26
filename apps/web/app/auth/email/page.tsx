@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Continue with email" };
 
 /**
  * Email capture — step 2 of the method-first flow, at `/auth/email`. Server Component so
- * the back link and header stay in the static shell (ADR 0023); only `EmailCaptureForm`
+ * the back link and header stay in the static shell (ADR 0019); only `EmailCaptureForm`
  * ships client JS. Shared `AuthHeader` keeps the scale identical to the entry screen.
  */
 export default function EmailCapturePage() {

@@ -16,9 +16,9 @@ import {
 
 /**
  * Reset-password form — set a new password (with a live strength meter and the
- * new-password policy). Presentational per ADR 0025: the submit handler is injected (it may
+ * new-password policy). Presentational per ADR 0022: the submit handler is injected (it may
  * throw a `FormSubmitError`, e.g. an expired token). No confirm field — show/hide covers
- * verification (spec §3.3). Pending/submit behaviour is the shared `Form` pattern (ADR 0026).
+ * verification (spec §3.3). Pending/submit behaviour is the shared `Form` pattern (ADR 0022).
  */
 export function ResetPasswordForm({
   onSubmit,

@@ -35,6 +35,6 @@ the console stub, CI builds with `SKIP_ENV_VALIDATION`, and tests mock the trans
 
 Switching provider later (e.g. Amazon SES for EU residency) is an **env change only** — same
 adapter, no code. Best practices + the provider R&D:
-ADR [0020](../../docs/decisions/0020-email-transactional-messaging.md).
+ADR [0014](../../docs/decisions/0014-email-transactional-messaging.md).
 
 Server-only.

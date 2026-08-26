@@ -4,7 +4,7 @@ import { AuthFlowProvider } from "@/components/auth/auth-flow-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
- * Shell for the auth screens under `/auth/*` (see ADR 0024). Layout conventions
+ * Shell for the auth screens under `/auth/*` (see ADR 0020). Layout conventions
  * (codebase-wide):
  * - `min-h-svh` (small-viewport-height) so mobile browser chrome never clips content.
  * - Native document scroll — NO `overflow-hidden` — so it still works when content

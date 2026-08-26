@@ -8,7 +8,7 @@ import { pool } from "@workspace/db/client";
  * globalThis-cached singleton (which throws). Robust under both Vitest isolation modes:
  * `isolate: true` gives each file its own pool + one close; `isolate: false` shares one pool
  * closed once at the end. Ordered AFTER `setup-env` so `DATABASE_URL` is set before the client
- * module loads. (ADR 0029)
+ * module loads. (ADR 0025)
  */
 afterAll(async () => {
   await pool.end();

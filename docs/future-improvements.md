@@ -10,7 +10,7 @@ already built.
 ## CI / CD
 
 - **Testing** — the full strategy is in
-  [decisions/0029](decisions/0029-testing-strategy.md) (Vitest + Testing Library,
+  [decisions/0025](decisions/0025-testing-strategy.md) (Vitest + Testing Library,
   Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
   Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
   Phase 1 (unit + component + CI test job + coverage), Phase 2 (db **and** auth integration
@@ -19,10 +19,10 @@ already built.
   `apps/e2e` workspace + CI job (Postgres service): smoke, protected-route redirect, the full
   **sign-up** and **sign-out** journeys, and a returning-authenticated journey via the
   **`storageState`** pattern (a `setup` project authenticates once), aligned to the vendored
-  `playwright-best-practices` skill; and the **Phase 4 MSW seam tests** (ADR 0029 §11 Q4).
+  `playwright-best-practices` skill; and the **Phase 4 MSW seam tests** (ADR 0025 §11 Q4).
   **Remaining (deferred to their triggers — deliberately not built on day one):** a shared
   contract package and flipping coverage report-only → thresholds.
-  - **MSW seam tests — done (Phase 4, ADR 0029 §11 Q4).** The seam's HTTP contract
+  - **MSW seam tests — done (Phase 4, ADR 0025 §11 Q4).** The seam's HTTP contract
     (enumeration-safe status→error mapping, identifier-first routing) is proven against
     MSW-intercepted `/api/auth/*`, with **no** client internals mocked, so it survives the ADR
     0027 split (only `lib/auth-client.ts`'s baseURL moves). The earlier interception failure was
@@ -31,30 +31,30 @@ already built.
     standard jsdom preset, no node-env or bespoke `baseURL` needed.
   - **Shared contract package (deferred — needs a 2nd party).** A zod/OpenAPI contract feeding
     both MSW handlers and provider assertions only earns its keep once a **separate backend or a
-    2nd client** exists (ADR 0029 §8.3, §9). Today there is one client and the request/response
+    2nd client** exists (ADR 0025 §8.3, §9). Today there is one client and the request/response
     types are already inferred (Better Auth types + the `account-exists` zod schema), so a
     contract package now would be a single-consumer abstraction with no counterparty. Build it at
     the split; full Pact only with a 2nd client/team.
   - **Coverage thresholds (deferred — needs a baseline).** Coverage stays **report-only** until a
     representative baseline exists; gating on day one either fails CI or bakes in a meaningless
-    bar (ADR 0029 §7 maturity path). Flip on global thresholds once the suite is broad, then
+    bar (ADR 0025 §7 maturity path). Flip on global thresholds once the suite is broad, then
     tighten to per-package/glob gates.
   - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
     setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
     `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
-    if a **non-db** consumer ever needs it (ADR 0029 §11).
+    if a **non-db** consumer ever needs it (ADR 0025 §11).
   - **Better Auth `testUtils()`** — ✅ done: bumped to **1.7.1** and adopted (session
     factories + `login()` from a test-only auth instance). The 1.7 bump also required an
-    `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0028's Redis
+    `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0018's Redis
     secondary-storage snippet needs the 1.7 API (`increment` + `getAndDelete`) when wired.
-  - **Real-SMTP email integration test (deferred).** The Nodemailer/SMTP adapter (ADR 0020) is
+  - **Real-SMTP email integration test (deferred).** The Nodemailer/SMTP adapter (ADR 0014) is
     covered by unit tests (mocked transport). A follow-up should add one integration test that
     starts a **Mailpit** container (Testcontainers `GenericContainer`, image `axllent/mailpit`,
     SMTP 1025 / API 8025), points the adapter's env at it, sends, then asserts receipt via
     Mailpit's `/api/v1/messages` — proving the real connect/TLS/wire path. Add `testcontainers`
     (already in the tree) as a `packages/email` devDep + a `test:integration` script so
     `turbo run test:integration` picks it up automatically.
-  - **OAuth end-to-end test (deferred).** Google sign-in (ADR 0016) is covered by an MSW seam
+  - **OAuth end-to-end test (deferred).** Google sign-in (ADR 0011) is covered by an MSW seam
     test (error mapping) + config, but a full browser e2e needs a **mock OAuth provider** (the
     real Google login can't be automated). Add a Playwright e2e against a stub IdP (e.g. a mock
     OAuth server / Better Auth's test helpers) when the OAuth surface grows.
@@ -67,19 +67,19 @@ already built.
   is ever published.
 - **Deeper security scanning** — OpenSSF Scorecard and `dependency-review-action`
   on PRs (free on public repos). _CodeQL is now enabled — see
-  [decisions/0017](decisions/0017-branch-protection-and-codeql.md)._
+  [decisions/0007](decisions/0007-github-automation-governance-and-branch-protection.md)._
 - **Workflow lockfile** — adopt GitHub's upcoming `dependencies:` block (2026
   roadmap) to pin transitive action SHAs once it is GA.
 
 ## Storybook
 
 - The addon trim decision, Chromatic (Phase 3), and publishing (Phase 4) are
-  tracked in [decisions/0018](decisions/0018-storybook-and-visual-testing.md).
+  tracked in [decisions/0024](decisions/0024-storybook-and-component-testing.md).
 - **Stories for the promoted molecules** — the shadcn _atoms_ each have a co-located
   `*.stories.tsx`; the form molecules just promoted into `@workspace/ui` (`Form`,
   `SubmitButton`, `FormError`, `FormTextField`/`FormPasswordField`, `PasswordInput`,
   `PasswordStrength`) and the brand `Logo` don't yet
-  ([decisions/0022](decisions/0022-shared-code-and-utilities-organization.md) §Component
+  ([decisions/0016](decisions/0016-shared-code-and-package-boundaries.md) §Component
   placement). RHF-bound molecules need a `useForm` wrapper in the story.
 
 ## Pull requests & developer experience
@@ -98,7 +98,7 @@ already built.
 ## Repository governance (GitHub settings — after first push)
 
 - **Branch protection / ruleset on `main`** — policy defined in
-  [decisions/0017](decisions/0017-branch-protection-and-codeql.md) (require a PR,
+  [decisions/0007](decisions/0007-github-automation-governance-and-branch-protection.md) (require a PR,
   require CI + CodeQL checks, disallow force-push/deletion); enable it in
   **Settings → Rules → Rulesets**. Raise required approvals 0 → 1+ and enforce Code
   Owner review as the team grows.
@@ -111,10 +111,10 @@ already built.
 Most of the original list is **done**: security headers
 ([decisions/0015](decisions/0015-web-security-headers.md)), `poweredByHeader: false`,
 root `metadata`/`viewport`/`robots`/`manifest`, `eslint-plugin-jsx-a11y`
-([decisions/0014](decisions/0014-base-ui-adoption.md)), `.env.example`
-([decisions/0021](decisions/0021-env-and-secrets-management.md)), `zod` adopted for
+([decisions/0021](decisions/0021-base-ui-selection-and-adoption.md)), `.env.example`
+([decisions/0013](decisions/0013-env-and-secrets-management.md)), `zod` adopted for
 form validation, Node pinning + DX files, and the rendering/perf model
-([decisions/0023](decisions/0023-nextjs-rendering-and-performance-model.md)).
+([decisions/0019](decisions/0019-nextjs-rendering-and-performance.md)).
 
 Remaining, **deferred with triggers**:
 
@@ -135,19 +135,19 @@ Remaining, **deferred with triggers**:
 
 ## Auth flow (wired; later screens deferred)
 
-The auth **UI** is complete and now **wired to Better Auth** (ADR 0027): the app-side seam
+The auth **UI** is complete and now **wired to Better Auth** (ADR 0017): the app-side seam
 (`apps/web/lib/auth/`) injects `signIn.email` / `signUp.email` / `requestPasswordReset` /
 `resetPassword` into the steps, routes the email step via a rate-limited identifier-first
 existence check, and sends **sign-up → auto-login → `/dashboard`** and **reset → sign in**
-(sessions revoked, [decisions/0016](decisions/0016-authentication-strategy.md)). Remaining:
+(sessions revoked, [decisions/0011](decisions/0011-authentication-strategy.md)). Remaining:
 
 - **Rate-limit / secondary storage** — BA rate-limits its endpoints (incl. the
   `account-exists` plugin) by default, but the store defaults to **in-memory** (per-instance).
   **Decided:** Redis (`secondary-storage`) is the production store, wired at the deploy/scale
   trigger — turnkey steps in
-  [decisions/0028](decisions/0028-rate-limiting-and-secondary-storage.md). Dev stays on the
+  [decisions/0018](decisions/0018-rate-limiting-and-secondary-storage.md). Dev stays on the
   default (rate limiting is off in dev). Identifier-first is an intentional enumeration
-  trade-off (ADR 0027 §3).
+  trade-off (ADR 0017 §3).
 - **Change password (Settings)** — a future settings screen needs current + new password
   (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
   `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
@@ -157,10 +157,10 @@ existence check, and sends **sign-up → auto-login → `/dashboard`** and **res
 newPassword, revokeOtherSessions })`.
 - **Verify-email banner** — ✅ done: `VerifyEmailBanner` in the authed-area layout prompts
   signed-in-but-unverified users with a rate-limited resend; the emailed link is handled by
-  BA's route handler (progressive verification, ADR 0016).
+  BA's route handler (progressive verification, ADR 0011).
 - **Lightweight onboarding, OAuth (Google) callback** — later phases per the
   [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
-  [decisions/0016](decisions/0016-authentication-strategy.md). The `/auth` "Continue with
+  [decisions/0011](decisions/0011-authentication-strategy.md). The `/auth` "Continue with
   Google" button is intentionally presentational until then (ADR 0025).
 
 ### Auth hardening — deploy-time + follow-ups (from the 2026-08-22 audit)
@@ -177,14 +177,14 @@ newPassword, revokeOtherSessions })`.
   `advanced.ipAddress.trustedProxyHeaders: true` together with an `ipv6Subnet` — the leftmost
   `x-forwarded-for` is client-spoofable until strictly behind a
   trusted proxy, which would let a caller poison/bypass the per-IP rate-limit key. Fold into the
-  deploy checklist alongside Redis (ADR 0028) and the real email transport.
+  deploy checklist alongside Redis (ADR 0018) and the real email transport.
 - **Audit logging (compliance):** beyond the new-device email, a compliance-bound product will
   want durable audit events (sign-in, email change, password reset) via Better Auth
   `databaseHooks`. Not needed yet; recorded so it isn't forgotten.
 
 ## Dependency / tooling upgrades (deferred on ecosystem readiness)
 
-See [decisions/0004](decisions/0004-defer-typescript-7.md).
+See [decisions/0006](decisions/0006-defer-typescript-7-and-eslint-10.md).
 
 - **TypeScript 7** — adopt when typescript-eslint supports it (~7.1).
 - **ESLint 10** — adopt when `eslint-plugin-react` / `eslint-config-next` declare
@@ -224,4 +224,4 @@ See [decisions/0004](decisions/0004-defer-typescript-7.md).
 - Error monitoring (e.g. Sentry), analytics, structured logging.
 - A "Safe Harbor" clause in `SECURITY.md`.
 - License review before any public/open-source release (currently proprietary — see
-  [decisions/0001](decisions/0001-proprietary-license-unlicensed.md)).
+  [decisions/0002](decisions/0002-proprietary-license-and-package-posture.md)).
