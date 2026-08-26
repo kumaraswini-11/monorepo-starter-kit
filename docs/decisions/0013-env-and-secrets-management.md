@@ -1,13 +1,13 @@
-# 0021. Environment variables & secrets management
+# 0013. Environment variables & secrets management
 
 - **Status:** Accepted
 - **Date:** 2026-08-04 · **Updated:** 2026-08-15 (§5 env validation implemented)
 
 ## Context
 
-Wiring the auth foundation ([0016](0016-authentication-strategy.md)) and data layer
-([0019](0019-data-layer-postgres-drizzle.md)) introduced the first real environment
-variables (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`). ADR 0019
+Wiring the auth foundation ([0011](0011-authentication-strategy.md)) and data layer
+([0012](0012-data-layer-postgres-drizzle.md)) introduced the first real environment
+variables (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`). ADR 0012
 explicitly deferred **environment-variable management** to a later ADR — this is it.
 
 Guiding rule for this ADR: **decide at scale** — assume the repo will hold **multiple
@@ -20,7 +20,7 @@ code is kept **ready** for the operational pieces so adoption is friction-free.
 A focused, internet-wide research pass against **official docs** — Turborepo (env
 handling + `turbo.json` reference + strict/loose modes), Next.js (env loading),
 Drizzle (config), and **The Twelve-Factor App** — plus the data-layer research behind
-[0019](0019-data-layer-postgres-drizzle.md) for the hosting question. Sources listed
+[0012](0012-data-layer-postgres-drizzle.md) for the hosting question. Sources listed
 at the end.
 
 ## Questions & critiques interrogated
@@ -59,7 +59,7 @@ _(My earlier root `.env.example` was corrected to `apps/web/.env.example` in com
 
 Declaring env vars in `turbo.json` **is the official Turborepo mechanism** — it's about
 **cache correctness** (Turbo must know which vars affect a task's output) and it also
-satisfies the repo's `turbo/no-undeclared-env-vars` lint rule (ADR 0003). The knobs:
+satisfies the repo's `turbo/no-undeclared-env-vars` lint rule (ADR 0005). The knobs:
 
 - `globalEnv` — hashes **every** task → a change busts all caches. **Avoid** for
   volatile runtime vars.
@@ -69,7 +69,7 @@ satisfies the repo's `turbo/no-undeclared-env-vars` lint rule (ADR 0003). The kn
   part of the cache key.
 
 Our runtime vars (`DATABASE_URL`, `BETTER_AUTH_*`) do **not** affect build output (the
-build is designed to run with no DB — see [0019](0019-data-layer-postgres-drizzle.md)),
+build is designed to run with no DB — see [0012](0012-data-layer-postgres-drizzle.md)),
 so they belong in **`globalPassThroughEnv`** (not hashed → no cache cost) and we use a
 **wildcard** to keep the list short forever:
 
@@ -84,7 +84,7 @@ wildcards + passthrough scale cleanly.
 ### 3. Database hosting is a `DATABASE_URL` change, not code (Neon is optional)
 
 There is **no contradiction** between "docker" and "Neon" — it's all standard Postgres
-(cross-ref [0019](0019-data-layer-postgres-drizzle.md)):
+(cross-ref [0012](0012-data-layer-postgres-drizzle.md)):
 
 - **docker-compose Postgres** = the local-dev default (zero cloud signup).
 - **Self-hosted Postgres** = production system-of-record (compliance / own-the-data).
@@ -138,7 +138,7 @@ shared schema beats duplicated reads; fail-fast typed env is a 12-Factor best pr
 outside `@workspace/env` + config/tooling files, so a new contributor can't accidentally
 read raw env — the error points them to the validated contract.
 
-**Build-time safety (the [0019] "build needs no DB/secret" rule):** validation runs at
+**Build-time safety (the [0012] "build needs no DB/secret" rule):** validation runs at
 import, which happens during `next build`. `skipValidation` (gated on
 `SKIP_ENV_VALIDATION`, which our CI sets) keeps a secret-free build green; real runtimes
 — and local `.env.local` — still validate. `emptyStringAsUndefined` treats blanks as
@@ -208,6 +208,6 @@ platform's secret store. No named per-environment files committed.
   <https://www.prisma.io/docs/guides/deployment/turborepo>
 - Infisical (open-source, self-hostable secrets manager): <https://infisical.com>
 
-See [0016](0016-authentication-strategy.md) (auth — first env consumer),
-[0019](0019-data-layer-postgres-drizzle.md) (data layer / DB hosting),
+See [0011](0011-authentication-strategy.md) (auth — first env consumer),
+[0012](0012-data-layer-postgres-drizzle.md) (data layer / DB hosting),
 [../references.md](../references.md), and [../future-improvements.md](../future-improvements.md).

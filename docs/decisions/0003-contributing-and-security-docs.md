@@ -1,4 +1,4 @@
-# 0006. Community-oriented CONTRIBUTING & SECURITY from established templates
+# 0003. Community CONTRIBUTING & SECURITY docs
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
@@ -8,7 +8,7 @@
 We want enterprise-grade contribution and security docs. The project is
 **internal-only today** but is expected to **open to external contributors
 later** (at which point the license will change — see
-[0001](0001-proprietary-license-unlicensed.md)).
+[0002](0002-proprietary-license-and-package-posture.md)).
 
 ## Decision
 

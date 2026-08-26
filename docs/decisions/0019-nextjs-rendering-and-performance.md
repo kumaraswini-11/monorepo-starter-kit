@@ -1,4 +1,4 @@
-# 0023. Next.js rendering & performance model — Cache Components (PPR)
+# 0019. Next.js rendering & performance model — Cache Components (PPR)
 
 - **Status:** Accepted
 - **Date:** 2026-08-14
@@ -45,15 +45,15 @@ These are the bulk of the "faster" story and we already get them:
    - The **authed `(app)` area is per-user** (reads the session cookie every request),
      so it has no useful static shell → we set **`instant = false`** on its layout.
      Public/mostly-static pages (sign-in) prerender normally.
-2. **React 19 form idiom.** Forms use **`<form action>` + `useActionState`** (pending
-   flag + returned error state from the hook, no manual `useState`/`onSubmit`). Better
-   Auth's browser client runs inside the action. (Full Server Actions — for
-   progressive enhancement — remain an option once we wire server-side cookie setting.)
-   **Refined by [0025](0025-frontend-architecture-forms-data-state-routing.md)
-   (Proposed):** while the backend is undecided, the _default_ form is React Hook Form
-   with an injected handler (presentational, backend-agnostic); `useActionState` and
-   Server Actions are the **fullstack** option, adopted if/when we commit to
-   Next-as-backend.
+2. **React 19 form idiom (rendering-relevant note only).** Forms are the app's client
+   islands (RSC-by-default everywhere else). The React 19 fullstack idiom is
+   **`<form action>` + `useActionState`** — a built-in pending flag plus returned error
+   state from the hook (no manual `useState`/`onSubmit`), with full Server Actions
+   remaining an option for progressive enhancement once we wire server-side cookie
+   setting. **The full forms story — the backend-agnostic React-Hook-Form default that
+   is our current form baseline vs. the `useActionState`/Server-Actions fullstack option
+   — is decided in [0022](0022-forms-rhf-submission-and-pending.md); this ADR keeps only
+   the rendering note that forms are the sole client islands.**
 3. **React Compiler — enabled** (`reactCompiler: true` + `babel-plugin-react-compiler`).
    Auto-memoizes components (fewer runtime re-renders; drops manual `useMemo`/
    `useCallback`) at the cost of a **slightly slower Babel compile step** — Next limits
@@ -90,7 +90,7 @@ and the error/loading/metadata conventions don't depend on that choice.
   feature, different source.
 - Our repo currently runs **fullstack** (Better Auth in the `/api/auth` route handler
   and server-side `getSession`), but `packages/auth` / `db` / `email` are
-  framework-agnostic ([0016](0016-authentication-strategy.md)), so extracting a
+  framework-agnostic ([0011](0011-authentication-strategy.md)), so extracting a
   standalone backend later changes the auth **wiring**, **not** this rendering model.
 
 ## Revisit triggers
@@ -111,4 +111,4 @@ and the error/loading/metadata conventions don't depend on that choice.
 - React Compiler — <https://react.dev/learn/react-compiler>
 - React 19 (Actions, `useActionState`, `useOptimistic`) — <https://react.dev/blog/2024/12/05/react-19>, <https://react.dev/reference/react/useActionState>
 
-See [0015](0015-web-security-headers.md) (CSP interaction), [0019](0019-data-layer-postgres-drizzle.md), and [../future-improvements.md](../future-improvements.md).
+See [0015](0015-web-security-headers.md) (CSP interaction), [0012](0012-data-layer-postgres-drizzle.md), and [../future-improvements.md](../future-improvements.md).

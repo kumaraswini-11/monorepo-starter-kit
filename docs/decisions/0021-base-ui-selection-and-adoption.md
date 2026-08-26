@@ -1,29 +1,56 @@
-# 0014. Base UI adoption — audit and per-area decisions
+# 0021. Base UI — selection & adoption
 
 - **Status:** Accepted
-- **Date:** 2026-07-13
+- **Date:** 2026-07-12
 
 ## Context
 
-Our components are built on **Base UI** (`@base-ui/react`), consumed through
-shadcn's `base-vega` style (see [0007](0007-base-ui-over-radix.md)). Base UI ships
-accessible, unstyled primitives but deliberately leaves several _platform_
+shadcn/ui components are built on a headless primitive library — historically
+**Radix UI**. Two things changed that:
+
+- **Base UI reached v1.0 stable in December 2025** (now v1.6.x, ~6M weekly
+  downloads) and is built by the same engineers who created Radix.
+- In **July 2026, shadcn/ui made Base UI the _default_** primitive for new
+  projects — the community was already choosing it ~2:1 on `shadcn/create`, and
+  the team formalized it.
+
+Radix is **not deprecated**: shadcn still supports it, and components ship for
+both libraries (unless a component is Base-UI-only). `shadcn init -b radix` opts
+a project back onto Radix.
+
+This repo already reflects the new default — `components.json` uses a `base-*`
+style (`base-vega`), and `packages/ui/src/components/button.tsx` imports from
+`@base-ui/react`.
+
+Selecting Base UI is one decision; **adopting it correctly is another**. Base UI
+ships accessible, unstyled primitives but deliberately leaves several _platform_
 concerns to the application. "shadcn added the component" is not the same as "we
-adopted Base UI correctly", so we audited our adoption against the official Base
-UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
+adopted Base UI correctly", so we also audited our adoption against the official
+Base UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
 
-## Findings & decisions
+## Decision: Base UI over Radix (with Radix escape hatch)
 
-| Area                   | Finding                                                                      | Decision                              |
-| ---------------------- | ---------------------------------------------------------------------------- | ------------------------------------- |
-| Styling                | `className` + `data-[state]`/`data-[side]` + CSS vars, unstyled — done right | ✅ Adopted as-is                      |
-| TypeScript             | Components typed via `X.Props` (e.g. `TooltipPrimitive.Provider.Props`)      | ✅ Adopted as-is                      |
-| A11y — primitives      | ARIA, keyboard, focus management inherited from Base UI                      | ✅ Adopted as-is                      |
-| **A11y — enforcement** | Nothing linted the _developer's_ a11y duties (alt, labels, ARIA)             | ✅ **Fixed** — `jsx-a11y` (below)     |
-| Composition            | Base UI uses the `render` prop / `useRender`, not Radix `asChild`            | ✅ Convention adopted (below)         |
-| RTL                    | `rtl:true` gives logical-property CSS ✓, but `DirectionProvider` is unwired  | ⏸️ Deferred — activate with i18n      |
-| Forms                  | `field.tsx` is presentational only — no `Form`, no validation engine         | ✅ **Resolved** — RHF + zod (0025 §2) |
-| CSP                    | Base UI injects inline styles needing a nonce under a strict CSP             | ↪️ Tracked with web-security work     |
+Use **Base UI** (`@base-ui/react`) as the component primitive layer, matching
+shadcn's current default and Base UI's stable status. Add new components with
+the default (Base UI), not `-b radix`.
+
+- Aligned with shadcn's actively-developed default direction.
+- Base UI is stable (1.x) and safe to depend on.
+- **Radix remains an escape hatch** (`shadcn init -b radix`) if a specific
+  component exists only on Radix or needs Radix-specific behavior.
+
+## Adoption — findings & per-area decisions
+
+| Area                   | Finding                                                                      | Decision                           |
+| ---------------------- | ---------------------------------------------------------------------------- | ---------------------------------- |
+| Styling                | `className` + `data-[state]`/`data-[side]` + CSS vars, unstyled — done right | ✅ Adopted as-is                   |
+| TypeScript             | Components typed via `X.Props` (e.g. `TooltipPrimitive.Provider.Props`)      | ✅ Adopted as-is                   |
+| A11y — primitives      | ARIA, keyboard, focus management inherited from Base UI                      | ✅ Adopted as-is                   |
+| **A11y — enforcement** | Nothing linted the _developer's_ a11y duties (alt, labels, ARIA)             | ✅ **Fixed** — `jsx-a11y` (below)  |
+| Composition            | Base UI uses the `render` prop / `useRender`, not Radix `asChild`            | ✅ Convention adopted (below)      |
+| RTL                    | `rtl:true` gives logical-property CSS ✓, but `DirectionProvider` is unwired  | ⏸️ Deferred — activate with i18n   |
+| Forms                  | `field.tsx` is presentational only — no `Form`, no validation engine         | ✅ **Resolved** — RHF + zod (0022) |
+| CSP                    | Base UI injects inline styles needing a nonce under a strict CSP             | ↪️ Tracked with web-security work  |
 
 ### Accessibility enforcement — `jsx-a11y` (done)
 
@@ -40,7 +67,7 @@ UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
 - **Why not `packages/ui`:** those components are vendored from shadcn/Base UI and
   already handle their own accessibility. Linting them would flag code we didn't
   author and fail the hard gate for no real gain — the same reasoning as the
-  react-hooks exception ([0013](0013-vendored-ui-lint-exception.md)).
+  react-hooks exception ([0005](0005-lint-gate-and-vendored-exception.md)).
 
 ### Composition — `render` / `useRender` (convention)
 
@@ -72,7 +99,7 @@ UI docs (styling, TypeScript, accessibility, composition, RTL, forms, CSP).
   shadcn's `<Form>`/`<FormField>`: it is Radix-Slot-based and we run no Radix. The full
   rationale — `isSubmitting`-over-`useTransition`, the `root.serverError` contract, and the
   reusable field layer — lives in
-  [0025 §2](0025-frontend-architecture-forms-data-state-routing.md).
+  [0022](0022-forms-rhf-submission-and-pending.md).
 - **Rejected:** Base UI's own `Form` + `Field` engine (less surrounding ecosystem) and
   **TanStack Form** (smaller ecosystem).
 
@@ -101,14 +128,21 @@ decision recorded in [0015](0015-web-security-headers.md).
 
 ## Consequences
 
+- Aligned with shadcn's actively-developed default direction; Base UI is stable
+  (1.x) and safe to depend on, with Radix retained only as an escape hatch.
 - Accessibility is now _enforced_ on our app code, not merely assumed.
 - Base UI's platform concerns (RTL, forms, CSP) are explicitly tracked with a
   decision or a deferral + trigger — not silently skipped.
 - Styling, TypeScript, and composition follow Base UI's documented model.
 
+## Sources
+
+- shadcn "Base UI as the Default" changelog and Base UI docs — see
+  [../references.md](../references.md).
+
 ## See also
 
-- **[0024](0024-ui-foundations-layout-responsiveness-accessibility.md)** — the
+- **[0020](0020-ui-foundations-layout-responsiveness-accessibility.md)** — the
   codebase-wide **layout, responsiveness (mobile → TV) & semantic-HTML/accessibility**
   conventions built on this adoption: Base UI is _behavior, not layout_; page semantics
   (landmarks + heading levels) that shadcn's `<div>`-based `Card` deliberately leaves to

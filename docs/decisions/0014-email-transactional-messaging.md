@@ -1,4 +1,4 @@
-# 0020. Email / transactional messaging — React Email + a `sendEmail` port; provider deferred
+# 0014. Email / transactional messaging — React Email + a `sendEmail` port; provider deferred
 
 - **Status:** Accepted
 - **Date:** 2026-08-04
@@ -23,7 +23,7 @@ Questions this ADR answers:
 
 ### How we decided
 
-Per the repo methodology ([0005](0005-follow-shadcn-baseline.md)), the analysis was
+Per the repo methodology ([0001](0001-decision-making-methodology.md)), the analysis was
 produced by **two parallel, internet-wide research passes** against **official docs**
 (react.email, nodemailer.com, and each provider's docs / pricing / compliance pages)
 **+ reputable 2026 comparisons**; verdicts below cite them (full list in _Sources_).
@@ -63,7 +63,7 @@ provider choice with zero risk.
   transport/SDK, exposing the `sendEmail` port + adapters + React Email templates.
   Consumed by `packages/auth` (fed into Better Auth's `sendResetPassword` /
   `sendVerificationEmail`) and by future billing/notifications. Same one-way isolation
-  boundary as `packages/db` ([0019](0019-data-layer-postgres-drizzle.md)).
+  boundary as `packages/db` ([0012](0012-data-layer-postgres-drizzle.md)).
 - **Now — console stub** in `packages/email` (this refines the auth plan's D3); React
   Email templates + a real provider adapter land later, with the UI phase.
 
@@ -173,7 +173,7 @@ SMTP-swappable, so the choice stays fully reversible.
 
 ## Placement — the `packages/email` boundary
 
-Structured exactly like `packages/db` ([0019](0019-data-layer-postgres-drizzle.md)):
+Structured exactly like `packages/db` ([0012](0012-data-layer-postgres-drizzle.md)):
 
 - **`packages/email` is the _only_ package that imports a transport/SDK.** It exposes
   the `sendEmail` port + adapters + React Email templates; consumers depend on that
@@ -236,7 +236,7 @@ competitors.**
 
 **Decision — Path A (Nodemailer/SMTP), with Resend as the first provider.** Chosen for the repo's
 goals — scalable, reusable, isolated, **portable**, compliance-ready, and flexible for the
-separate-backend split (ADR 0027): one adapter serves every SMTP provider, so the provider stays a
+separate-backend split (ADR 0017): one adapter serves every SMTP provider, so the provider stays a
 **deploy-time env choice with zero code lock-in** (Resend now → SES for EU-residency/scale/cost
 later, credentials only). Resend's **SDK (Path B) was evaluated and rejected as the default** — its
 extras (webhooks/batch) are marginal for transactional auth mail, its webhooks work over SMTP
@@ -248,14 +248,14 @@ explicitly **not** a deciding factor — AGENTS.md, "Build for the enterprise.")
 
 - **One pooled transporter, created lazily and reused** (`pool: true` + `maxConnections`/
   `maxMessages`) — never per-message (explicit Nodemailer guidance); lazy init keeps `next build`
-  credential-free (ADR 0021).
+  credential-free (ADR 0013).
 - **Security by port:** 465/2465 → `secure: true` (implicit TLS); 25/587/2587 → STARTTLS
   (`secure: false`). TLS cert validation stays **on** (never `rejectUnauthorized: false`);
   `disableFileAccess`/`disableUrlAccess: true` (we only send pre-rendered HTML — no fs/URL fetches).
 - **`EMAIL_FROM`** default; `replyTo`/`headers` passed through from the `EmailMessage`.
 - Resend SMTP endpoint: `smtp.resend.com`, user `resend`, pass = API key, port 465.
 
-**Env (validated; all optional so dev + no-secret CI build still work — ADR 0021):** `SMTP_HOST`,
+**Env (validated; all optional so dev + no-secret CI build still work — ADR 0013):** `SMTP_HOST`,
 `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`. Selection: SMTP when
 `SMTP_HOST` is set, else the console stub.
 
@@ -286,7 +286,7 @@ explicitly **not** a deciding factor — AGENTS.md, "Build for the enterprise.")
 - Self-hosting deliverability — <https://www.coinerella.com/dont-host-email-yourself-your-reminder-in-2026/>, <https://powerdmarc.com/self-hosting-email/>
 - Provider comparisons — <https://www.hirenodejs.com/blog/nodejs-email-resend-postmark-ses-2026>, <https://www.buildmvpfast.com/blog/resend-vs-ses-vs-postmark-transactional-email-deliverability-saas-2026>, <https://emailsendx.com/blog/amazon-ses-vs-sendgrid-vs-mailgun-vs-postmark-2026>, <https://www.buildmvpfast.com/api-costs/email>
 
-See [0016](0016-authentication-strategy.md) (auth — the first consumer),
-[0019](0019-data-layer-postgres-drizzle.md) (the isolation-boundary pattern),
+See [0011](0011-authentication-strategy.md) (auth — the first consumer),
+[0012](0012-data-layer-postgres-drizzle.md) (the isolation-boundary pattern),
 [../references.md](../references.md), and
 [../future-improvements.md](../future-improvements.md).

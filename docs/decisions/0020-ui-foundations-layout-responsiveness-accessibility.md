@@ -1,4 +1,4 @@
-# 0024. UI foundations — layout, responsiveness (mobile → TV) & accessibility
+# 0020. UI foundations — layout, responsiveness (mobile → TV) & accessibility
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
@@ -25,9 +25,9 @@ Base UI official docs (accessibility overview, `ScrollArea`, `Dialog`,
 `DirectionProvider`, the `render` prop — via context7 `/mui/base-ui`), the **W3C
 WAI-ARIA Authoring Practices Guide (APG)** and **WCAG 2.2**, and current (2026)
 responsive-design guidance (container queries, fluid type, readability caps). Sources
-at the end. This complements [0014](0014-base-ui-adoption.md) (Base UI adoption /
-a11y enforcement) and [0023](0023-nextjs-rendering-and-performance-model.md)
-(rendering model).
+at the end. This complements [0021](0021-base-ui-selection-and-adoption.md) (Base UI
+selection / adoption / a11y enforcement) and
+[0019](0019-nextjs-rendering-and-performance.md) (rendering model).
 
 ## Decisions
 
@@ -40,9 +40,9 @@ a11y enforcement) and [0023](0023-nextjs-rendering-and-performance-model.md)
     for **bounded** scroll regions (panels, sidebars, long lists). **Never the page.**
   - **`Dialog`** — reference-counted **scroll-lock** + **focus-trap**
     (`modal: true | false | 'trap-focus'`); handles nested dialogs correctly.
-  - **`DirectionProvider`** — RTL behavior (see [0014](0014-base-ui-adoption.md); wired
+  - **`DirectionProvider`** — RTL behavior (see [0021](0021-base-ui-selection-and-adoption.md); wired
     with i18n).
-  - **`render` prop** — polymorphism (not Radix `asChild`); see [0014](0014-base-ui-adoption.md).
+  - **`render` prop** — polymorphism (not Radix `asChild`); see [0021](0021-base-ui-selection-and-adoption.md).
 
 ### 2. Layout & viewport
 
@@ -99,7 +99,7 @@ Every component and page is designed for the **full range, phone → 4K/TV**:
   title as `<h1>`, a section title as `<h2>`), via the heading element directly or
   `render`. **One `<h1>` per page; never skip levels for styling.**
 - **`jsx-a11y` enforces the _developer's_ duties** (alt text, labels, ARIA misuse) on
-  **app** code ([0014](0014-base-ui-adoption.md)). Division of labour: **Base UI** →
+  **app** code ([0021](0021-base-ui-selection-and-adoption.md)). Division of labour: **Base UI** →
   primitive a11y; **`jsx-a11y`** → our composition; **this ADR** → page semantics
   (landmarks + headings) that shadcn intentionally leaves to us.
 
@@ -114,50 +114,7 @@ Every component and page is designed for the **full range, phone → 4K/TV**:
   `inset-s-4`) is **cosmetic**; we **keep `start-` / `end-`** for consistency with
   shadcn and readability. It is an editor suggestion, not a lint-gate rule. RTL
   _activation_ (`DirectionProvider` + a dynamic `dir`) lands with **i18n**
-  ([0014](0014-base-ui-adoption.md)).
-
-### 6. Icons & SVG assets — placement, naming & accessibility
-
-**Placement (reusability boundary — see
-[0022](0022-shared-code-and-utilities-organization.md)):**
-
-- **Our brand** (efferd `Logo` / `LogoIcon`) → `apps/web/components/brand/`. It is
-  app-specific identity and must not pollute the template-reusable `packages/ui`. The brand
-  **name string** is separate from the mark: it lives in `apps/web/lib/brand.ts`
-  (`brand.name`) — the single rebrand seam, wired into `metadata`, UI copy, and the marks'
-  `aria-label`, so renaming the product is a one-file change while the SVG marks stay here.
-  **(Revised 2026-08-16 → both the marks and `brand.ts` move into `@workspace/ui` as this
-  product's shared identity — the accepted single "brand" concession in an otherwise
-  brand-agnostic library; see
-  [0022](0022-shared-code-and-utilities-organization.md) → Component placement.)**
-- **Generic / third-party UI icons** (`GoogleIcon`, `GithubIcon` — social-login
-  affordances any app reuses) → `packages/ui/src/components/icons/`.
-- **Functional glyphs** → **lucide-react** (already a dep, tree-shaken via
-  `optimizePackageImports`). Only hand-author an SVG component when lucide lacks it
-  (brand marks). Raw `.svg` _asset_ files (if ever) → `public/`, via `next/image`.
-
-**Naming:** kebab-case file mirroring the PascalCase export (`google-icon.tsx` →
-`GoogleIcon`), like `password-input.tsx` → `PasswordInput`. The `-icon` suffix is kept
-(over a bare `google.tsx`) for grep-ability and file/export mirroring.
-
-**Component standard (every hand-authored SVG):**
-
-- `fill="currentColor"` on the **`<svg>`** (inherit text colour; light/dark adaptive) —
-  never on child paths.
-- `viewBox` present; **no** `width`/`height` — size-agnostic; the caller sizes via
-  `className` (`h-6 w-auto`, or a button's automatic `size-4`).
-- `xmlns` present (standalone-serialization-safe; matches lucide's output).
-- `props: React.ComponentProps<"svg">` spread **last**, so call sites can override size,
-  `data-icon`, or `aria-*`.
-- **Accessibility (the point):**
-  - **Decorative** (icon paired with visible text, e.g. inside "Continue with Google") →
-    **`aria-hidden="true"`** so screen readers do not announce it twice. Default for the
-    `icons/` set.
-  - **Meaningful** (standalone, conveys info with no adjacent text — the `Logo` is the
-    only on-screen "efferd") → **`role="img"` + `aria-label`**; a call site passes
-    `aria-hidden` to override when the mark sits beside visible brand text.
-  - We omit `focusable="false"` (a legacy-IE workaround) — the stack is modern-only and
-    lucide does not emit it either.
+  ([0021](0021-base-ui-selection-and-adoption.md)).
 
 ### 7. Cross-browser input hardening — autofill & Edge native controls (2026-08-16)
 
@@ -184,6 +141,29 @@ Base UI is behaviour-only / unstyled, so these are ours to own in CSS, not the p
   `Button`/`Input`, and `globals.css` gives only _enabled_ buttons `cursor: pointer` — so a
   disabled control is inert with no interactive cursor. No change needed.
 
+## Further UI conventions
+
+Two smaller, reusable conventions. None touches a vendored shadcn primitive — they live in
+our own components.
+
+### Control sizing — one size per header/toolbar row
+
+Icon controls in a row share **one** size for optical rhythm. The header uses **`icon-sm`
+(32px)** across the sidebar trigger, theme toggle, and account-menu button (the avatar fills
+that button). shadcn's defaults differ (`SidebarTrigger` = `icon-sm`/32, a plain icon `Button` =
+36), so we align our controls **to** the trigger rather than editing the primitive (0001); 32px
+still meets the WCAG 2.5.8 target minimum. `SidebarTrigger` also accepts a `size` override via
+props if a row wants the larger size — still no primitive edit.
+
+### Action-color semantics — destructive is reserved for irreversible loss
+
+`variant="destructive"` (on `Button` / `DropdownMenuItem`) is used **only** for actions that
+cause irreversible loss (delete account, revoke a key, remove a member). **Reversible** actions,
+including **Sign out**, use the **default** variant (keep a leading icon for scanability). Red is
+a scarce signal — spending it on a safe, high-frequency action both alarms users and desensitises
+them, so genuine destructive red stops meaning "stop." (Sign-out was initially prototyped
+destructive; changed on review.)
+
 ## Consequences
 
 - Every screen gets: **`<main>` + landmarks**, **`min-h-svh`**, **native scroll**
@@ -201,7 +181,7 @@ Base UI is behaviour-only / unstyled, so these are ours to own in CSS, not the p
 ## Revisit triggers
 
 - **i18n / an RTL locale** → mount `DirectionProvider` + dynamic `dir`
-  ([0014](0014-base-ui-adoption.md)).
+  ([0021](0021-base-ui-selection-and-adoption.md)).
 - **Content / marketing pages** → a fluid type scale + SEO (`opengraph-image`,
   JSON-LD) — see [../future-improvements.md](../future-improvements.md).
 - **A genuinely huge-screen product** (kiosk / native TV app) → add a breakpoint
@@ -226,17 +206,17 @@ Base UI is behaviour-only / unstyled, so these are ours to own in CSS, not the p
 - Responsive 2026 — container queries, fluid type `clamp()`, readability caps:
   <https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/>,
   <https://belovdigital.agency/blog/designing-for-different-screen-sizes-best-practices/>
-- SVG icon accessibility (decorative vs meaningful; `currentColor` / `viewBox`):
-  <https://dev.to/svgicons/svg-icon-accessibility-decorative-vs-meaningful-icons-2430>,
-  <https://koenvangilst.nl/lab/accessible-svgs>
 - Autofill styling (`:autofill` + inset box-shadow trick): MDN
   <https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill>, CSS-Tricks
   <https://css-tricks.com/almanac/pseudo-selectors/a/autofill/>
 - Edge password-reveal (`::-ms-reveal` / `::-ms-clear`): Microsoft Learn
   <https://learn.microsoft.com/en-us/microsoft-edge/web-platform/password-reveal>, Stefan
   Judis <https://www.stefanjudis.com/snippets/how-to-hide-microsoft-edges-password-reveal-button/>
+- Material 3 — color roles (destructive / error semantics):
+  <https://m3.material.io/styles/color/roles>
+- Apple Human Interface Guidelines — buttons:
+  <https://developer.apple.com/design/human-interface-guidelines/buttons>
 
-See [0007](0007-base-ui-over-radix.md) (Base UI over Radix),
-[0014](0014-base-ui-adoption.md) (Base UI adoption / a11y enforcement),
-[0023](0023-nextjs-rendering-and-performance-model.md) (rendering model), and
+See [0021](0021-base-ui-selection-and-adoption.md) (Base UI — selection & adoption),
+[0019](0019-nextjs-rendering-and-performance.md) (rendering model), and
 [../future-improvements.md](../future-improvements.md).

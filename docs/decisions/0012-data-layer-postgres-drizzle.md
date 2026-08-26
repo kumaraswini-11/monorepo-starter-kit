@@ -1,11 +1,11 @@
-# 0019. Data layer — PostgreSQL + Drizzle; database portability & lock-in strategy
+# 0012. Data layer — PostgreSQL + Drizzle; database portability & lock-in strategy
 
 - **Status:** Accepted
 - **Date:** 2026-08-04
 
 ## Context
 
-Implementing the Better Auth foundation ([0016](0016-authentication-strategy.md))
+Implementing the Better Auth foundation ([0011](0011-authentication-strategy.md))
 forced a full evaluation of the **data layer** — the foundation the whole app (not
 just auth) sits on. Each question below carried a common assumption worth
 **verifying, not trusting**:
@@ -22,11 +22,11 @@ just auth) sits on. Each question below carried a common assumption worth
 
 ### How we decided
 
-Per the repo methodology ([0005](0005-follow-shadcn-baseline.md)), the analysis was
+Per the repo methodology ([0001](0001-decision-making-methodology.md)), the analysis was
 produced by **six parallel, internet-wide research passes** against **official
 documentation + reputable engineering sources**; the verdicts below cite them (full
 list in _Sources_). Because Better Auth is already chosen
-([0016](0016-authentication-strategy.md)), its supported adapters also **bound** how
+([0011](0011-authentication-strategy.md)), its supported adapters also **bound** how
 portable the _auth_ store can be.
 
 ## Questions & critiques interrogated
@@ -46,7 +46,7 @@ defaults. Each item records a belief we explicitly pressure-tested:
   library/host choice — justify it or reconsider.
 - **"If we change the DB later, can we just drop `packages/db` and swap it, without
   touching the rest of the codebase?"** Critique: is the data layer truly isolated?
-- **Constraint** — Better Auth ([0016](0016-authentication-strategy.md)) is fixed; its
+- **Constraint** — Better Auth ([0011](0011-authentication-strategy.md)) is fixed; its
   adapters set the outer bound on where the _auth_ tables can live.
 
 ## Scope & non-goals
@@ -55,8 +55,9 @@ defaults. Each item records a belief we explicitly pressure-tested:
   the **portability / lock-in** and **isolation** strategy, **hosting** (self-host vs
   managed), the **scalability** roadmap, and **enterprise operational standards**.
 - **Out of scope** (decided separately — the auth implementation plan / a later ADR):
-  environment-variable management, the Better Auth **runtime** config (secret,
-  sessions, cookies, email delivery, rate limiting), and the concrete table schema.
+  environment-variable management (now [0013](0013-env-and-secrets-management.md)), the
+  Better Auth **runtime** config (secret, sessions, cookies, email delivery, rate
+  limiting), and the concrete table schema.
 
 ## Decision
 
@@ -70,13 +71,13 @@ defaults. Each item records a belief we explicitly pressure-tested:
   **production code** it is the _only_ package that imports `drizzle-orm`/`pg`; everything
   else depends on its exported API, never on Drizzle/`pg` directly. (One narrow, test-only
   exception: integration tests may import `drizzle-orm` helpers — e.g. `eq` — as a
-  **devDependency** for direct DB assertions; runtime code stays behind the boundary. ADR 0029 §11.)
+  **devDependency** for direct DB assertions; runtime code stays behind the boundary. ADR 0025 §11.)
 - **Portability strategy** — commit to the SQL/Postgres paradigm; use the boundary for
   **testability + a single choke-point + a contained blast radius**, **not** to chase
   cross-paradigm swaps. Use Postgres's full power (joins, constraints, JSONB,
   transactions) rather than a lowest-common-denominator subset.
 - **Hosting** — **self-host PostgreSQL as the production system-of-record**
-  (compliance / own-the-data, per [0016](0016-authentication-strategy.md)); **docker
+  (compliance / own-the-data, per [0011](0011-authentication-strategy.md)); **docker
   Postgres for local dev**; **Neon acceptable & reversible** for dev/preview. Keep the
   app on the plain `pg` driver (**not** Neon's serverless driver) so identical
   Drizzle-over-`pg` code runs unchanged on self-host _or_ Neon.
@@ -230,7 +231,10 @@ consistent, the widely-recommended shape for a growing Drizzle data layer
 (repository-per-aggregate; see _Sources_). Schema stays single-file for now (all four
 tables are one bounded context — auth-core); split `schema/` by domain when a second
 context lands. A tenant-aware repository base is the natural extension when B2B
-multi-tenancy arrives.
+multi-tenancy arrives. (The `account.issuer` column + unique `(issuer, accountId)`
+index added for Better Auth 1.7 — see [0011](0011-authentication-strategy.md)'s
+2026-08-22 update — is a schema/migration change **owned by this data layer**, applied
+via Drizzle Kit in `packages/db`.)
 
 ## Scaling to millions
 
@@ -248,7 +252,8 @@ is the real ceiling**; sharding was the last resort. The ladder (cheap → expen
    reads to replicas, writes to primary; use `$primary` for read-after-write (lag).
 4. **Caching layer (cheap, high impact)** — **Redis** for hot reads, sessions, and
    rate-limit counters; point **Better Auth "secondary storage"** at it to move sessions
-   - rate limits off the primary. _(This is the future "Redis" layer.)_
+   - rate limits off the primary. _(This is the future "Redis" layer — see
+     [0018](0018-rate-limiting-and-secondary-storage.md).)_
 5. **Native partitioning** — RANGE/LIST/HASH when one table outgrows RAM / is
    time-series. Still single-node (not horizontal scale).
 6. **Horizontal sharding — Citus** (Postgres extension, shard by `org_id`/`user_id`) —
@@ -258,7 +263,7 @@ is the real ceiling**; sharding was the last resort. The ladder (cheap → expen
 **Roadmap:** _Now_ — tuning + pooling. _Next_ — Redis (Better Auth secondary storage) +
 read replicas. _Later_ — partitioning. _Defer until proven_ — sharding / CQRS.
 
-> Honest caveat (carried from [0016](0016-authentication-strategy.md)): "scales to
+> Honest caveat (carried from [0011](0011-authentication-strategy.md)): "scales to
 > millions" is a reasonable **inference** from Postgres's track record + these levers,
 > **not** a benchmark of our stack. Validate with load tests before betting a launch.
 
@@ -383,4 +388,4 @@ LEVEL SECURITY` (owners bypass RLS by default), policy keyed on the tenant id.
 - Repository pattern with Drizzle — <https://medium.com/@vimulatus/repository-pattern-in-nest-js-with-drizzle-orm-e848aa75ecae>
 - Migrations belong in version control — <https://orm.drizzle.team/docs/migrations>
 
-See [0016](0016-authentication-strategy.md) (auth strategy), [../references.md](../references.md), and [../future-improvements.md](../future-improvements.md).
+See [0011](0011-authentication-strategy.md) (auth strategy), [../references.md](../references.md), and [../future-improvements.md](../future-improvements.md).

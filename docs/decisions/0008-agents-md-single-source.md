@@ -1,4 +1,4 @@
-# 0012. AGENTS.md is the single source of truth; CLAUDE.md imports it
+# 0008. AGENTS.md is the single source of truth; CLAUDE.md imports it
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
@@ -34,3 +34,9 @@ We develop on Windows, so the import is the only portable choice.
 - Future monorepo scaling: Claude auto-loads nested `CLAUDE.md` (not nested
   `AGENTS.md`); path-scoped rules go in `.claude/rules/`. Deferred — see
   [../future-improvements.md](../future-improvements.md).
+
+## See also
+
+- [0009](0009-project-mcp-servers.md) and
+  [0010](0010-agent-skills-vendoring.md) — the rest of the committed,
+  team-shared agent-config family (MCP servers and vendored agent skills).

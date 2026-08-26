@@ -1,7 +1,6 @@
-# 0029. Testing strategy — Vitest + Testing Library, Playwright, real-Postgres integration, and a monorepo test architecture built for the backend split
+# 0025. Testing strategy — Vitest + Testing Library, Playwright, real-Postgres integration, and a monorepo test architecture built for the backend split
 
-- **Status:** Accepted (strategy + tool choices); implementation is **phased** (see
-  §11) and three provisioning sub-decisions are confirmed at implementation time (§10)
+- **Status:** Accepted (strategy + tool choices); implementation **phased** (§10), three provisioning sub-decisions confirmed at implementation time (§8 Open decisions).
 - **Date:** 2026-08-22
 
 ## Context
@@ -17,7 +16,7 @@ This ADR is the R&D-backed answer to the questions that were open: **which libra
 of 2026, not from memory), what to test and where, folder structure, how to run it in a
 Turborepo, how to test the DB + Better Auth layer, and — crucially — how to design the
 test architecture so it survives future scale and the planned split to a separate backend
-([ADR 0027](0027-backend-architecture-fullstack-and-migration.md)).** It was researched
+([ADR 0017](0017-backend-architecture-and-migration.md)).** It was researched
 against official docs (Vitest 4, Testing Library, Playwright, Next.js 16, Better Auth,
 Drizzle, Testcontainers, Turborepo — see §14) and the actual codebase.
 
@@ -29,7 +28,7 @@ scalability, enterprise, monorepo, and don't assume):
 2. **Monorepo-native** — tests co-located with the code they cover, so they travel with a
    package when it moves or the repo splits; one shared config to evolve standards.
 3. **Future-proof for the backend split** — design the seam and the harness now so
-   extracting `packages/auth` + `packages/db` into a standalone service ([ADR 0027](0027-backend-architecture-fullstack-and-migration.md))
+   extracting `packages/auth` + `packages/db` into a standalone service ([ADR 0017](0017-backend-architecture-and-migration.md))
    is cheap and safe, not a test rewrite.
 4. **Market-current** — the tools that are the 2026 default for this stack (Next 16 /
    React 19 / Vite / Turborepo), verified against official docs, versions pinned under the
@@ -105,7 +104,7 @@ test-drives the assembled car on a real road. You need both.)
 
 **Library — Vitest 4, confirmed.** Vite-native/ESM-first, matches the repo (`"type":
 "module"`, catalog `vitest ^4.1.10`) and shares one transform pipeline with the Storybook
-browser tests ADR 0018 already mandated Vite for. Add **`@testing-library/react` v16**
+browser tests ADR 0024 already mandated Vite for. Add **`@testing-library/react` v16**
 (React 19 support), **`@testing-library/user-event`** (`userEvent.setup()` per test), and
 **`@testing-library/jest-dom`** matchers. _Already in the lockfile_ (pulled transitively by
 Storybook's `addon-vitest`): `@testing-library/dom`, `jest-dom`, `user-event`,
@@ -126,7 +125,7 @@ Storybook interaction tests already cover in a real browser. Skip `happy-dom` (l
 complete → inconsistency risk).
 
 **Shared config — `@workspace/vitest-config`.** A private, source-only package (like
-`@workspace/eslint-config` / `typescript-config`; exempt from ADR 0022's isomorphic/leaf
+`@workspace/eslint-config` / `typescript-config`; exempt from ADR 0016's isomorphic/leaf
 rules that bind `@workspace/utils`) exporting two presets:
 
 ```ts
@@ -177,7 +176,7 @@ API was removed in v4). Shared deps (`jsdom`, RTL, jest-dom, user-event) go in t
   and the _pure_ form logic (`submitWithFormError` / error-mapping branches).
 - **Component (jsdom):** `@workspace/ui` primitives + form molecules (`Form`,
   `SubmitButton`, `FormError`, `FormPasswordField`) and `apps/web` feature forms
-  (`SignInForm`, …) — all presentational with injected handlers (ADR 0025), so no
+  (`SignInForm`, …) — all presentational with injected handlers (ADR 0022), so no
   server-only module leaks in.
 - **Not unit → e2e:** **async Server Components** (Next.js explicitly does not support them
   in Vitest), the real Better Auth flow, routing/PPR/streaming.
@@ -190,7 +189,7 @@ API was removed in v4). Shared deps (`jsdom`, RTL, jest-dom, user-event) go in t
   `userEvent.type` + submit, assert via the a11y tree — `getByRole("alert")` for the
   `FormError` banner, `SubmitButton` disabled + label swap, focus moved to the banner.
   Inject a stub that throws `FormSubmitError("…")` and assert the verbatim message; throw a
-  generic `Error` and assert the safe fallback (the ADR 0026 contract).
+  generic `Error` and assert the safe fallback (the ADR 0022 contract).
 - **Base UI:** query portalled content via `screen` (mounts on `document.body`); drive with
   keyboard via `user-event`. jsdom has **no layout** — never assert positioning; push those
   to Storybook / browser mode.
@@ -199,7 +198,7 @@ API was removed in v4). Shared deps (`jsdom`, RTL, jest-dom, user-event) go in t
 **Gotchas.** jsdom applies no CSS (assert classes/roles/behavior, not computed styles);
 mock `next/font`; esbuild ignores `"use client"`/`"use server"` directives (client
 components import fine, server actions can't execute — test the injected handler);
-`server-only` throws if a server module enters a DOM test (the ADR 0025 presentational
+`server-only` throws if a server module enters a DOM test (the ADR 0022 presentational
 split prevents this); ESM is native (no transform config).
 
 ### 2. End-to-end testing
@@ -247,7 +246,7 @@ and component layers. Keep e2e a thin set of critical journeys (slow, DB-bound).
 query semantics) and Better Auth talks to the DB through its own `drizzleAdapter` — only a
 real engine proves the generated schema, cascades, and adapter queries. **Mock only the true
 ports:** the `SendEmail` transport (`@workspace/email` — already a console stub; inject a spy
-and assert recipient/args) and future external services. This matches ADR 0019's stated
+and assert recipient/args) and future external services. This matches ADR 0012's stated
 rationale for the `packages/db` boundary (testability against real Postgres).
 
 **Provisioning — Testcontainers (primary) → pglite (fallback).**
@@ -261,7 +260,7 @@ rationale for the `packages/db` boundary (testability against real Postgres).
 
 Recommendation: **Testcontainers as the CI + source-of-truth**, **pglite as the fast local
 fallback** (and the answer to Docker-on-Windows friction). Stay on the plain `pg` driver
-(ADR 0019) so the same code runs on any of them.
+(ADR 0012) so the same code runs on any of them.
 
 **Migrations + schema.** Apply the real Drizzle migrations in global setup (`migrate(db, {
 migrationsFolder })`) — never hand-craft tables. The Better Auth schema is already
@@ -323,7 +322,7 @@ excluded from the default fast `test` include.
 ```
 
 Add a root `"test": "turbo run test"`. **`test` + `test:integration` take NO build
-dependency** — our packages are **source-only** (ADR 0022, no build step; Vitest transforms
+dependency** — our packages are **source-only** (ADR 0016, no build step; Vitest transforms
 TS source directly), and integration runs against a real Postgres container, so nothing to
 build. A `^build` here is not just wasteful — it drags the _apps'_ builds (`web`/`storybook`)
 into the test lane via turbo's task graph, and a CI `web#build` without secrets fails env
@@ -410,7 +409,7 @@ apps/
    single-consumer abstraction with no second party — build it when a separate backend or a 2nd
    client appears (full Pact only with a 2nd client/team). See §11 Q5 and future-improvements.
 
-## 9. The separate-backend scenario ([ADR 0027](0027-backend-architecture-fullstack-and-migration.md))
+## 9. The separate-backend scenario ([ADR 0017](0017-backend-architecture-and-migration.md))
 
 If `packages/auth` + `packages/db` (+ an API) later become a standalone service (Node/Hono/
 Express), the testing strategy adapts as follows — and a few **design-now** moves make that
@@ -422,7 +421,7 @@ split cheap rather than a rewrite:
 | **The seam**           | `authClient` is _already_ an HTTP client; only `lib/auth-client.ts`'s `baseURL` moves       | **Test the seam with MSW** (intercept `/api/auth/*`) — never mock `authClient` internals, so tests survive unchanged                                                |
 | **Contract**           | Two services can drift                                                                      | A **shared zod/OpenAPI contract package** feeding _both_ MSW handlers and provider assertions — one source of truth (full Pact only when a 2nd client/team appears) |
 | **E2E**                | Playwright boots **both** services                                                          | Build the `webServer` as an **array** from day one; seed via the backend                                                                                            |
-| **`lib/session.ts`**   | Becomes an HTTP/DB-less session read (ADR 0027 §4) — the one file with real logic to change | —                                                                                                                                                                   |
+| **`lib/session.ts`**   | Becomes an HTTP/DB-less session read (ADR 0017 §4) — the one file with real logic to change | —                                                                                                                                                                   |
 
 **Reusable vs rebuilt:** reusable — the whole Vitest/coverage/shared-config harness, MSW
 setup, the Playwright rig, the Postgres CI service, every package-local test. Rebuilt —
@@ -453,11 +452,11 @@ _why_ is preserved (dates are when the decision was taken).
 
 ### Q1 — Aren't Vitest, Playwright, "jest-dom", jsdom all "testing libraries"? Why not one? (2026-08-22)
 
-**Decided.** There are only two _frameworks_ — **Vitest** (unit + component + integration,
-in Node) and **Playwright** (e2e, real browser); we do **not** use Jest. RTL / jest-dom /
-jsdom are helper libraries, not frameworks. Two frameworks because fast-simulated and
-real-browser are different jobs (the test pyramid). Full reasoning + table in the **FAQ**
-under "Decision (summary)" above.
+**Decided — see the FAQ** ("why more than one testing tool") under **Decision (summary)**
+above for the full answer and table: only two _frameworks_ (**Vitest** for unit + component +
+integration in Node, **Playwright** for e2e in a real browser), and we do **not** use Jest;
+RTL / jest-dom / jsdom are helper libraries, not frameworks; two frameworks because
+fast-simulated and real-browser are different jobs (the test pyramid).
 
 ### Q2 — How should integration tests provision Postgres? Every option, every aspect. (2026-08-22)
 
@@ -465,10 +464,10 @@ under "Decision (summary)" above.
 branch-per-PR** complementary later for preview/e2e/migration rehearsal (Phase 3+);
 **pglite** an optional no-Docker fallback. Rationale: it's the de-facto enterprise standard
 for testing the data layer, and it's **prod-identical** — real `postgres:17` over our actual
-`node-postgres` driver (ADR 0019), ephemeral and isolated, and it scales unchanged into any
+`node-postgres` driver (ADR 0012), ephemeral and isolated, and it scales unchanged into any
 cloud/devops pipeline. For a compliance-bound product, fidelity wins for the layer whose job
 is "does our SQL/auth actually work against real Postgres." (`node-postgres` = our prod
-driver, self-hosted Postgres with Neon a reversible option — ADR 0019.)
+driver, self-hosted Postgres with Neon a reversible option — ADR 0012.)
 
 | Option                                       | Fidelity (vs prod)         | Speed (inner loop)     | Isolation               | Local / Windows     | CI                        | Cloud/devops fit           | Cost                 | Driver parity\*                              |
 | -------------------------------------------- | -------------------------- | ---------------------- | ----------------------- | ------------------- | ------------------------- | -------------------------- | -------------------- | -------------------------------------------- |
@@ -478,7 +477,7 @@ driver, self-hosted Postgres with Neon a reversible option — ADR 0019.)
 | **docker-compose (shared local)**            | ★★★★★ real PG              | ★★★                    | ★★ shared, manual reset | needs Docker        | ✗ awkward                 | ★★★                        | free                 | ✅ node-postgres                             |
 | **Neon branch (cloud, per-run)**             | ★★★★★ real managed PG      | ★★ network latency     | ★★★★★ branch per PR/run | ✗ needs net + token | ★★★★ needs secrets        | ★★★★★ _is_ the cloud       | $ per branch/compute | ⚠️ node-postgres TCP ✅ / serverless HTTP ❌ |
 
-\* Prod is self-hosted Postgres via **node-postgres** (`pg`) + Drizzle (ADR 0019); Neon is a
+\* Prod is self-hosted Postgres via **node-postgres** (`pg`) + Drizzle (ADR 0012); Neon is a
 reversible dev/preview option. **What enterprises do (2026):** Testcontainers is the
 mainstream standard for DB-layer integration tests; cloud branching (Neon/Supabase) is the
 _preview/e2e_ tool, not the fast inner loop; `services:` is the older CI-only pattern;
@@ -493,7 +492,7 @@ library) or trivial (`getUserById` = a one-line select). But this repo is a **st
 template built for future scope** — its job is to ship reusable _patterns_, not just cover
 today's code. Downstream projects will have real domain logic (billing ledgers with multi-row
 ACID, RBAC/permission queries, multi-tenant isolation, custom joins — what the `packages/db`
-boundary exists for, ADR 0019), and they should **inherit a ready DB-testing harness + worked
+boundary exists for, ADR 0012), and they should **inherit a ready DB-testing harness + worked
 examples** instead of re-solving it. Doing it now (Docker available, context fresh) is cheaper
 than later, and the example tests double as documentation. Implemented with the Q2 verdict —
 **Testcontainers** over the prod `node-postgres` driver.
@@ -507,11 +506,11 @@ ever appears. Tracked in `future-improvements.md`.
 ### Q4 — How do we MSW-test the auth seam without mocking the client? (2026-08-23)
 
 **Decided: intercept real HTTP; import the seam _after_ MSW starts.** The seam
-(`apps/web/lib/auth/actions.ts`) is the sole owner of the Better Auth transport (ADR 0027 §1),
+(`apps/web/lib/auth/actions.ts`) is the sole owner of the Better Auth transport (ADR 0017 §1),
 so its contract test (`actions.test.ts`) drives the **real** `actions.ts` + the **real** shared
 `authClient` and lets **MSW** intercept `/api/auth/*`, asserting the status→user-safe-error
 mapping (401→"Invalid email or password.", 422→"already exists", 429→rate-limit copy, etc.). We
-mock **no** `authClient` internals, so the test survives the ADR 0027 split unchanged — only the
+mock **no** `authClient` internals, so the test survives the ADR 0017 split unchanged — only the
 client's `baseURL` moves, and the handlers already match any origin (leading-wildcard matchers).
 
 **The gotcha (root-caused):** Better Auth's client **snapshots `globalThis.fetch` into
@@ -540,7 +539,7 @@ be a single-consumer abstraction — against the repo's "no premature abstractio
 ## Consequences
 
 **Positive:** a real, fast test pyramid; high-fidelity data/auth tests (real Postgres);
-enterprise-ready CI that splits cleanly; a harness and seam design that make the ADR 0027
+enterprise-ready CI that splits cleanly; a harness and seam design that make the ADR 0017
 backend split cheap; standards centralized in one config package.
 
 **Negative / costs:** integration + e2e need infrastructure (Docker/Postgres, Playwright
@@ -549,7 +548,7 @@ friction — mitigated by pglite); more moving parts (a new config package, an `
 workspace) to maintain.
 
 **Neutral:** implementation is deferred/phased (this ADR records the direction, like
-[0028](0028-rate-limiting-and-secondary-storage.md)); the three §8 sub-decisions are
+[0018](0018-rate-limiting-and-secondary-storage.md)); the three §8 sub-decisions are
 confirmed when Phase 1/2 land.
 
 ## Version notes & uncertainties (verify at implementation, per AGENTS.md)
@@ -561,7 +560,7 @@ confirmed when Phase 1/2 land.
   16's `@next/playwright` "testmode" (network interception) is optional/newer — adopt only if
   needed.
 - **Better Auth** — repo on **1.7.1**; `testUtils()` adopted (test-only instance). 1.7 added
-  `account.issuer` (schema + migration updated); ADR 0028's Redis snippet needs the 1.7
+  `account.issuer` (schema + migration updated); ADR 0018's Redis snippet needs the 1.7
   secondary-storage API (`increment` + `getAndDelete`) when wired.
 - **Next.js 16** — async Server Components are **not** unit-testable (→ e2e).
 - **Turborepo 2.10** — `transit`/`merge-reports` wiring are recent 2.x features; verify
@@ -599,12 +598,12 @@ confirmed when Phase 1/2 land.
 
 ## Relationship to other ADRs
 
-Builds on [0018](0018-storybook-and-visual-testing.md) (Vite/Storybook browser tests),
-[0019](0019-data-layer-postgres-drizzle.md) (Postgres/Drizzle boundary — the integration
-target), [0020](0020-email-transactional-messaging.md) (the `SendEmail` port we mock),
-[0022](0022-shared-code-and-utilities-organization.md) (per-package co-location + config
-packages), [0025](0025-frontend-architecture-forms-data-state-routing.md) /
-[0026](0026-form-submission-and-pending-state-pattern.md) (the presentational forms + pending
-contract we assert), and [0027](0027-backend-architecture-fullstack-and-migration.md) (the
-backend split this architecture is designed to survive). Supersedes the ad-hoc testing notes
-in [../future-improvements.md](../future-improvements.md), which now points here.
+Builds on [0024](0024-storybook-and-component-testing.md) (Vite/Storybook browser tests),
+[0012](0012-data-layer-postgres-drizzle.md) (Postgres/Drizzle boundary — the integration
+target), [0014](0014-email-transactional-messaging.md) (the `SendEmail` port we mock),
+[0016](0016-shared-code-and-package-boundaries.md) (per-package co-location + config
+packages), [0022](0022-forms-rhf-submission-and-pending.md) (the presentational forms +
+pending contract we assert) / [0023](0023-app-shell-routing-and-boundaries.md) (the routing &
+state architecture), and [0017](0017-backend-architecture-and-migration.md) (the backend split
+this architecture is designed to survive). Supersedes the ad-hoc testing notes in
+[../future-improvements.md](../future-improvements.md), which now points here.

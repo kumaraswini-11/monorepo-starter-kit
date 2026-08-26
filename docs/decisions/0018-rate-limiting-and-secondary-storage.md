@@ -1,4 +1,4 @@
-# 0028. Rate limiting & secondary storage — Redis for production, wired at deploy
+# 0018. Rate limiting & secondary storage (Redis)
 
 - **Status:** Accepted
 - **Date:** 2026-08-17
@@ -7,7 +7,7 @@
 
 Better Auth ships a **built-in rate limiter, enabled by default in production** (disabled in
 dev), covering all `/api/auth/*` routes — including our `account-exists` plugin endpoint (ADR
-0027 §3). Defaults: **100 req / 60s** globally, with **sensitive paths stricter (3 / 10s)** —
+0017 §3). Defaults: **100 req / 60s** globally, with **sensitive paths stricter (3 / 10s)** —
 `/sign-in/email`, `/two-factor/verify`, … — and it applies to **client-initiated requests
 only** (server `auth.api` calls are exempt). Tune with `rateLimit.customRules` (wildcards).
 
@@ -26,8 +26,8 @@ lands, sessions + caching) — but **wire it at the deploy/scale trigger, not no
 undeployed, single-instance template stays on the default (rate limiting is off in dev
 anyway). This ADR records the decision + the turnkey wiring so adoption is a lookup, not a
 re-investigation — the same "decide now, adopt at the trigger" pattern as
-[0004](0004-defer-typescript-7.md) (tooling majors) and
-[0022](0022-shared-code-and-utilities-organization.md) (`@workspace/utils`).
+[0006](0006-defer-typescript-7-and-eslint-10.md) (tooling majors) and
+[0016](0016-shared-code-and-package-boundaries.md) (`@workspace/utils`).
 
 ### Why Redis, not the database
 
@@ -35,7 +35,7 @@ re-investigation — the same "decide now, adopt at the trigger" pattern as
   TTL, shared across all instances — the canonical Redis workload (atomic `INCR`/`EXPIRE`,
   sub-millisecond, in-memory). Sessions + caching are the same shape.
 - **Keep churn off the primary DB:** Postgres is the durable, transactional source of truth
-  ([0019](0019-data-layer-postgres-drizzle.md)); routing a write-per-request onto it adds load
+  ([0012](0012-data-layer-postgres-drizzle.md)); routing a write-per-request onto it adds load
   and contention. Redis absorbs it.
 - **Horizontal scale:** one shared Redis enforces limits globally across N instances; memory
   cannot, and the DB pays the cost above.
@@ -55,11 +55,19 @@ single-instance template (dev rate-limiting off) is premature infra.
    Redis, or `@upstash/redis` (HTTP) for serverless/edge. Add `REDIS_URL` (or Upstash REST
    creds) to `@workspace/env`, `.env.example`, and `turbo.json` passthrough; a `redis` service
    in `docker-compose.yml` for local dev.
-2. **`packages/auth` config:**
+2. **`packages/auth` config.** _(Updated 2026-08-22 for Better Auth 1.7.)_ The repo is on
+   Better Auth **1.7** (ADR 0025 §11), whose upgrade guide changed the storage contracts, so
+   the snippet below is **1.7-correct** — it **changed from the 1.6 shape**
+   (`get`/`set`/`delete` + `increment`): secondary storage now also requires the new
+   **`getAndDelete()`**, and a dedicated rate-limit store replaces separate `get`/`set` with a
+   single **`consume(key, rule)`** method. No code change today (dev stays on the in-memory
+   default; Redis is a deploy-time task) — this records the correct 1.7 contract for when the
+   store is wired.
+
    ```ts
-   // Prefer a BA `redisStorage()` helper if one ships (it implements the full interface).
+   // Prefer a BA-provided storage helper if one ships (it implements the full interface).
    // Manually — secondary-storage RATE LIMITING requires an atomic `increment`; BA throws
-   // "SecondaryStorage.increment is required" without it:
+   // "SecondaryStorage.increment is required" without it. 1.7 adds `getAndDelete`:
    secondaryStorage: {
      get: (key) => redis.get(key),
      set: (key, value, ttl) =>
@@ -70,11 +78,16 @@ single-instance template (dev rate-limiting off) is premature infra.
        if (count === 1 && ttl) await redis.expire(key, ttl);
        return count;
      },
+     getAndDelete: (key) => redis.getdel(key), // new in 1.7 — atomic get-then-delete (Redis GETDEL)
    },
-   rateLimit: { storage: "secondary-storage" }, // the default once secondaryStorage is set
+   // Reusing secondaryStorage is the simplest path; it is the default once secondaryStorage is set:
+   rateLimit: { storage: "secondary-storage" },
+   // If instead you supply a DEDICATED rate-limit store, 1.7 replaces the old separate
+   // get/set with a single `consume(key, rule)` (atomic count + TTL → allow/deny decision).
    ```
+
 3. **Sessions:** defining `secondaryStorage` moves sessions to Redis. To keep the durable
-   session row in Postgres (audit + revocation, ADR 0016), set
+   session row in Postgres (audit + revocation, ADR 0011), set
    `session.storeSessionInDatabase: true`; or go deliberately Redis-only. The 5-min
    `cookieCache` already avoids most per-request session lookups either way.
 4. **Tune limits:** `rateLimit.customRules` for sensitive endpoints (sign-in/up default
@@ -100,26 +113,13 @@ shared sessions or caching.
 
 - Better Auth — Rate Limit (storage: memory / database / secondary-storage; enabled by
   default in production) — <https://better-auth.com/docs/concepts/rate-limit>
-- Better Auth — secondary storage holds sessions + rate limits; the local
+- Better Auth — secondary storage holds sessions + rate limits; the 1.7 upgrade guide
+  (`increment()` + `getAndDelete()`; rate-limit `consume(key, rule)`); the local
   `better-auth-security-best-practices` skill.
-
-## Update — 2026-08-22: Better Auth 1.7 changed the secondary-storage / rate-limit API
-
-The repo upgraded to Better Auth **1.7** (ADR 0029 §11). Its 1.7 upgrade guide changes the
-adapter contracts this ADR's Redis snippet targets, so **when the Redis store is actually
-wired, use the 1.7 API**, not the 1.6 shape above:
-
-- **Secondary storage** must now implement **`increment()`** and **`getAndDelete()`** (the
-  latter is new in 1.7; previously `get`/`set`/`delete` + `increment`).
-- **Rate-limit storage** replaces separate `get`/`set` with a single **`consume(key, rule)`**
-  method.
-
-No code change today (dev stays on the in-memory default; Redis is a deploy-time task) — this
-is a note so the deferred wiring uses the correct 1.7 contract.
 
 ## See also
 
-[0027](0027-backend-architecture-fullstack-and-migration.md) (auth wiring + the
-`account-exists` plugin), [0019](0019-data-layer-postgres-drizzle.md) (Postgres = durable
-data), [0029](0029-testing-strategy.md) (the 1.7 bump), and
+[0017](0017-backend-architecture-and-migration.md) (auth wiring + the
+`account-exists` plugin), [0012](0012-data-layer-postgres-drizzle.md) (Postgres = durable
+data), [0025](0025-testing-strategy.md) (the 1.7 bump), and
 [../future-improvements.md](../future-improvements.md).

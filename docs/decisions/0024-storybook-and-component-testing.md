@@ -1,4 +1,4 @@
-# 0018. Adopt Storybook (phased) for the UI library; visual testing deferred
+# 0024. Storybook (phased) for the UI library — component & visual testing
 
 - **Status:** Accepted — Phases 0-2 done; Phase 3 (Chromatic) / Phase 4 (publish) deferred
 - **Date:** 2026-08-01
@@ -13,7 +13,7 @@ ever seen inside `apps/web`. As the library and team grow, we want:
 - **Isolated component development** (build/see a component without the whole app),
 - **Living documentation** (props, variants, states) for the design system,
 - **Component + accessibility testing** (ties to the a11y work in
-  [0014](0014-base-ui-adoption.md)).
+  [0021](0021-base-ui-selection-and-adoption.md)).
 
 Storybook is the industry-standard tool for this. Chromatic (by the Storybook
 team) adds visual-regression testing + hosting. Because this is a **private,
@@ -24,7 +24,7 @@ conscious** ethos, "should we adopt this _now_?" was evaluated as seriously as
 ### How we decided
 
 Two adversarially-verified deep-research passes (per the
-[0005](0005-follow-shadcn-baseline.md) methodology), plus direct official-docs
+[0001](0001-decision-making-methodology.md) methodology), plus direct official-docs
 verification where a research pass failed. Findings are cited below; the
 **adopt-vs-defer verdict is a synthesized judgment**, not an independently voted
 claim. Time-sensitive: anchored to **Storybook 10.x, mid-2026**.
@@ -168,11 +168,11 @@ design system.
 
 - **CSF3** stories, **co-located** with components; **autodocs** for prop tables.
 - **`@storybook/addon-a11y`** (axe) in CI — the real a11y gap noted in
-  [0014](0014-base-ui-adoption.md).
+  [0021](0021-base-ui-selection-and-adoption.md).
 - **`@storybook/addon-vitest`** for interaction/component tests (Vite prerequisite).
 - Light/dark **theming** in the preview; **MSW** for any data-driven stories.
 - Turbo-cached `build:storybook`; SHA-pinned actions if a Storybook CI job is added
-  (per [0009](0009-github-automation-and-governance.md)).
+  (per [0007](0007-github-automation-governance-and-branch-protection.md)).
 - Storybook **complements** (does not duplicate) the existing lint/typecheck/build
   gate — it adds isolation, docs, and visual/a11y coverage.
 
@@ -274,3 +274,12 @@ Turborepo: [Storybook guide](https://turborepo.dev/docs/guides/tools/storybook) 
 Chromatic: [security](https://www.chromatic.com/security),
 [access](https://www.chromatic.com/docs/access/) ·
 Alternatives: [comparison](https://www.pkgpulse.com/guides/storybook-8-vs-ladle-vs-histoire-2026)
+
+## See also
+
+- [0025](0025-testing-strategy.md) — the overall testing strategy; Storybook's
+  `addon-vitest` browser tests are one layer of that pyramid (this ADR mandated Vite,
+  the transform pipeline those tests build on), so the full test topology is
+  discoverable across both ADRs.
+- [0021](0021-base-ui-selection-and-adoption.md) — the Base UI a11y work this
+  Storybook `addon-a11y` gate addresses.

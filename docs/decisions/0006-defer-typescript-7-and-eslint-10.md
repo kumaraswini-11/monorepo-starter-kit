@@ -1,4 +1,4 @@
-# 0004. Stay on TypeScript 5.x / ESLint 9; defer TS 7 & ESLint 10
+# 0006. Tooling versions — defer TypeScript 7 & ESLint 10
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
@@ -27,3 +27,8 @@ majors, so this is the safe default.)
   it's a one-line bump to `^7` for a large typecheck speedup.
 - **Revisit ESLint 10** when `eslint-plugin-react` / `eslint-config-next`
   declare support.
+- This is the canonical **"Deferred on evidence" / "Decide-now, adopt-at-trigger"**
+  application of the decision-making methodology
+  ([0001](0001-decision-making-methodology.md)): the decision and its turnkey bump
+  are recorded now, so adoption at the trigger is a lookup, not a
+  re-investigation.

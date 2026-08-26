@@ -1,8 +1,8 @@
-# 0016. Authentication strategy — adopt Better Auth (self-hosted), not roll-your-own
+# 0011. Authentication strategy — adopt Better Auth (self-hosted), not roll-your-own
 
-- **Status:** Accepted (strategy). Phase 1 (email/password foundation) **implemented
-  & live-verified 2026-08-13**; later phases (OAuth, passwordless, passkeys, MFA,
-  orgs/SSO) pending.
+- **Status:** Accepted (strategy). Phase 1 (email/password) implemented & live-verified
+  2026-08-13; Phase 2 (Google OAuth) implemented 2026-08-24; later phases (passwordless,
+  passkeys, MFA, orgs/SSO) pending — see **Phased adoption plan** below.
 - **Date:** 2026-07-16
 
 ## Context
@@ -22,7 +22,7 @@ Before deciding, we scoped the three forks that actually change the answer:
 
 ### How we decided
 
-Per the repo's methodology (see [0005](0005-follow-shadcn-baseline.md)), the
+Per the repo's methodology (see [0001](0001-decision-making-methodology.md)), the
 recommendation was produced by a multi-source, internet-wide research pass with
 **adversarial fact-checking** (3-vote verification per claim). Every claim below
 was **confirmed 3–0** against 2026 sources — primary maintainer announcements,
@@ -70,7 +70,7 @@ auth system.
   (orgs/teams/RBAC), **SSO** (SAML 2.0 + OIDC + OAuth2, linkable per-organization
   with auto-provisioning), **OIDC-Provider**, and **SCIM** plugins.
 - **MIT license** — usable in our proprietary / `UNLICENSED` product (cf.
-  [0001](0001-proprietary-license-unlicensed.md)); MIT deps like Next.js and React
+  [0002](0002-proprietary-license-and-package-posture.md)); MIT deps like Next.js and React
   are already the norm here.
 
 ## Security & trust model
@@ -170,8 +170,7 @@ Start simple, escalate only when forced:
   This is the phase where the WorkOS hybrid is worth reconsidering. (We do not
   install these plugins until Phase 4.)
 - ⚠️ **No pre-built UI** — we build login/account screens ourselves (fine — we
-  already have shadcn / Base UI, cf. [0007](0007-base-ui-over-radix.md),
-  [0014](0014-base-ui-adoption.md)).
+  already have shadcn / Base UI, cf. [0021](0021-base-ui-selection-and-adoption.md)).
 - ⚠️ **Limited public evidence of multi-million-user production scale.** Vendor docs
   are authoritative on _features_, not _scale_ — "scales to millions" is a reasonable
   inference, not a benchmark. **Load-test the session store** before betting a launch
@@ -192,15 +191,13 @@ Start simple, escalate only when forced:
 
 ## Update — 2026-08-22: upgraded to Better Auth 1.7
 
-Bumped Better Auth **1.6.26 → 1.7.1** (verified via the integration gate — ADR 0029 §11). The
+Bumped Better Auth **1.6.26 → 1.7.1** (verified via the integration gate — ADR 0025 §11). The
 one change affecting us: 1.7 scopes account identity by **issuer**, so the `account` table
 gains an `issuer` column (credential accounts use `local:credential`) + a unique
-`(issuer, accountId)` index — schema + migration updated (ADR 0019). The many other 1.7
+`(issuer, accountId)` index — schema + migration updated (ADR 0012). The many other 1.7
 breaking changes (SCIM, SAML, OAuth-provider, DPoP, Expo…) touch features we don't use. 1.7's
 `testUtils()` plugin is now used in auth integration tests (test-only instance). One deferred
-knock-on: the Redis secondary-storage API changed — see [0028](0028-rate-limiting-and-secondary-storage.md).
-
-See [../references.md](../references.md) and [../future-improvements.md](../future-improvements.md).
+knock-on: the Redis secondary-storage API changed — see [0018](0018-rate-limiting-and-secondary-storage.md).
 
 ## Update — 2026-08-24: Google OAuth (Phase 2) implemented
 
@@ -216,12 +213,14 @@ the same config pattern adds GitHub/others later.
   **not** add `email-password` to `trustedProviders`. Better Auth's default links a social sign-in
   to an existing account **only on a verified email**; force-linking (via trustedProviders) would
   link even an _unverified_ email/password account to a matching Google sign-in — an
-  **account-takeover** vector, since progressive verification (ADR 0016) lets email/password
+  **account-takeover** vector, since progressive verification (ADR 0011) lets email/password
   accounts stay unverified. Google's `email_verified` makes new Google users verified, so
   same-email linking happens only once the pre-existing account is verified.
 - **Seam unchanged in shape:** `signInWithGoogle()` in `lib/auth/actions.ts` calls
   `authClient.signIn.social({ provider: "google", callbackURL, errorCallbackURL })` behind the
-  same enumeration-safe wrapper (ADR 0027 §1); the `/auth` page stays a static shell with the
-  button as a hydrated **client island** (ADR 0023/0025). Covered by an MSW seam test.
+  same enumeration-safe wrapper (ADR 0017 §1); the `/auth` page stays a static shell with the
+  button as a hydrated **client island** (ADR 0019/0023). Covered by an MSW seam test.
 - **Deferred:** a real end-to-end OAuth e2e (needs a mock OAuth provider) — logged in
   future-improvements, alongside the email real-SMTP integration test.
+
+See [../references.md](../references.md) and [../future-improvements.md](../future-improvements.md).

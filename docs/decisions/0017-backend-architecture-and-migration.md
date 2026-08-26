@@ -1,10 +1,10 @@
-# 0027. Backend architecture — Next.js fullstack now, separate-backend migration path
+# 0017. Backend architecture — Next.js fullstack now, separate-backend migration path
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
 
 > Resolves the fullstack-vs-separate-backend decision that
-> [0025](0025-frontend-architecture-forms-data-state-routing.md) deliberately deferred. This
+> [0023](0023-app-shell-routing-and-boundaries.md) deliberately deferred. This
 > ADR is both the **decision record** and the **wiring + migration playbook** — written
 > _before_ wiring so the seam is built to move cheaply, and so a future migration is a
 > lookup, not a re-investigation.
@@ -12,11 +12,11 @@
 ## Context
 
 The auth **UI** is complete and **presentational** (forms take an injected `onSubmit`, ADR
-0025), and the Better Auth **server** already exists and is **framework-neutral**. What's
-left is to **wire** the UI to auth. That forces the question ADR 0025 parked: does auth (and
+0022), and the Better Auth **server** already exists and is **framework-neutral**. What's
+left is to **wire** the UI to auth. That forces the question ADR 0023 parked: does auth (and
 the API generally) run **inside Next.js** (fullstack) or in a **separate backend service**?
 
-Constraint recap (ADR 0016 / 0025): enterprise, compliance-bound, **reusable as a template**,
+Constraint recap (ADR 0011 / 0023): enterprise, compliance-bound, **reusable as a template**,
 **no vendor/framework lock-in**, minimal / no premature abstraction.
 
 ## Current state (what already exists)
@@ -94,7 +94,7 @@ Core (neutral)              packages/auth  ·  packages/db  ·  packages/email  
 One module owns every auth transport call and error-maps it; nothing above it imports
 `authClient` directly. `authClient` returns `{ data, error }` (it does **not** throw), so the
 seam converts a returned `error` into a **`FormSubmitError`** (user-safe copy) that the
-shared `submitWithFormError` renders in the `FormError` banner (ADR 0026 / 0025 §2).
+shared `submitWithFormError` renders in the `FormError` banner (ADR 0022).
 
 ```
 // apps/web/lib/auth/actions.ts   (illustrative shape, not final code)
@@ -119,7 +119,7 @@ The step wrappers supply the seam functions as the forms' `onSubmit`, then navig
 - `ResetPasswordStep` → `resetPassword(token, newPassword)` → toast → `/auth/sign-in`.
 - `SignOutButton` → `authClient.signOut()` (already present).
 
-The **forms/`packages/ui` do not change** — they already accept `onSubmit` (ADR 0025).
+The **forms/`packages/ui` do not change** — they already accept `onSubmit` (ADR 0022).
 
 ### 3. The one nuance — identifier-first existence check
 
@@ -134,8 +134,8 @@ sign-in/up branch reveals existence, by design.
 ### 4. Runtime (already scaffolded — just needs to run)
 
 - **Postgres** via `docker-compose`; **env** from `.env.example` (`BETTER_AUTH_SECRET`,
-  `DATABASE_URL`, `BETTER_AUTH_URL`) validated by `@workspace/env` (ADR 0021); **migrations**
-  via drizzle-kit (ADR 0019). **Email** stays the console stub (ADR 0020) until a provider is
+  `DATABASE_URL`, `BETTER_AUTH_URL`) validated by `@workspace/env` (ADR 0013); **migrations**
+  via drizzle-kit (ADR 0012). **Email** stays the console stub (ADR 0014) until a provider is
   chosen — no code change to switch, just the adapter.
 - `nextCookies()` plugin is **only** needed if we call auth from **Server Actions**; we call
   it via the **browser client → route handler**, so it is not required (note it if we ever add
@@ -151,7 +151,7 @@ sign-in/up branch reveals existence, by design.
   under them changes no caller (steps/forms untouched).
 - **Next.js structure:** route handlers under `app/api/*`; server reads via `lib/session`
   (RSC + `cache()`); client mutations via the seam; guards in layouts (`instant = false`,
-  ADR 0023). No business logic in components.
+  ADR 0019). No business logic in components.
 
 ## Migration path → separate backend (in depth, for later)
 
@@ -190,8 +190,8 @@ Because the core is framework-neutral and the UI is presentational, a split is a
 
 Roughly a **day-ish**: a thin new service (~1 handler + bootstrap), a 1-line client repoint,
 CORS/cookie config, and one `getSession` transport swap. **No UI rework.** That contained
-cost is the entire point of the wiring-agnostic design (ADR 0025) + framework-neutral core
-(ADR 0016).
+cost is the entire point of the wiring-agnostic design (ADR 0023) + framework-neutral core
+(ADR 0011).
 
 ## Consequences
 
@@ -199,8 +199,8 @@ cost is the entire point of the wiring-agnostic design (ADR 0025) + framework-ne
   cross-origin complexity; the template runs out of the box.
 - The seam (`lib/auth/`) is the single, documented swap point; a future service split follows
   this playbook without touching the UI.
-- ADR 0025's "backend undecided" is resolved; its Server-Actions / `useActionState` note
-  ([0023] §2) becomes available (fullstack) but is **not** adopted — we keep the injected
+- ADR 0023's "backend undecided" is resolved; its Server-Actions / `useActionState` note
+  ([0019] §2) becomes available (fullstack) but is **not** adopted — we keep the injected
   browser-client handler so the seam stays portable.
 
 ## Sources
@@ -214,11 +214,15 @@ cost is the entire point of the wiring-agnostic design (ADR 0025) + framework-ne
 
 ## See also
 
-- [0016](0016-authentication-strategy.md) — Better Auth chosen (self-hosted, framework-neutral,
+- [0011](0011-authentication-strategy.md) — Better Auth chosen (self-hosted, framework-neutral,
   own DB).
-- [0025 §2/§6](0025-frontend-architecture-forms-data-state-routing.md) — presentational forms,
-  the `lib/` data-access seam, wiring-agnostic through-line.
-- [0026](0026-form-submission-and-pending-state-pattern.md) — `FormSubmitError` /
-  `root.serverError` contract the seam feeds.
-- [0019](0019-data-layer-postgres-drizzle.md), [0020](0020-email-transactional-messaging.md),
-  [0021](0021-env-and-secrets-management.md) — data / email / env the wiring depends on.
+- [0022](0022-forms-rhf-submission-and-pending.md) — presentational forms + the
+  `FormSubmitError` / `root.serverError` contract the seam feeds.
+- [0023](0023-app-shell-routing-and-boundaries.md) — the `lib/` data-access seam, routing, and
+  the wiring-agnostic through-line (this ADR resolves its "backend undecided").
+- [0018](0018-rate-limiting-and-secondary-storage.md) — rate limiting & secondary storage for
+  the identifier-first `account-exists` check (§3) and sessions (the split's spoke).
+- [0025](0025-testing-strategy.md) — testing strategy, including the separate-backend test
+  scenario for this migration (the split's spoke).
+- [0012](0012-data-layer-postgres-drizzle.md), [0014](0014-email-transactional-messaging.md),
+  [0013](0013-env-and-secrets-management.md) — data / email / env the wiring depends on.

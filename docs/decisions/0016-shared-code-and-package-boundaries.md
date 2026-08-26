@@ -1,4 +1,4 @@
-# 0022. Shared-code organization — utilities & internal-package boundaries
+# 0016. Shared-code organization & package boundaries
 
 - **Status:** Accepted
 - **Date:** 2026-08-09
@@ -11,7 +11,7 @@ utilities, and shared types. The question raised before proceeding: **where does
 reusable code live — one `utils` package, or something more structured?** This is a
 foundational, hard-to-reverse layout decision, so it is settled now as policy.
 
-Guiding rule (as with [0021](0021-env-and-secrets-management.md)): **decide at
+Guiding rule (as with [0013](0013-env-and-secrets-management.md)): **decide at
 scale** — assume many apps and a large helper surface, and pick the structure that
 _stays healthy_ at that size rather than the one that is easiest today.
 
@@ -24,7 +24,7 @@ production Next.js template) as a concrete reference layout, and the Next.js/Rea
 **`server-only`** boundary for bundle safety. Sources at the end. The repo's own
 baseline (`@workspace/ui` exposing `./lib/*`, `./hooks/*`, `./components/*`;
 `@workspace/db|auth|email` as domain packages) was taken as the create-turbo/shadcn
-starting point (methodology per [0005](0005-follow-shadcn-baseline.md)).
+starting point (methodology per [0001](0001-decision-making-methodology.md)).
 
 ## Questions & critiques interrogated
 
@@ -102,7 +102,7 @@ which is auth-specific) stay in the app, grouped by feature.
 `submitWithFormError` / `FormSubmitError`) bind to RHF, and that is the right call **for this
 repo**: `@workspace/ui` is an **internal** design system (not published for arbitrary
 consumers), and **RHF is standardized across every app**
-([0025](0025-frontend-architecture-forms-data-state-routing.md)). Making the design system
+([0022](0022-forms-rhf-submission-and-pending.md)). Making the design system
 "form-state-agnostic" would optimize for a consumer our own standing decision rules out. It is
 also **shadcn's own pattern** (its `Form` ships in the component layer with RHF). RHF is
 pinned in the **catalog**, so every app shares one version; tree-shaking keeps it out of
@@ -117,9 +117,10 @@ bundles that import only atoms.
 **Brand → `@workspace/ui`.** `Logo`/`LogoIcon` + product name (`brand.ts`) live here as the
 product's shared identity (so multiple apps share one brand). Trade-off: a different-brand
 project overwrites them there — the accepted single identity concession in an otherwise
-brand-agnostic library. (Revises
-[0024](0024-ui-foundations-layout-responsiveness-accessibility.md) §6, which had placed brand
-in the app.)
+brand-agnostic library. (Revises the original brand placement in § Icons & SVG assets below —
+moved into this ADR from what was
+[0020](0020-ui-foundations-layout-responsiveness-accessibility.md) §6 — which had placed
+brand in the app; that section now defers here.)
 
 The guardrail still holds: **don't scatter** a generic primitive inside a feature folder
 (hard to find/reuse), and **don't hoist** a feature-specific **organism** (e.g. `SignInForm`)
@@ -135,6 +136,51 @@ app cannot render these components and needs its **own** UI layer regardless, so
 RHF-in-`ui` choice does not block it. If RN ever lands, the shared piece is a separate RN
 component package (and/or headless logic), not this one.
 
+### Icons & SVG assets — placement, naming & accessibility
+
+_Moved here 2026-08-16 from what was [0020](0020-ui-foundations-layout-responsiveness-accessibility.md)
+§6 (UI foundations); the placement half is owned by this ADR, the accessibility/authoring
+standard is unchanged._
+
+**Placement (reusability boundary — see § Component placement above):**
+
+- **Our brand** (efferd `Logo` / `LogoIcon`) → `apps/web/components/brand/`. It is
+  app-specific identity and must not pollute the template-reusable `packages/ui`. The brand
+  **name string** is separate from the mark: it lives in `apps/web/lib/brand.ts`
+  (`brand.name`) — the single rebrand seam, wired into `metadata`, UI copy, and the marks'
+  `aria-label`, so renaming the product is a one-file change while the SVG marks stay here.
+  **(Revised 2026-08-16 → both the marks and `brand.ts` move into `@workspace/ui` as this
+  product's shared identity — the accepted single "brand" concession in an otherwise
+  brand-agnostic library; see § Component placement above.)**
+- **Generic / third-party UI icons** (`GoogleIcon`, `GithubIcon` — social-login
+  affordances any app reuses) → `packages/ui/src/components/icons/`.
+- **Functional glyphs** → **lucide-react** (already a dep, tree-shaken via
+  `optimizePackageImports`). Only hand-author an SVG component when lucide lacks it
+  (brand marks). Raw `.svg` _asset_ files (if ever) → `public/`, via `next/image`.
+
+**Naming:** kebab-case file mirroring the PascalCase export (`google-icon.tsx` →
+`GoogleIcon`), like `password-input.tsx` → `PasswordInput`. The `-icon` suffix is kept
+(over a bare `google.tsx`) for grep-ability and file/export mirroring.
+
+**Component standard (every hand-authored SVG):**
+
+- `fill="currentColor"` on the **`<svg>`** (inherit text colour; light/dark adaptive) —
+  never on child paths.
+- `viewBox` present; **no** `width`/`height` — size-agnostic; the caller sizes via
+  `className` (`h-6 w-auto`, or a button's automatic `size-4`).
+- `xmlns` present (standalone-serialization-safe; matches lucide's output).
+- `props: React.ComponentProps<"svg">` spread **last**, so call sites can override size,
+  `data-icon`, or `aria-*`.
+- **Accessibility (the point):**
+  - **Decorative** (icon paired with visible text, e.g. inside "Continue with Google") →
+    **`aria-hidden="true"`** so screen readers do not announce it twice. Default for the
+    `icons/` set.
+  - **Meaningful** (standalone, conveys info with no adjacent text — the `Logo` is the
+    only on-screen "efferd") → **`role="img"` + `aria-label`**; a call site passes
+    `aria-hidden` to override when the mark sits beside visible brand text.
+  - We omit `focusable="false"` (a legacy-IE workaround) — the stack is modern-only and
+    lucide does not emit it either.
+
 ### `@workspace/utils` rules (so it never becomes the anti-pattern)
 
 1. **Isomorphic & pure only** — identical on client and server. No Node-only (`fs`,
@@ -142,7 +188,7 @@ component package (and/or headless logic), not this one.
    import-time side effects.
 2. **`"sideEffects": false`** + **granular subpath exports** (`@workspace/utils/date`,
    `/string`, `/result`), **one module per concern** — the same per-topic discipline
-   applied to `packages/db/queries/` ([0019](0019-data-layer-postgres-drizzle.md)). A
+   applied to `packages/db/queries/` ([0012](0012-data-layer-postgres-drizzle.md)). A
    client importing `formatDate` must not pull in the whole package.
 3. **Dependency-light** — the client can import it, so keep it near-zero-dep; heavy
    deps go behind lazy `import()` or stay in a domain package.
@@ -171,14 +217,49 @@ This boundary is what prevents a "shared helper" from leaking secrets or Node co
 into the browser bundle — it is the reason the isomorphic package is kept strictly
 pure.
 
+### Package isolation boundary (ports & adapters)
+
+Several domain packages share one structural pattern. It is stated **once here** so the
+domain ADRs can reference it rather than re-derive it. A **cross-cutting capability with a
+replaceable implementation** (a database driver, an email transport/SDK, later a
+cache/queue client) lives behind a **single domain package that is the only importer of that
+underlying driver/SDK** — the classic **ports & adapters (hexagonal)** shape:
+
+- **One-way dependency.** The package exposes a stable **port** (its exported interface —
+  repositories + domain types, a `sendEmail(...)` function, etc.); consumers depend **only**
+  on that surface, **never** on the driver/SDK directly. The dependency arrow points one way,
+  into the package.
+- **The adapter is swappable behind the port.** Changing the implementation
+  (Drizzle → Kysely, one SMTP provider → another, self-host → managed) is an **internals
+  rewrite of that one package**; consumers stay untouched because the exported interface is
+  stable. A same-paradigm swap is a drop-in; a cross-paradigm swap (e.g. SQL → document
+  store) is **contained** (blast-radius bounded to the package), **not** free — the interface
+  can encode paradigm-specific semantics a different paradigm won't honor.
+- **Escape-hatch handles stay narrow.** Where a framework must talk to the raw driver (e.g.
+  Better Auth's own DB adapter), expose the raw handle only from a **narrow, explicitly-named
+  subpath** (`@workspace/db/client`), never the default barrel — so the choke-point is
+  structural, not merely convention.
+- **What it buys (and doesn't).** The value is **testability, domain isolation, a single
+  choke-point, and a contained blast radius** — _not_ "database/provider agnosticism for
+  free." Avoid lock-in by choosing an **open, portable underlying technology** (Postgres,
+  SMTP), not by building a lowest-common-denominator abstraction over incompatible ones (a
+  leaky/premature abstraction).
+
+The concrete instances: **`packages/db`** (the data-access boundary,
+[0012](0012-data-layer-postgres-drizzle.md)) and **`packages/email`** (the `sendEmail` port,
+[0014](0014-email-transactional-messaging.md)); a future cache / rate-limit client
+([0018](0018-rate-limiting-and-secondary-storage.md)) follows the same shape. Those ADRs
+carry the per-package specifics (drivers, exceptions, exports map); the general contract is
+this section.
+
 ### Governance (what stops the rot)
 
 - **Enforce boundaries in lint, not docs** — **implemented** in `@workspace/eslint-config`
   via core `no-restricted-imports`: **no deep-reaching past a package's `exports` map**
   (bans `@workspace/*/src/**`), and **`@workspace/utils` imports nothing internal** (leaf
-  rule in its own config). CI fails on warnings ([0003](0003-hard-lint-gate.md)), so these
-  are hard gates. A richer element-type graph (app-can't-import-app, per-type allowed-deps)
-  via `eslint-plugin-boundaries` stays available if the package graph grows.
+  rule in its own config). CI fails on warnings ([0005](0005-lint-gate-and-vendored-exception.md)),
+  so these are hard gates. A richer element-type graph (app-can't-import-app, per-type
+  allowed-deps) via `eslint-plugin-boundaries` stays available if the package graph grows.
 - **Acyclic dependency direction:** `utils` (leaf) → domain packages → `ui` → apps.
 - **One purpose per package**, documented; `@workspace/*` naming (existing convention).
 
@@ -199,6 +280,9 @@ pure.
   tree-shaking, safe client/server separation, and granular Turbo caching.
 - The naming default is **`@workspace/utils`** (Turborepo's own term; `core`/`lib` were
   rejected as vaguer). Revisit only if a clearer split emerges.
+- Icon/brand asset placement and the SVG authoring standard are now owned here (moved from
+  the UI-foundations ADR), so "where does this mark live?" has one home alongside the
+  component-placement rules.
 
 ## Revisit triggers
 
@@ -233,9 +317,19 @@ pure.
   <https://piccalil.li/blog/framework-agnostic-design-systems-part-1/>; Atomic-Design +
   Feature-Sliced hybrid / feature-based critique
   <https://www.codewithseb.com/blog/from-components-to-systems-scalable-frontend-with-atomiec-design>
+- SVG icon accessibility (decorative vs meaningful; `currentColor` / `viewBox`) —
+  <https://dev.to/svgicons/svg-icon-accessibility-decorative-vs-meaningful-icons-2430>,
+  <https://koenvangilst.nl/lab/accessible-svgs>
+- Ports & adapters / hexagonal architecture (isolation for testability, not free swaps) —
+  Alistair Cockburn <https://alistair.cockburn.us/hexagonal-architecture>,
+  <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>; Leaky abstractions
+  <https://en.wikipedia.org/wiki/Leaky_abstraction>
 - `eslint-plugin-boundaries` (module-boundary enforcement) —
   <https://github.com/javierbrea/eslint-plugin-boundaries>
 
-See [0005](0005-follow-shadcn-baseline.md) (baseline methodology),
-[0019](0019-data-layer-postgres-drizzle.md) (per-aggregate module discipline), and
-[../future-improvements.md](../future-improvements.md).
+See [0001](0001-decision-making-methodology.md) (baseline methodology),
+[0012](0012-data-layer-postgres-drizzle.md) (per-aggregate module discipline; the data-layer
+instance of the port boundary),
+[0014](0014-email-transactional-messaging.md) (the email-port instance of the boundary),
+[0020](0020-ui-foundations-layout-responsiveness-accessibility.md) (UI foundations — the icon
+section moved from there), and [../future-improvements.md](../future-improvements.md).
