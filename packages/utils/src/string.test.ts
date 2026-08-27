@@ -32,8 +32,10 @@ describe("getInitials", () => {
     expect(getInitials("Ada King Lovelace", 3)).toBe("AKL");
   });
 
-  it("returns a single initial for a one-word value", () => {
-    expect(getInitials("Ada")).toBe("A");
+  it("fills to `max` letters from a single word", () => {
+    expect(getInitials("Ada")).toBe("AD");
+    expect(getInitials("dev")).toBe("DE");
+    expect(getInitials("a")).toBe("A"); // only one letter available
   });
 
   it("ignores extra/leading whitespace", () => {
