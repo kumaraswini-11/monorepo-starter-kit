@@ -14,8 +14,8 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 /**
  * Dashboard — the authed landing page. Rendered inside the app shell (see the `(app)` layout),
- * so it's a normal content pane: the theme toggle lives in the shell header and sign-out in the
- * sidebar footer (reachable from every page), not here.
+ * so it's a normal content pane: the theme toggle and the account menu (which holds sign-out)
+ * live in the shell header (reachable from every page), not here.
  */
 export default async function DashboardPage() {
   const session = await getSession();

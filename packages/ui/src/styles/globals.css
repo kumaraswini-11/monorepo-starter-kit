@@ -184,5 +184,15 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+
+    /*
+     * …but a loading spinner is *essential* progress feedback, not decoration — WCAG 2.3.3
+     * exempts essential motion. Keep it turning (a frozen spinner reads as stuck). Decorative
+     * loops such as the skeleton pulse stay neutralized by the reset above.
+     */
+    [data-slot="spinner"] {
+      animation-duration: 1s !important;
+      animation-iteration-count: infinite !important;
+    }
   }
 }

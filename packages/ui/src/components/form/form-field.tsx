@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import {
   useController,
   type Control,
@@ -27,9 +28,9 @@ import { Input } from "@workspace/ui/components/shadcn/input";
  * re-renders to the one field, is RHF's documented path for external UI libraries, and
  * gives the password field its live value for the strength meter.
  *
- * Fields stay ENABLED during submit (ADR 0026): only the submit button is disabled, so
+ * Fields stay ENABLED during submit (ADR 0022): only the submit button is disabled, so
  * keyboard focus is never dropped mid-submit. Deliberately NOT shadcn's
- * `<Form>`/`<FormField>` — that wrapper is Radix-Slot-based and we run no Radix (ADR 0014);
+ * `<Form>`/`<FormField>` — that wrapper is Radix-Slot-based and we run no Radix (ADR 0021);
  * the `FieldError` `errors` prop already takes RHF's `fieldState.error` shape.
  */
 
@@ -75,15 +76,19 @@ export function FormTextField<T extends FieldValues>({
   ...inputProps
 }: BaseFieldProps<T> & ControlledInputProps) {
   const { field, fieldState } = useController({ control, name });
-  const errorId = `${name}-error`;
+  // Unique per instance (ADR 0022): `name` alone collides when a page renders more than one
+  // form that shares a field name (e.g. Settings' profile + change-email both have `email`).
+  const reactId = useId();
+  const fieldId = `${reactId}-${name}`;
+  const errorId = `${fieldId}-error`;
 
   return (
     <Field data-invalid={fieldState.invalid || undefined}>
-      <FieldLabelRow htmlFor={name} label={label} action={labelAction} />
+      <FieldLabelRow htmlFor={fieldId} label={label} action={labelAction} />
       <Input
         {...inputProps}
         {...field}
-        id={name}
+        id={fieldId}
         aria-invalid={fieldState.invalid || undefined}
         aria-describedby={fieldState.error ? errorId : undefined}
       />
@@ -101,15 +106,18 @@ export function FormPasswordField<T extends FieldValues>({
   ...inputProps
 }: BaseFieldProps<T> & ControlledInputProps & { showStrength?: boolean }) {
   const { field, fieldState } = useController({ control, name });
-  const errorId = `${name}-error`;
+  // Unique per instance — see FormTextField: `name` alone collides across forms on one page.
+  const reactId = useId();
+  const fieldId = `${reactId}-${name}`;
+  const errorId = `${fieldId}-error`;
 
   return (
     <Field data-invalid={fieldState.invalid || undefined}>
-      <FieldLabelRow htmlFor={name} label={label} action={labelAction} />
+      <FieldLabelRow htmlFor={fieldId} label={label} action={labelAction} />
       <PasswordInput
         {...inputProps}
         {...field}
-        id={name}
+        id={fieldId}
         aria-invalid={fieldState.invalid || undefined}
         aria-describedby={fieldState.error ? errorId : undefined}
       />

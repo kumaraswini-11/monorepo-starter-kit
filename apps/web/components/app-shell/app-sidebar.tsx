@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboardIcon, SettingsIcon } from "lucide-react";
 
 import { Logo, LogoIcon } from "@workspace/ui/components/brand/logo";
 import {
@@ -17,18 +16,16 @@ import {
 } from "@workspace/ui/components/shadcn/sidebar";
 import { brand } from "@workspace/ui/lib/brand";
 
+import { NAV_ITEMS } from "@/components/app-shell/nav";
+
 /**
- * The app's primary navigation (ADR 0022: a feature organism, so it lives in the app, not the
+ * The app's primary navigation (ADR 0016: a feature organism, so it lives in the app, not the
  * design system). Built from the shared shadcn/Base UI `Sidebar` primitives: routing via each
  * button's `render={<Link/>}` (Base UI composition), the active item from the pathname, and
  * `collapsible="icon"` so it collapses to an icon rail (not fully offscreen) — tooltips surface
- * each label in that state. The user/account menu lives in the header (see `UserMenu`).
+ * each label in that state. Nav items come from the shared `NAV_ITEMS` (shared with the header
+ * breadcrumb + command palette). The user/account menu lives in the header (see `UserMenu`).
  */
-const NAV_ITEMS = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
-  { title: "Settings", href: "/settings", icon: SettingsIcon },
-] as const;
-
 export function AppSidebar() {
   const pathname = usePathname() ?? "";
 
@@ -56,8 +53,9 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            {/* Primary navigation landmark — the shadcn Sidebar primitive renders plain divs,
-                so the app supplies the <nav> for landmark navigation. */}
+            {/* Primary navigation landmark + aria-current on the active link. The shadcn Sidebar
+                primitive is content-agnostic (plain divs; visual-only `isActive`), so the app owns
+                these page-level semantics — deliberate, not a gap (ADR 0020, 0023). */}
             <nav aria-label="Main">
               <SidebarMenu>
                 {NAV_ITEMS.map((item) => {

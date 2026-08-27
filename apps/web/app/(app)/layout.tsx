@@ -2,16 +2,18 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { Separator } from "@workspace/ui/components/shadcn/separator";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@workspace/ui/components/shadcn/sidebar";
 
+import { AppBreadcrumb } from "@/components/app-shell/app-breadcrumb";
 import { AppSidebar } from "@/components/app-shell/app-sidebar";
+import { AppSidebarTrigger } from "@/components/app-shell/app-sidebar-trigger";
+import { CommandPalette } from "@/components/app-shell/command-palette";
 import { UserMenu } from "@/components/app-shell/user-menu";
 import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { getSession } from "@/lib/session";
 
 /**
@@ -41,16 +43,25 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   const defaultOpen = (await cookies()).get("sidebar_state")?.value !== "false";
 
-  const user = { name: session.user.name, email: session.user.email };
+  const user = {
+    name: session.user.name,
+    email: session.user.email,
+    image: session.user.image,
+  };
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger />
+        <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <AppSidebarTrigger />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-vertical:h-4 data-vertical:self-center"
+          />
+          <AppBreadcrumb />
           <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
+            <CommandPalette />
             <UserMenu user={user} />
           </div>
         </header>

@@ -43,13 +43,16 @@ function ThemeHotkey() {
         return;
       }
 
-      if (event.metaKey || event.ctrlKey || event.altKey) {
+      // Mod+Shift+L (⌘⇧L on macOS, Ctrl+Shift+L elsewhere) — a modifier-based chord, never a
+      // bare key, to satisfy WCAG 2.1.4 and match the sidebar's ⌘B grammar; ⇧ dodges ⌘L (the
+      // browser address bar). Quick light↔dark flip; the header menu covers System (ADR 0023).
+      const mod = event.metaKey || event.ctrlKey;
+      if (!mod || !event.shiftKey || event.altKey) {
         return;
       }
 
-      // `event.key` can be undefined for synthetic/autofill/IME keydowns (e.g. a
-      // password manager filling a field), so guard before `toLowerCase()`.
-      if (event.key?.toLowerCase() !== "d") {
+      // `event.key` can be undefined for synthetic/autofill/IME keydowns, so guard.
+      if (event.key?.toLowerCase() !== "l") {
         return;
       }
 
@@ -57,6 +60,7 @@ function ThemeHotkey() {
         return;
       }
 
+      event.preventDefault();
       setTheme(resolvedTheme === "dark" ? "light" : "dark");
     }
 
