@@ -149,6 +149,17 @@ the wrong field's error is announced) — invalid HTML and a broken programmatic
 (WCAG 1.3.1). Fixed in the shared primitive before the multi-form consumer exists; no test impact
 (`getByLabel` / `getByRole` resolve via the for/id link, not the id's value).
 
+## Addendum — password-strength colour & form rhythm
+
+_Added 2026-08-27 (UI review)._
+
+- **"Good" and "Strong" deliberately share the success hue.** The strength meter advances by
+  **filled-segment count (3 vs 4) + the text label**, not colour alone, so a same-hue top pair is
+  intentional (varying the hue for extra signal is an optional future refinement, not a bug).
+- **One owner of vertical rhythm.** `Form` (`gap-6`) and shadcn's `FieldGroup` (`gap-7`) both set
+  vertical spacing; prefer a single owner — defer to `FieldGroup`'s baseline rather than editing
+  the vendored primitive — so stacked fields don't mix 24px / 28px gaps.
+
 ## Sources
 
 - RHF adoption R&D (2026-08-16): **React Hook Form** + **`@hookform/resolvers`** docs (via

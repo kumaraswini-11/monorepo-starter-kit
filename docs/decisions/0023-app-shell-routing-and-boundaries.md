@@ -242,6 +242,34 @@ approach: the direction is locked, the dependency lands when the need is real.
 - **GraphQL chosen** → TanStack Query pairs with a typed GraphQL client (e.g. graphql-request
   / urql) behind the same data seam.
 
+## Addendum — header, sidebar & keyboard shortcuts
+
+_Added 2026-08-27 (UI review)._
+
+- **Sticky header** with a solid background, so the theme + account controls stay reachable on
+  long, natively-scrolling pages (the sidebar is already fixed).
+- **Header breadcrumb (done).** `AppBreadcrumb` shows the current section (a single crumb from the
+  active nav item) — a "you are here" anchor that fills the once-empty header middle; it extends to
+  a real trail when nested routes arrive. Nav items come from a shared **`NAV_ITEMS`** (one source
+  for the sidebar, breadcrumb, and palette).
+- **Theme lives in the account menu (done)** — a three-state Light / Dark / System `menuitemradio`
+  submenu, not a standalone header toggle (the common account-menu pattern; keeps the header to
+  one avatar control). The public `(auth)` pages, which have no account menu, keep a standalone
+  `ThemeToggle`. Three-state so the `system` default stays reachable.
+- **Command palette ⌘K (done).** `CommandPalette` (built on the vendored `cmdk` `command.tsx`) is
+  the discoverable hub — navigation, theme, sign-out — with a header trigger showing a
+  platform-aware `Kbd`. New actions go **in the palette**, not new global chords.
+- **Keyboard-shortcut grammar (one system).** Every global uses a **modifier** (WCAG 2.1.4), never
+  a bare key: **⌘K** palette, **⌘B** sidebar (shadcn default), **⌘⇧L** quick light↔dark flip (`⇧`
+  dodges ⌘L = the browser address bar). Declared via `aria-keyshortcuts`. Avoid browser-reserved
+  single-`Mod` keys (⌘L/⌘D/⌘T/⌘N/⌘W/⌘S/⌘P/⌘F/⌘R); prefer ⌘⇧‹letter› or the palette.
+- **Sign-out is shared** via a `useSignOut` hook (account menu + palette) so behaviour and copy
+  stay identical.
+- **Still to refine (own task):** the three chords are separate `keydown` listeners today —
+  consolidate into one **registry** that also feeds a **shortcuts sheet** (e.g. ⌘/). A
+  `SidebarRail` edge-toggle was tried and **removed** — its hover highlight read as a stray box;
+  the header trigger + ⌘B suffice.
+
 ## Sources
 
 - Official docs (gathered during the R&D pass, via context7 / vendor sites): **TanStack

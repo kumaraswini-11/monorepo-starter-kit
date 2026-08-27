@@ -126,6 +126,11 @@ The guardrail still holds: **don't scatter** a generic primitive inside a featur
 (hard to find/reuse), and **don't hoist** a feature-specific **organism** (e.g. `SignInForm`)
 into `@workspace/ui`.
 
+This ADR settles **where** a piece lives; for **what _shape_ the abstraction should take** once
+you know its home — generic inputs vs a domain model, sensible default + escape hatch, and why
+there is no `UserAvatar`/`CompanyAvatar` fan-out — see
+[0026](0026-choosing-the-right-abstraction.md).
+
 **Revisit trigger — the one scenario that reopens this.** If `@workspace/ui` ever must serve a
 **web** consumer that does _not_ use react-hook-form (a different form library, or a
 form-less context), split the RHF-bound molecules into a dedicated `@workspace/form` package
@@ -291,6 +296,18 @@ this section.
 - A contract type is shared by ≥2 domains that can't own it → introduce `@workspace/types`.
 - Package count or coupling grows enough to want tag-based boundaries → evaluate a
   richer boundaries config.
+
+## Addendum — `getInitials` (avatar fill + built-ins)
+
+_Added 2026-08-27._
+
+`getInitials(value, max = 2)` returns up to `max` uppercase initials and, when there are fewer
+words than `max`, **fills from the first word's next letters** (`"Ada"` → `"AD"`, `"dev"` → `"DE"`)
+— so avatar callers get a stable fallback, not a single colliding letter. Email/`@` knowledge stays
+in the **caller** (it passes the name or the email's local part); the util stays generic. It is
+written with plain built-ins (`trim`/`split`/`match`): for these short inputs (names, a local part)
+readable standard methods beat a hand-tuned O(k) scan — "complexity-optimal" here means
+_simplest-correct_, not micro-optimized.
 
 ## Sources
 

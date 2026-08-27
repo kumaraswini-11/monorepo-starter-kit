@@ -190,6 +190,19 @@ destructive; changed on review.)
 - **Automated a11y testing** (axe-core / Playwright) → add to CI (testing backlog in
   [../future-improvements.md](../future-improvements.md)).
 
+## Addendum — avatar image & full-width banners
+
+_Added 2026-08-27 (UI review)._
+
+- **Avatar = image, then initials.** Account/profile avatars render `AvatarImage` from the user's
+  photo (Google OAuth returns one, ADR 0011) with initials as the fallback; the image is
+  decorative (`alt=""`) since the account name sits beside it. Initials come from `getInitials`
+  (ADR 0016).
+- **Full-width banners** (e.g. the verify-email banner) should span the **same content container**
+  the page content uses, so a full-width border/background doesn't sit under centred, width-capped
+  content on wide viewports. Pending a single shared page-container width (tracked with the
+  header/breadcrumb work in ADR 0023).
+
 ## Sources
 
 - Base UI — Accessibility overview: <https://base-ui.com/react/overview/accessibility>

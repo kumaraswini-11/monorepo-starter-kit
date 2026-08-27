@@ -104,16 +104,13 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
   if it changes how we work. `taze` also reorders/tightens manifests — **audit its
   diff** before committing.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
-- **Component placement (atomic-design _lens_; ADR 0016 → Component placement):** categorize
-  by atomic level to pick the home, but keep **reusability-tier packages + feature folders**
-  (never literal `atoms/molecules/organisms` folders). **Atoms + agnostic molecules**
-  (shadcn/Base UI primitives, `PasswordInput`, brand) → **`@workspace/ui`**, which stays
-  **the single design system** — presentational _and_ form-bound (`PasswordInput`, `Form`,
-  `SubmitButton`, `FormTextField`); `react-hook-form` is a deliberate `@workspace/ui`
-  dependency (internal monorepo standardized on RHF). **Feature organisms** (a feature's
-  screens/flows, e.g. `SignInForm`) → the app (`apps/*/components/<feature>/`). Proven-generic
-  UI goes to `@workspace/ui` from the start; only _uncertain_ abstractions wait for a 2nd
-  consumer.
+- **Component placement & shape (ADR 0016, 0026):** atomic-design as a _lens_ to pick the home
+  — no literal `atoms/molecules/organisms` folders. **`@workspace/ui`** is the single design
+  system (atoms + agnostic _and_ form-bound molecules; `react-hook-form` is a deliberate `ui`
+  dep); **feature organisms** (e.g. `SignInForm`) live in the app under
+  `apps/*/components/<feature>/`. Proven-generic UI → `ui` from the start; _uncertain_ ones wait
+  for a 2nd consumer. **Shape:** generic inputs (a `name`, not a `user`) + a sensible default +
+  one escape hatch — no per-entity wrappers, no prop-explosion.
 - **Record notable decisions as ADRs** in `docs/decisions/` (copy the existing
   `NNNN-title.md` format and update the index). Log deferred work in
   `docs/future-improvements.md`.
@@ -133,3 +130,8 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
 
 Contribution flow: `CONTRIBUTING.md`. Security policy: `SECURITY.md`. The reasoning
 behind the rules above lives in `docs/decisions/`.
+
+> **Editing this file:** it loads every session, so keep it a **lean handbook** — for each
+> line ask _"would removing this make an agent err?"_; if not, cut it. Push detail to an
+> ADR/skill and leave a pointer (a bloated file gets ignored). See
+> [Anthropic — Best practices for Claude Code](https://code.claude.com/docs/en/best-practices).
