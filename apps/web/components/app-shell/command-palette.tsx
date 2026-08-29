@@ -75,7 +75,7 @@ export function CommandPalette() {
         aria-keyshortcuts="Control+K Meta+K"
         onClick={() => setOpen(true)}
       >
-        <SearchIcon />
+        <SearchIcon aria-hidden="true" />
         <span className="hidden sm:inline">Search</span>
         <Kbd className="hidden sm:inline-flex" suppressHydrationWarning>
           {isMac ? "⌘K" : "Ctrl K"}
@@ -93,7 +93,7 @@ export function CommandPalette() {
                   key={item.href}
                   onSelect={() => run(() => router.push(item.href))}
                 >
-                  <item.icon />
+                  <item.icon aria-hidden="true" />
                   {item.title}
                 </CommandItem>
               ))}
@@ -105,7 +105,7 @@ export function CommandPalette() {
                   key={option.value}
                   onSelect={() => run(() => setTheme(option.value))}
                 >
-                  <option.icon />
+                  <option.icon aria-hidden="true" />
                   {option.label}
                 </CommandItem>
               ))}
@@ -113,7 +113,7 @@ export function CommandPalette() {
             <CommandSeparator />
             <CommandGroup heading="Account">
               <CommandItem onSelect={() => run(() => void runSignOut())}>
-                <LogOutIcon />
+                <LogOutIcon aria-hidden="true" />
                 Sign out
               </CommandItem>
             </CommandGroup>

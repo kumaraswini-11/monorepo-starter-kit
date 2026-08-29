@@ -18,7 +18,7 @@ export function ThemeRadioGroup() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+    <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
       {THEME_OPTIONS.map((option) => (
         <DropdownMenuRadioItem key={option.value} value={option.value}>
           <option.icon aria-hidden="true" />

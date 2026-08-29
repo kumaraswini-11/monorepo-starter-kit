@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { Separator } from "@workspace/ui/components/shadcn/separator";
 import {
   SidebarInset,
   SidebarProvider,
@@ -31,8 +30,8 @@ export const instant = false;
  *
  * The sidebar's open/collapsed state persists across reloads via the `sidebar_state` cookie —
  * read here so the server renders the correct initial state (no flash/hydration mismatch).
- * Global controls live in the shell header (theme toggle + the account menu, which holds sign-out)
- * so they're reachable from every page, including Settings.
+ * Global controls live in the shell header — the command palette (⌘K) and the account menu, which
+ * holds the theme control and sign-out — so they're reachable from every page.
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await getSession();
@@ -51,14 +50,21 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
+      {/* Skip link: first focusable element, jumps keyboard users past the sidebar + header nav
+          straight to the content region (WCAG 2.4.1 Bypass Blocks). Visually hidden until focused.
+          A native <a>, not next/link, on purpose: a skip link's job is to MOVE FOCUS to the target,
+          and next/link doesn't do that for same-page hashes (vercel/next.js#38085) — it only
+          scrolls. Our rule holds: <Link> for route navigation, <a> for same-page hashes. */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:rounded-md focus:border focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow-md focus:ring-2 focus:ring-ring focus:outline-none"
+      >
+        Skip to content
+      </a>
       <AppSidebar />
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
           <AppSidebarTrigger />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-vertical:h-4 data-vertical:self-center"
-          />
           <AppBreadcrumb />
           <div className="ml-auto flex items-center gap-2">
             <CommandPalette />
@@ -70,7 +76,15 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <VerifyEmailBanner email={session.user.email} />
         )}
 
-        <div className="flex-1">{children}</div>
+        {/* Content region + skip-link target. `flex flex-1 flex-col` so pages/boundaries can claim
+            the remaining height honestly (error/empty states center without viewport math, ADR 0020). */}
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="flex flex-1 flex-col outline-none"
+        >
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

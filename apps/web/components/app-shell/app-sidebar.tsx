@@ -35,7 +35,7 @@ export function AppSidebar() {
         <Link
           href="/dashboard"
           aria-label={`${brand.name} — go to dashboard`}
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex items-center gap-2 rounded-md px-2 py-1.5 outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           {/* The link carries the accessible name; the marks are decorative. Show the compact
               mark when collapsed to the icon rail, the full wordmark when expanded. */}
