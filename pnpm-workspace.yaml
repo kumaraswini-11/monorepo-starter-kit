@@ -38,7 +38,7 @@ catalog:
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   "@testing-library/jest-dom": ^6.9.1
   "@testing-library/react": ^16.3.0
-  "@testing-library/user-event": ^14.6.1
+  "@testing-library/user-event": ^14.6.6
   jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.7.1
