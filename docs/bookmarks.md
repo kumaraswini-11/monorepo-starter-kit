@@ -116,3 +116,36 @@ adopted; listed for when a real need lands.
   dependency versus our native GitHub CI/CodeQL status badges. Kept for reference —
   handy if `packages/ui` ever ships as a public design system, or for a personal /
   OSS project.
+
+## UI component galleries & design references (to explore)
+
+A dump of inspiration + component sources to browse later — shadcn-style component
+libraries, UI galleries, and design-token / checklist references. **Not adopted; notes
+are provisional until each is visited.** Any client-runtime component is still judged on
+bundle weight before adoption (dep-weight policy), and third-party libraries against
+[decisions/0021](decisions/0021-base-ui-selection-and-adoption.md) (Base UI over Radix) —
+so these are idea sources, not drop-ins.
+
+- [Refero](https://styles.refero.design/) — searchable gallery of real product UI
+  screenshots; interaction/design inspiration.
+- [reui](https://reui.io/components) — open-source shadcn/Base-UI-flavoured component
+  collection (animated + data components); same lineage as our stack.
+- [Design System Checklist](https://designsystemchecklist.com/) — open checklist for
+  building/auditing a design system (foundations → components → governance).
+- [Emil Kowalski — You don't need animations](https://emilkowal.ski/ui/you-dont-need-animations)
+  — essay on motion restraint from the [animations.dev](https://animations.dev/) author;
+  complements our reduced-motion stance (ADR 0020).
+- [transitions.dev](https://transitions.dev/) — CSS transition/animation reference _(to verify)_.
+- [BuninUX — Design Tokens](https://buninux.com/design-tokens) — design-tokens reference
+  _(to verify)_.
+- [beautifului.dev](https://beautifului.dev/) — UI component / design resource _(to verify)_.
+- [beui.dev](https://beui.dev/) — UI component kit _(to verify)_.
+- [rareui.com](https://rareui.com/) — UI component collection _(to verify)_.
+- [coss.com/ui](https://coss.com/ui) — UI component resource _(to verify)_.
+- [awesome-ai-apps](https://github.com/Arindam200/awesome-ai-apps#-featured-ai-apps) —
+  curated list of AI/agent app examples + featured demos; build references for AI features.
+- [shadcn/ui](https://ui.shadcn.com/) — source of our vendored components and the
+  design-system baseline (ADR 0021); reference for new blocks/components.
+
+_(Already bookmarked above under "Design engineering & UI craft":
+[UI Skills](https://www.ui-skills.com/).)_
