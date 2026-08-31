@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
+import { LogOutIcon } from "lucide-react";
 
 import { AvatarWithFallback } from "@workspace/ui/components/avatar/avatar-with-fallback";
 import { Button } from "@workspace/ui/components/shadcn/button";
@@ -12,13 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/shadcn/dropdown-menu";
 
-import { ThemeRadioGroup } from "@/components/theme/theme-radio-group";
+import { ThemeMenuSub } from "@/components/theme/theme-menu-sub";
 import { useSignOut } from "@/lib/auth/use-sign-out";
 
 /**
@@ -85,18 +82,7 @@ export function UserMenu({
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {/* Theme lives here (three-state, ADR 0023) rather than a standalone header toggle;
-            the quick ⌘⇧L flip and the ⌘K palette also change it. */}
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <SunIcon className="dark:hidden" aria-hidden="true" />
-            <MoonIcon className="hidden dark:block" aria-hidden="true" />
-            Theme
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <ThemeRadioGroup />
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <ThemeMenuSub />
         <DropdownMenuSeparator />
         {/* Default (not destructive) — sign-out is reversible; red is reserved for irreversible
             loss (ADR 0020). */}
