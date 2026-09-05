@@ -10,7 +10,7 @@ import { cn } from "@workspace/ui/lib/utils";
  * Back link shared by the auth steps. `-ms-1.5` cancels the ghost button's start padding
  * so the arrow sits on the same left axis as the wordmark/heading below it. The arrow is
  * decorative (the visible "Back" label is the accessible name), so it is `aria-hidden`
- * (ADR 0024 §6).
+ * (ADR 0020 §6).
  */
 export function AuthBackLink<T extends string>({
   href,

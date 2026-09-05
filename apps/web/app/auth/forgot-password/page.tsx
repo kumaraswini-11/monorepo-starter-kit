@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Reset your password" };
 
 /**
  * Forgot-password request at `/auth/forgot-password` (reached from the sign-in "Forgot
- * password?" link). Server Component shell (ADR 0023): the back link is static;
+ * password?" link). Server Component shell (ADR 0019): the back link is static;
  * `ForgotPasswordStep` renders the request form / "check inbox" confirmation as a client
  * island.
  */

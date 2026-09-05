@@ -1,0 +1,226 @@
+# 0011. Authentication strategy — adopt Better Auth (self-hosted), not roll-your-own
+
+- **Status:** Accepted (strategy). Phase 1 (email/password) implemented & live-verified
+  2026-08-13; Phase 2 (Google OAuth) implemented 2026-08-24; later phases (passwordless,
+  passkeys, MFA, orgs/SSO) pending — see **Phased adoption plan** below.
+- **Date:** 2026-07-16
+
+## Context
+
+We are building an enterprise application intended to **scale to millions of
+users** and to face **compliance** later. Authentication comes first;
+authorization follows. The core question: **build the auth system manually, or
+adopt a library — and if a library, which one?**
+
+Before deciding, we scoped the three forks that actually change the answer:
+
+| Question we asked                  | Answer for this product                                                                       | Why it mattered                                                                                   |
+| ---------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Who logs in?** (audience)        | **Hybrid** — B2C self-signup now, B2B enterprise customers later                              | Decides whether enterprise **SSO (SAML/OIDC) + SCIM** are a hard _future_ requirement (they are). |
+| **Where does identity live?**      | **Own it in our DB (self-host)** — data residency / compliance                                | Rules out managed stores that hold users off-site; mandates a **self-hosted library**.            |
+| **Which login methods at launch?** | Email+password, social OAuth, passwordless (magic link / OTP), passkeys; **MFA & more later** | Determines which tools can cover the whole method set **first-party**, not via bolt-ons.          |
+
+### How we decided
+
+Per the repo's methodology (see [0001](0001-decision-making-methodology.md)), the
+recommendation was produced by a multi-source, internet-wide research pass with
+**adversarial fact-checking** (3-vote verification per claim). Every claim below
+was **confirmed 3–0** against 2026 sources — primary maintainer announcements,
+official docs, OWASP, and vendor pricing pages. Time-sensitivity is high; this
+reflects the **July 2026** landscape.
+
+## Options considered
+
+| Option                                      | Type                | 2026 status (verified)                                                                                                                                       | Verdict                                                                                                                          |
+| ------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Roll your own**                           | —                   | N/A                                                                                                                                                          | ❌ **Rejected** — security surface too large (below); OWASP prefers maintained defenses.                                         |
+| **Lucia**                                   | library             | **Deprecated** — v3 EOL March 2025; repositioned to _"a learning resource on implementing auth from scratch"_ (maintainer's words)                           | ❌ Not a dependency.                                                                                                             |
+| **Auth.js / NextAuth v5**                   | library (self-host) | **Frozen** — security-patch-only since Sept 2025; still **beta after 2+ years**; team **merged into Better Auth**, which they now recommend for new projects | ❌ Abandoned foundation.                                                                                                         |
+| **Managed** (Clerk / Auth0 / WorkOS _core_) | hosted service      | Mature, best-in-class DX                                                                                                                                     | ❌ Store identity **off-site** → fails the self-host requirement. (WorkOS retained as an _optional SSO complement_ — see below.) |
+| **Better Auth**                             | library (self-host) | **v1.6 (May 2026), active**; first-party plugins for every required method + org/SSO/SCIM                                                                    | ✅ **Chosen.**                                                                                                                   |
+
+### Why not roll our own
+
+The surface we would own forever: password hashing, session fixation/rotation,
+CSRF, credential-stuffing defense, account recovery, rate limiting, and
+**WebAuthn/passkey correctness** — each a place where one subtle bug exposes the
+whole user base, and exactly what compliance auditors scrutinize. This is OWASP's
+own position:
+
+> "Built-in defenses are generally preferable because they're maintained by the
+> framework authors and reduce the risk of subtle implementation mistakes."
+> — OWASP CSRF Cheat Sheet
+
+And the highest-value control — **MFA** — _"would have stopped 99.9% of account
+compromises"_ (Microsoft, via OWASP). We adopt a maintained library and prioritize
+MFA early rather than rebuild all of this.
+
+## Decision
+
+Adopt **[Better Auth](https://better-auth.com)** as the **self-hosted core** of the
+auth system.
+
+- **Self-hosted, data in our own DB.** It is an MIT-licensed TypeScript library that
+  runs inside our app (Node runtime) — not a hosted service. Fits Next.js 16 App
+  Router / React 19 Server Components.
+- **All launch methods are first-party plugins:** email+password and social OAuth
+  (core), **magic link**, **email OTP**, **passkeys** (WebAuthn), plus **2FA/TOTP**
+  for the MFA phase — no third-party dependency for any of them.
+- **Credible B2B path without a rewrite:** first-party **Organization**
+  (orgs/teams/RBAC), **SSO** (SAML 2.0 + OIDC + OAuth2, linkable per-organization
+  with auto-provisioning), **OIDC-Provider**, and **SCIM** plugins.
+- **MIT license** — usable in our proprietary / `UNLICENSED` product (cf.
+  [0002](0002-proprietary-license-and-package-posture.md)); MIT deps like Next.js and React
+  are already the norm here.
+
+## Security & trust model
+
+The key concern for a compliance-bound product — _can the library author see our
+data?_ **No.**
+
+- **Self-hosted.** User records, passwords, and sessions live in **our** database
+  and are processed in **our** server process. There is **no Better Auth server in
+  the auth path** — no network route for the author to see anything. (This is the
+  concrete advantage over Clerk/Auth0/WorkOS, which hold identity off-site.)
+- **Telemetry is opt-in and OFF by default** — and even when enabled collects **no
+  PII**: their docs state _"We do not collect emails, usernames, tokens, secrets,
+  client IDs, client secrets, or database URLs"_ and _"We never send your full
+  betterAuth configuration."_ Hard kill-switch: `BETTER_AUTH_TELEMETRY=0`. (Notably
+  stricter than Next.js, whose telemetry is opt-_out_.)
+- **Open-source (MIT) → auditable.** Every line is reviewable — a plus over a closed
+  hosted service for compliance.
+- **Security defaults:** scrypt password hashing (memory-hard; swappable to
+  argon2/bcrypt), multi-layered CSRF (Origin + `SameSite=Lax` + Fetch-Metadata),
+  `httpOnly` secure session cookies with sliding renewal and per-device revocation.
+- **The real risk is supply chain, not snooping.** Like _any_ server dependency, it
+  runs with full access to credentials/DB, so a malicious/compromised _release_
+  could do harm. This is the generic npm risk — **mitigated by controls already in
+  this repo**: lockfile pinning, the `minimumReleaseAge` cooldown, review-before-
+  upgrade, Dependabot/taze. Keep them.
+
+## Session strategy — server-side sessions, not JWT access/refresh tokens
+
+**What we use:** Better Auth's default **database-backed sessions** with a signed,
+`httpOnly`, `SameSite=Lax` cookie. The token returned by sign-in/sign-up is an
+**opaque session key** (a row in the `session` table) — **not** a JWT, and there is
+**no separate access/refresh-token pair**. Config in `packages/auth`:
+
+- `expiresIn: 7d` — session lifetime.
+- `updateAge: 1d` — **sliding renewal**: activity past a day extends the expiry
+  server-side. This _is_ the "refresh" — handled by the server, with no refresh token
+  to store, rotate, or leak.
+- `cookieCache: 5min` — a short signed cookie serves most requests without a DB read
+  (performance); the DB session stays the source of truth.
+
+**Why this beats access/refresh JWTs for a first-party web app:**
+
+- **XSS-resilient.** An `httpOnly` cookie is unreadable by JavaScript; a JWT held in
+  `localStorage` / JS memory is exfiltratable by any XSS. Cookies + our CSRF defenses
+  (Origin + `SameSite` + Fetch-Metadata) are the stronger posture.
+- **Instant revocation.** Because the session lives in our DB, we can kill it
+  immediately — sign-out-everywhere, password reset, admin ban. Stateless JWTs stay
+  valid until expiry unless you bolt on a denylist, which reintroduces the very DB
+  lookup JWTs exist to avoid. Revocation was **verified live** (2026-08-13): a
+  password reset invalidated the prior sessions and the old credentials returned
+  `401`.
+- **Simpler, fewer failure modes** — no refresh-token rotation, reuse-detection, or
+  client-side token-refresh dance.
+
+**When tokens _would_ be justified (opt-in, added later):**
+
+- A **mobile app** or **non-browser / third-party / cross-domain API client** that
+  can't rely on cookies → Better Auth **`bearer`** plugin (`Authorization: Bearer …`).
+- **Stateless identity verification across services** → Better Auth **`jwt`** plugin
+  (issues JWTs + a JWKS endpoint).
+
+Both are first-party plugins we switch on when such a consumer actually appears —
+consistent with the phased approach. Until then, sessions are the correct default and
+match the security model above.
+
+## Authorization approach (the "later" phase)
+
+Start simple, escalate only when forced:
+
+- **Begin with Better Auth's Organization-plugin RBAC** (owner/admin/member + custom
+  permissions) — covers most needs.
+- **Graduate to a dedicated policy engine only** when fine-grained ABAC or
+  relationship-based authz exceeds RBAC: **Cerbos** (policy-as-code ABAC) or
+  **OpenFGA / SpiceDB** (Google-Zanzibar ReBAC). Do not build this on day one.
+  _(This guidance is directional — the authz-engine research did not surface
+  independently verified claims; revisit with dedicated research when the phase
+  arrives.)_
+
+## Phased adoption plan
+
+1. **Now — Authentication.** Better Auth core + email/password + social OAuth +
+   magic link/OTP + passkeys. Own the schema in our DB.
+2. **Next — MFA.** Enable the 2FA/TOTP plugin.
+3. **Then — Authorization.** Organization-plugin RBAC; add a policy engine only if
+   complexity demands it.
+4. **When B2B lands — Enterprise SSO/SCIM.** Better Auth SSO + SCIM plugins, **or**
+   front the SSO phase with **WorkOS AuthKit** (free to 1M MAU, purpose-built for
+   enterprise SSO) if time-to-market beats running a second system — accepting
+   off-site storage for those SSO connections only, with Better Auth remaining the
+   identity core.
+
+## Consequences — risks & lock-in
+
+- ⚠️ **SSO/SCIM are the newest, least-proven surface.** A **CVSS 9.6 SSRF
+  (CVE-2026-53513)** hit the SSO plugin, and SCIM covers only a subset of SCIM 2.0.
+  This is the phase where the WorkOS hybrid is worth reconsidering. (We do not
+  install these plugins until Phase 4.)
+- ⚠️ **No pre-built UI** — we build login/account screens ourselves (fine — we
+  already have shadcn / Base UI, cf. [0021](0021-base-ui-selection-and-adoption.md)).
+- ⚠️ **Limited public evidence of multi-million-user production scale.** Vendor docs
+  are authoritative on _features_, not _scale_ — "scales to millions" is a reasonable
+  inference, not a benchmark. **Load-test the session store** before betting a launch
+  on it.
+- **Lock-in / migration:** identity lives in our DB under a Better-Auth-defined
+  schema. Moving off it, or adding WorkOS for SSO, means schema/session-format
+  reconciliation. Manageable, but plan the schema with portability in mind.
+
+## Sources (verified 3–0)
+
+- Auth.js → Better Auth stewardship: <https://github.com/nextauthjs/next-auth/discussions/13252>, <https://better-auth.com/blog/authjs-joins-better-auth>
+- Lucia deprecation: <https://github.com/lucia-auth/lucia/discussions/1714>, <https://lucia-auth.com/>
+- Better Auth methods & B2B plugins: <https://better-auth.com/docs/plugins> (passkey, magic-link, email-otp, 2fa, organization, sso, scim)
+- Better Auth security & telemetry: <https://better-auth.com/docs/reference/security>, <https://better-auth.com/docs/reference/telemetry>
+- Sessions vs JWT (session model, bearer/jwt plugins): <https://better-auth.com/docs/concepts/session-management>, <https://better-auth.com/docs/plugins/bearer>, <https://better-auth.com/docs/plugins/jwt>; OWASP Session Management Cheat Sheet — <https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html>
+- OWASP (roll-your-own / MFA): CSRF & Credential-Stuffing cheat sheets
+- WorkOS pricing (free to 1M MAU): <https://workos.com/pricing>
+
+## Update — 2026-08-22: upgraded to Better Auth 1.7
+
+Bumped Better Auth **1.6.26 → 1.7.1** (verified via the integration gate — ADR 0025 §11). The
+one change affecting us: 1.7 scopes account identity by **issuer**, so the `account` table
+gains an `issuer` column (credential accounts use `local:credential`) + a unique
+`(issuer, accountId)` index — schema + migration updated (ADR 0012). The many other 1.7
+breaking changes (SCIM, SAML, OAuth-provider, DPoP, Expo…) touch features we don't use. 1.7's
+`testUtils()` plugin is now used in auth integration tests (test-only instance). One deferred
+knock-on: the Redis secondary-storage API changed — see [0018](0018-rate-limiting-and-secondary-storage.md).
+
+## Update — 2026-08-24: Google OAuth (Phase 2) implemented
+
+Social sign-in via Better Auth's first-party `socialProviders` (official docs). **Google first**;
+the same config pattern adds GitHub/others later.
+
+- **Enablement is env-gated** (deploy-time, like SMTP): `socialProviders.google` is registered
+  only when `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` are both set; absent (dev / no-secret CI
+  build), no provider is registered and the app still builds. Better Auth serves the callback at
+  `<BETTER_AUTH_URL>/api/auth/callback/google` — add that as the authorized redirect URI on the
+  Google Cloud OAuth client.
+- **Account linking — the security decision.** `account.accountLinking.enabled: true`, but we do
+  **not** add `email-password` to `trustedProviders`. Better Auth's default links a social sign-in
+  to an existing account **only on a verified email**; force-linking (via trustedProviders) would
+  link even an _unverified_ email/password account to a matching Google sign-in — an
+  **account-takeover** vector, since progressive verification (ADR 0011) lets email/password
+  accounts stay unverified. Google's `email_verified` makes new Google users verified, so
+  same-email linking happens only once the pre-existing account is verified.
+- **Seam unchanged in shape:** `signInWithGoogle()` in `lib/auth/actions.ts` calls
+  `authClient.signIn.social({ provider: "google", callbackURL, errorCallbackURL })` behind the
+  same enumeration-safe wrapper (ADR 0017 §1); the `/auth` page stays a static shell with the
+  button as a hydrated **client island** (ADR 0019/0023). Covered by an MSW seam test.
+- **Deferred:** a real end-to-end OAuth e2e (needs a mock OAuth provider) — logged in
+  future-improvements, alongside the email real-SMTP integration test.
+
+See [../references.md](../references.md) and [../future-improvements.md](../future-improvements.md).

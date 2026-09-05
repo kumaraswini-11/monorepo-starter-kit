@@ -1,36 +1,43 @@
 /**
- * Pure, isomorphic string helpers — zero dependencies, safe to import from any client
- * or server bundle (`@workspace/utils`, ADR 0022). No I/O, no globals, no side effects.
+ * Pure, isomorphic string helpers — zero dependencies, safe to import from any client or server
+ * bundle (`@workspace/utils`, ADR 0016). No I/O, no globals, no side effects. Inputs here are
+ * short (names, an email's local part), so we favour clear built-ins over hand-tuned scans.
  */
 
-/** Common ASCII/Unicode whitespace: tab–CR (9–13), space (32), non-breaking space (160). */
-function isWhitespace(charCode: number): boolean {
-  return (
-    charCode === 32 || (charCode >= 9 && charCode <= 13) || charCode === 160
-  );
+/**
+ * The first whitespace-delimited word of a string — `"Ada Lovelace"` → `"Ada"`,
+ * `"  hello world"` → `"hello"`. Returns `undefined` for empty/whitespace-only input, so callers
+ * fall back to their own default rather than an empty string. `\S+` treats every Unicode
+ * whitespace (incl. the non-breaking space) as a separator.
+ */
+export function firstWord(text: string): string | undefined {
+  return text.match(/\S+/)?.[0];
 }
 
 /**
- * The first whitespace-delimited word of a string — e.g. `"Ada Lovelace"` → `"Ada"`,
- * `"  hello world"` → `"hello"`. Leading whitespace is skipped. Returns `undefined` for
- * empty or whitespace-only input, so callers fall back to their own default rather than
- * an empty string.
- *
- * Complexity: **O(k)** time, where `k` is the offset of the first word boundary — it
- * early-exits at the first whitespace instead of scanning and allocating the whole
- * string the way `text.split(" ")[0]` does. **O(1)** auxiliary space until the single
- * returned slice.
+ * Up to `max` uppercase initials for avatar-style fallbacks — the first letter of each of the
+ * first `max` whitespace-delimited words, and when there are **fewer words than `max`**, the
+ * remaining slots are filled from the first word's next letters. E.g. `"Ada Lovelace"` → `"AL"`,
+ * `"grace hopper"` → `"GH"`, `"Ada"` → `"AD"`, `"dev"` → `"DE"`, `"a"` → `"A"`; `max` (default 2)
+ * caps the length. Empty/whitespace-only → `""`. Callers pass a name — or another single token,
+ * e.g. an email's local part — and get a stable, non-colliding 1–`max`-letter fallback (a bare
+ * name-initials helper would reduce every single-token value to one colliding letter).
  */
-export function firstWord(text: string): string | undefined {
-  const length = text.length;
+export function getInitials(value: string, max = 2): string {
+  const words = value.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) {
+    return "";
+  }
 
-  // Skip any leading whitespace.
-  let start = 0;
-  while (start < length && isWhitespace(text.charCodeAt(start))) start++;
+  let initials = words
+    .slice(0, max)
+    .map((word) => word.charAt(0))
+    .join("");
 
-  // Advance to the next whitespace (or the end) — the end of the first word.
-  let end = start;
-  while (end < length && !isWhitespace(text.charCodeAt(end))) end++;
+  // Fewer words than `max` — top up from the first word's remaining letters ("dev" → "DE").
+  if (initials.length < max) {
+    initials += words[0]!.slice(1, 1 + max - initials.length);
+  }
 
-  return start === end ? undefined : text.slice(start, end);
+  return initials.toUpperCase();
 }

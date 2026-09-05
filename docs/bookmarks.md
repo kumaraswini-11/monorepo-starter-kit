@@ -17,7 +17,7 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   `/triage` (grouped Shaping / Upkeep / Productivity). **Adopted** — vendored + hash-pinned
   via `npx skills add mattpocock/skills` (`skills-lock.json`), alongside the first-party
   better-auth / shadcn / vercel sets, per the refined policy in
-  [decisions/0011](decisions/0011-project-mcp-servers.md) (reputable first-party/known-author
+  [decisions/0010](decisions/0010-agent-skills-vendoring.md) (reputable first-party/known-author
   skill sets in; unvetted community registries below stay browse-only).
 - [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/)
   — a course on **AI agent engineering**: how to build reliable "harnesses" that
@@ -32,9 +32,9 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   layout, and writing (concentric radius, optical alignment, no `transition: all`,
   `tabular-nums`, `text-wrap: balance`/`pretty`, semantic colour tokens, `:focus-visible`,
   24/44px hit areas, `prefers-reduced-motion`, gap 2× between groups, verb-first button
-  labels…). Much already matches our conventions (ADR 0024 a11y, the RHF form pattern, OKLCH
+  labels…). Much already matches our conventions (ADR 0020 a11y, the RHF form pattern, OKLCH
   tokens). Now **adopted first-party**: Jakub publishes these as free agent skills on GitHub
-  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0011) — so the rules are
+  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0010) — so the rules are
   applied directly in-repo, no hand-written copy needed.
 - [Jakub Krehel](https://jakub.kr/) — personal site of the **interfaces.dev** author
   (design engineer). Source of the `better-*` interface skills we vendor; follow for
@@ -62,13 +62,13 @@ We adopt only **reputable first-party / known-author** skill sets, vendored and
 hash-pinned (`skills-lock.json`); these **unvetted community registries** stay
 browse-only — kept for skill _ideas_, not `npx`-installed into this repo
 (private/proprietary + supply-chain caution — see
-[decisions/0011-project-mcp-servers.md](decisions/0011-project-mcp-servers.md)).
+[decisions/0010-agent-skills-vendoring.md](decisions/0010-agent-skills-vendoring.md)).
 
 - [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — by
   **VoltAgent**: a curated **"awesome list"** of 1000+ agent skills, organized by provider
   (Anthropic, Google, Stripe, Vercel, Microsoft…) and hand-picked from real engineering
   teams rather than mass AI-generated. Not a registry/installer — a directory. **Best
-  starting point to discover reputable first-party skills** worth vendoring (per ADR 0011);
+  starting point to discover reputable first-party skills** worth vendoring (per ADR 0010);
   browse, then `skills add` the vetted ones.
 - [autoskills.sh](https://www.autoskills.sh/) — by midudev; `npx autoskills`
   auto-detects your stack and installs curated, SHA-256-verified skills.
@@ -116,3 +116,36 @@ adopted; listed for when a real need lands.
   dependency versus our native GitHub CI/CodeQL status badges. Kept for reference —
   handy if `packages/ui` ever ships as a public design system, or for a personal /
   OSS project.
+
+## UI component galleries & design references (to explore)
+
+A dump of inspiration + component sources to browse later — shadcn-style component
+libraries, UI galleries, and design-token / checklist references. **Not adopted; notes
+are provisional until each is visited.** Any client-runtime component is still judged on
+bundle weight before adoption (dep-weight policy), and third-party libraries against
+[decisions/0021](decisions/0021-base-ui-selection-and-adoption.md) (Base UI over Radix) —
+so these are idea sources, not drop-ins.
+
+- [Refero](https://styles.refero.design/) — searchable gallery of real product UI
+  screenshots; interaction/design inspiration.
+- [reui](https://reui.io/components) — open-source shadcn/Base-UI-flavoured component
+  collection (animated + data components); same lineage as our stack.
+- [Design System Checklist](https://designsystemchecklist.com/) — open checklist for
+  building/auditing a design system (foundations → components → governance).
+- [Emil Kowalski — You don't need animations](https://emilkowal.ski/ui/you-dont-need-animations)
+  — essay on motion restraint from the [animations.dev](https://animations.dev/) author;
+  complements our reduced-motion stance (ADR 0020).
+- [transitions.dev](https://transitions.dev/) — CSS transition/animation reference _(to verify)_.
+- [BuninUX — Design Tokens](https://buninux.com/design-tokens) — design-tokens reference
+  _(to verify)_.
+- [beautifului.dev](https://beautifului.dev/) — UI component / design resource _(to verify)_.
+- [beui.dev](https://beui.dev/) — UI component kit _(to verify)_.
+- [rareui.com](https://rareui.com/) — UI component collection _(to verify)_.
+- [coss.com/ui](https://coss.com/ui) — UI component resource _(to verify)_.
+- [awesome-ai-apps](https://github.com/Arindam200/awesome-ai-apps#-featured-ai-apps) —
+  curated list of AI/agent app examples + featured demos; build references for AI features.
+- [shadcn/ui](https://ui.shadcn.com/) — source of our vendored components and the
+  design-system baseline (ADR 0021); reference for new blocks/components.
+
+_(Already bookmarked above under "Design engineering & UI craft":
+[UI Skills](https://www.ui-skills.com/).)_

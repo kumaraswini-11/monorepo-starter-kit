@@ -14,12 +14,12 @@ import { AuthEmailField } from "@/components/auth/auth-email-field";
 import { signInFormSchema, type SignInFormValues } from "@/lib/validation";
 
 /**
- * Sign-in credential form (returning user). Presentational per ADR 0025 — the email is a
+ * Sign-in credential form (returning user). Presentational per ADR 0022 — the email is a
  * prop and the submit handler is injected, so it's agnostic to how sign-in is performed.
  * Client validation is minimal (non-empty); the real check is server-side, surfaced via
  * `FormError` when the injected `onSubmit` throws a `FormSubmitError` (e.g. an
  * enumeration-safe "Invalid email or password"). Pending/submit behaviour is the shared
- * `Form` pattern (ADR 0026).
+ * `Form` pattern (ADR 0022).
  */
 export function SignInForm({
   email,

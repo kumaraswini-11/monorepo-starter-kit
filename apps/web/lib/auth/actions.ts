@@ -5,13 +5,13 @@ import { FormSubmitError } from "@workspace/ui/components/form/form-submit";
 import { authClient } from "@/lib/auth-client";
 
 /**
- * Client-side auth seam (ADR 0027 §1) — the ONLY module that talks to the Better Auth
+ * Client-side auth seam (ADR 0017 §1) — the ONLY module that talks to the Better Auth
  * transport. UI/step components call these; nothing else imports `authClient` directly.
  * Better Auth returns `{ data, error }` (it never throws), so each wrapper converts a
  * returned `error` into a user-safe `FormSubmitError` that the shared `submitWithFormError`
- * renders in the `FormError` banner (ADR 0026). Messages stay enumeration-safe.
+ * renders in the `FormError` banner (ADR 0022). Messages stay enumeration-safe.
  *
- * A future separate-backend split (ADR 0027) changes only this file and
+ * A future separate-backend split (ADR 0017) changes only this file and
  * `lib/auth-client.ts` — never the forms or steps.
  */
 
@@ -27,7 +27,7 @@ export async function signInWithEmail(
 }
 
 /**
- * Start the Google OAuth flow (ADR 0016). On success the browser redirects to Google and back to
+ * Start the Google OAuth flow (ADR 0011). On success the browser redirects to Google and back to
  * `callbackURL`; only a pre-redirect failure (misconfig/network) surfaces here as a form error.
  */
 export async function signInWithGoogle(): Promise<void> {
@@ -119,7 +119,7 @@ export async function resolveAuthRoute(
 }
 
 /**
- * Resend the email-verification link (progressive verification, ADR 0016). Throws on failure
+ * Resend the email-verification link (progressive verification, ADR 0011). Throws on failure
  * so the caller (the verify-email banner) can surface it via a toast.
  */
 export async function resendVerificationEmail(email: string): Promise<void> {

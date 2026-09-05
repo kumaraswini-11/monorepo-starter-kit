@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig, mergeConfig } from "vitest/config";
 
 /**
- * Shared Vitest presets (ADR 0029). Both live in one file so neither needs a relative
+ * Shared Vitest presets (ADR 0025). Both live in one file so neither needs a relative
  * `./base` import — that would force `allowImportingTsExtensions` on every consumer's tsc.
  */
 
@@ -28,9 +28,9 @@ export const base = defineConfig({
     include: ["src/**/*.test.ts"],
     // Integration tests (`*.integration.test.ts`) also end in `.test.ts`, so exclude them
     // from the fast unit/component run — they need the container harness and run under the
-    // separate `test:integration` config (ADR 0029 §11).
+    // separate `test:integration` config (ADR 0025 §11).
     exclude: [...configDefaults.exclude, "**/*.integration.test.ts"],
-    // Coverage is inert until `--coverage` is passed. Report-only for now (ADR 0029):
+    // Coverage is inert until `--coverage` is passed. Report-only for now (ADR 0025):
     // thresholds are added once a baseline exists. v8 provider (matches the repo).
     coverage: {
       provider: "v8",
@@ -63,7 +63,7 @@ export const dom = mergeConfig(
     // Force the automatic JSX runtime for tests regardless of the consumer's on-disk
     // tsconfig. apps/web extends Next's config (`jsx: "preserve"`), which would otherwise
     // leave JSX untransformed and fail the parse. Vite 8 is rolldown/oxc-based, so JSX
-    // settings live under `oxc.jsx` (the `esbuild` key is ignored here). (ADR 0029)
+    // settings live under `oxc.jsx` (the `esbuild` key is ignored here). (ADR 0025)
     oxc: {
       jsx: {
         runtime: "automatic",
@@ -80,7 +80,7 @@ export const dom = mergeConfig(
 );
 
 /**
- * Integration preset (ADR 0029 §11) — Node, matches only `*.integration.test.ts`, runs
+ * Integration preset (ADR 0025 §11) — Node, matches only `*.integration.test.ts`, runs
  * serially (a shared real DB), and allows time for container start + migrations. Deliberately
  * **standalone** (reuses `base`'s server-only alias but NOT its unit `include` — merging that
  * in would pull the fast unit tests into the integration run, since `mergeConfig` concatenates

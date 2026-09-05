@@ -24,7 +24,7 @@ export const config = [
   {
     // Guard: force everyone through the validated `@workspace/env` contract instead
     // of reading `process.env` directly (which silently masks missing config —
-    // ADR 0021). Exemptions below for the env package itself + config/tooling files.
+    // ADR 0013). Exemptions below for the env package itself + config/tooling files.
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -32,7 +32,7 @@ export const config = [
           selector:
             "MemberExpression[object.name='process'][property.name='env']",
           message:
-            "Import validated env from `@workspace/env`; don't read `process.env` directly (ADR 0021).",
+            "Import validated env from `@workspace/env`; don't read `process.env` directly (ADR 0013).",
         },
       ],
     },
@@ -46,7 +46,7 @@ export const config = [
     },
   },
   {
-    // Module boundaries (ADR 0022 §Governance): consumers go through a package's `exports`
+    // Module boundaries (ADR 0016 §Governance): consumers go through a package's `exports`
     // map — never reach into its `src/`. Keeps internals swappable + the public surface honest.
     rules: {
       "no-restricted-imports": [
@@ -56,7 +56,7 @@ export const config = [
             {
               group: ["@workspace/*/src/*", "@workspace/*/src/**"],
               message:
-                "Deep import bypasses the package's exports map — import from its public entry (e.g. `@workspace/ui/components/...`), not `src/` (ADR 0022).",
+                "Deep import bypasses the package's exports map — import from its public entry (e.g. `@workspace/ui/components/...`), not `src/` (ADR 0016).",
             },
           ],
         },

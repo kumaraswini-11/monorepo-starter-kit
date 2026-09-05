@@ -3,7 +3,7 @@ import { render } from "@react-email/render";
 
 /**
  * Render a React Email template to the { html, text } pair the `sendEmail` port
- * expects (ADR 0020). Output is plain strings, so it stays provider-agnostic.
+ * expects (ADR 0014). Output is plain strings, so it stays provider-agnostic.
  */
 export async function renderEmail(
   element: ReactElement

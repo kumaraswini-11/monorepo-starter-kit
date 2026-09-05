@@ -5,10 +5,10 @@ import { afterAll, afterEach, describe, expect, it } from "vitest";
 import { FormSubmitError } from "@workspace/ui/components/form/form-submit";
 
 /**
- * Seam contract tests (ADR 0029 §9). The seam (`actions.ts`) is the ONLY module that talks to
+ * Seam contract tests (ADR 0025 §9). The seam (`actions.ts`) is the ONLY module that talks to
  * the Better Auth transport, so we exercise it through **real HTTP** intercepted by MSW —
  * never by mocking `authClient` internals. That pins the transport contract (which HTTP status
- * maps to which user-safe error) and makes these tests survive the ADR 0027 backend split
+ * maps to which user-safe error) and makes these tests survive the ADR 0017 backend split
  * unchanged: only the client's baseURL moves, and the handlers already match any origin.
  *
  * Ordering matters: Better Auth's client snapshots `globalThis.fetch` into `customFetchImpl`

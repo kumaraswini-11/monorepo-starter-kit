@@ -1,7 +1,7 @@
 import type { SendEmail } from "@workspace/email/types";
 
 /**
- * Dev/test adapter (ADR 0020): logs the message — including any verification /
+ * Dev/test adapter (ADR 0014): logs the message — including any verification /
  * reset link in the body — to the server console instead of sending. Lets the auth
  * flows work end-to-end with no email vendor. Swap for a Nodemailer/SMTP or provider
  * adapter in production.

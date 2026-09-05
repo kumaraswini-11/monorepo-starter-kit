@@ -12,7 +12,7 @@ import { Alert, AlertTitle } from "@workspace/ui/components/shadcn/alert";
  * submit disables the button and drops focus to `<body>` — moves focus to itself when the
  * message appears, so keyboard/AT users land on the error (`role="alert"` also announces
  * it). Subscribes via `useFormState`, so the parent form isn't re-rendered by it.
- * Field-level (validation) errors stay inline on their field via `FieldError`. (ADR 0026.)
+ * Field-level (validation) errors stay inline on their field via `FieldError`. (ADR 0022.)
  */
 export function FormError<T extends FieldValues>({
   control,

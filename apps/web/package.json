@@ -17,6 +17,7 @@
     "@workspace/auth": "workspace:*",
     "@workspace/env": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "@workspace/utils": "workspace:*",
     "better-auth": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",

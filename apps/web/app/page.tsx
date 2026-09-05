@@ -9,7 +9,7 @@ import { getSession } from "@/lib/session";
  *
  * It reads the session (`headers()`), so it's dynamic with no static shell — it only
  * redirects. `instant = false` opts this segment out of instant-navigation validation
- * (Cache Components / ADR 0023), acknowledging the intentional server-blocking read.
+ * (Cache Components / ADR 0019), acknowledging the intentional server-blocking read.
  */
 export const instant = false;
 

@@ -8,7 +8,7 @@
 The scaffold's `apps/web/next.config.ts` set **no HTTP security headers** — a gap
 for an enterprise / future-compliance product. Separately, Base UI needs a nonce
 (via its `<CSPProvider>`) to function under a strict Content-Security-Policy (see
-[0014](0014-base-ui-adoption.md)). We verified the approach against the
+[0021](0021-base-ui-selection-and-adoption.md)). We verified the approach against the
 version-local docs (`node_modules/next/dist/docs`, per the AGENTS.md rule);
 notably, **Next 16 renamed middleware to _proxy_** (`proxy.ts`,
 `export function proxy(...)`) — the mechanism a future nonce would use.

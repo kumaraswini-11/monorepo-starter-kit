@@ -7,4 +7,4 @@ Storybook for the `@workspace/ui` design system — a dev workbench plus interac
 
 `storybook` (dev) · `build:storybook` · `test` (Vitest browser)
 
-See ADR [0018](../../docs/decisions/0018-storybook-and-visual-testing.md).
+See ADR [0024](../../docs/decisions/0024-storybook-and-component-testing.md).

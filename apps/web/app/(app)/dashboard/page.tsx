@@ -3,29 +3,28 @@ import type { Metadata } from "next";
 import { Badge } from "@workspace/ui/components/shadcn/badge";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/shadcn/card";
 
-import { SignOutButton } from "@/components/auth/sign-out-button";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
+/**
+ * Dashboard — the authed landing page. Rendered inside the app shell (see the `(app)` layout),
+ * so it's a normal content pane: the theme toggle and the account menu (which holds sign-out)
+ * live in the shell header (reachable from every page), not here.
+ */
 export default async function DashboardPage() {
   const session = await getSession();
   const user = session?.user;
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-2xl flex-col justify-center gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
-        <ThemeToggle />
-      </div>
-      <Card>
+    <div className="mx-auto w-full max-w-2xl p-6">
+      <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+      <Card className="mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             Welcome{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
@@ -39,10 +38,7 @@ export default async function DashboardPage() {
             You&apos;re signed in as {user?.email}.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <SignOutButton />
-        </CardContent>
       </Card>
-    </main>
+    </div>
   );
 }

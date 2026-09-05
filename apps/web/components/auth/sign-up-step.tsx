@@ -12,9 +12,9 @@ import { signUpWithEmail } from "@/lib/auth/actions";
 
 /**
  * Client wiring + guard for `/auth/sign-up`. Requires the email captured at `/auth/email`;
- * a refresh / direct nav without one restarts the flow there (ADR 0025 §4). Shows a
+ * a refresh / direct nav without one restarts the flow there (ADR 0023 §4). Shows a
  * skeleton while redirecting. Better Auth auto-signs-in on sign-up, so on success →
- * `/dashboard`; a failure surfaces via `FormError` (ADR 0025 §2 / 0027).
+ * `/dashboard`; a failure surfaces via `FormError` (ADR 0022 / 0027).
  */
 export function SignUpStep() {
   const router = useRouter();

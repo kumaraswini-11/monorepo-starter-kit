@@ -1,6 +1,6 @@
 # @workspace/vitest-config
 
-Shared **Vitest** presets — source-only config package (ADR 0029).
+Shared **Vitest** presets — source-only config package (ADR 0025).
 
 ## Entry points
 
@@ -12,4 +12,4 @@ Shared **Vitest** presets — source-only config package (ADR 0029).
 DOM consumers add `jsdom` + `@testing-library/*` themselves (they resolve from the consumer) plus a
 one-line `vitest.d.ts` for the matcher types. Integration consumers wire their own `globalSetup` /
 `setupFiles` (the harness lives in `@workspace/db/testing`). See ADR
-[0029](../../docs/decisions/0029-testing-strategy.md).
+[0025](../../docs/decisions/0025-testing-strategy.md).

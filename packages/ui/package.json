@@ -10,7 +10,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@base-ui/react": "^1.7.0",
+    "@base-ui/react": "^1.8.0",
+    "@workspace/utils": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -35,7 +36,7 @@
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
-    "@turbo/gen": "^2.10.11",
+    "@turbo/gen": "^2.10.12",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -44,7 +45,7 @@
     "@workspace/vitest-config": "workspace:*",
     "eslint": "catalog:",
     "jsdom": "catalog:",
-    "shadcn": "^4.18.0",
+    "shadcn": "^4.21.0",
     "storybook": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
