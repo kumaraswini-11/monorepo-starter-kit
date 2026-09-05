@@ -78,6 +78,22 @@ browse-only — kept for skill _ideas_, not `npx`-installed into this repo
   (`npx skills add`). Large registry spanning many tools.
 - [skillsmp.com](https://skillsmp.com/) — community registry aggregating 2M+
   skills from GitHub; **no curation/vetting** — lowest trust.
+- [TanStack Intent](https://tanstack.com/intent/latest/docs/overview) — a **different** skills model
+  from the registries above: a CLI that ships versioned **"Skills" inside npm packages**, discovered
+  from installed deps and injected into `AGENTS.md`/`CLAUDE.md`/`.cursorrules`, **version-matched** to
+  the library. Adjacent to our vendored-skills strategy
+  ([decisions/0010](decisions/0010-agent-skills-vendoring.md)), but **deferred**: thin ecosystem
+  today, unknown maturity, and auto-injecting dep-shipped skills into `AGENTS.md` cuts against our
+  **lean, hand-curated handbook** + **vetted / hash-pinned** posture. Watch as it (and the ecosystem)
+  matures.
+
+_Also evaluated in the same TanStack pass, not adopted:_
+[TanStack Devtools](https://tanstack.com/devtools/latest/docs/overview) — a framework-agnostic shell
+for building **custom** devtools panels (alpha); we have no custom-devtools need and rely on
+Next/React devtools. [TanStack Config](https://tanstack.com/config/latest/docs/overview) — a
+**library build/publish** toolchain (Vite / ESLint / release); **N/A** — our packages are private,
+source-only, never published ([decisions/0002](decisions/0002-proprietary-license-and-package-posture.md),
+[decisions/0016](decisions/0016-shared-code-and-package-boundaries.md)).
 
 ## UI libraries to evaluate
 
