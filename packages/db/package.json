@@ -27,7 +27,7 @@
   "devDependencies": {
     "@testcontainers/postgresql": "catalog:",
     "@types/node": "catalog:",
-    "@types/pg": "^8.20.4",
+    "@types/pg": "^8.23.1",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "@workspace/vitest-config": "workspace:*",
@@ -40,7 +40,7 @@
   "dependencies": {
     "@workspace/env": "workspace:*",
     "drizzle-orm": "catalog:",
-    "pg": "^8.22.0",
+    "pg": "^8.23.0",
     "server-only": "catalog:"
   }
 }

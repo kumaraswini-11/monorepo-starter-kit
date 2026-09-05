@@ -18,7 +18,7 @@ catalog:
   "@types/react": ^19.2.18
   "@types/react-dom": ^19.2.4
   # Shared libraries
-  lucide-react: ^1.33.0
+  lucide-react: ^1.39.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.4.3
   # React Hook Form — packages/ui form layer + apps/web auth forms
@@ -31,17 +31,17 @@ catalog:
   "@vitest/coverage-v8": ^4.1.11
   "@vitest/browser-playwright": ^4.1.11
   # Testcontainers — ephemeral real Postgres for integration tests (ADR 0025)
-  "@testcontainers/postgresql": ^11.7.1
+  "@testcontainers/postgresql": ^12.1.0
   # Playwright — end-to-end tests (apps/e2e), ADR 0025
   "@playwright/test": ^1.62.1
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   "@testing-library/jest-dom": ^6.9.1
   "@testing-library/react": ^16.3.0
-  "@testing-library/user-event": ^14.6.1
+  "@testing-library/user-event": ^14.6.6
   jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
-  better-auth: ^1.7.1
+  better-auth: ^1.7.2
   # Drizzle ORM — packages/db runtime + packages/auth integration tests (DB assertions)
   drizzle-orm: ^0.45.2
   # Language & lint tooling
