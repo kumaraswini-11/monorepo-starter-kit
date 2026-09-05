@@ -215,15 +215,11 @@ See [decisions/0006](decisions/0006-defer-typescript-7-and-eslint-10.md).
     deprecated now that ESLint 10 shipped, and we deliberately stay on 9 (see the
     ESLint 10 entry above). Bumping within 9.x won't clear it; only the deferred
     major would.
-  - `@react-email/components@1.0.12` — **deprecated because React Email 6 unified** all
-    components into the single **`react-email`** package (import from `react-email` directly;
-    `@react-email/render`, which we also use, stays separate and is **not** deprecated). Build +
-    typecheck are green today, so it isn't urgent, but there **is** now a migration path — it's a
-    deliberate, reviewed change for `@workspace/email` (rewrite the ~7 template imports
-    `@react-email/components` → `react-email`, add `react-email` as a runtime dep, drop
-    `@react-email/components`) **with a bundle check**: React Email ≥ 6.8 tree-shakes
-    prismjs/marked/tailwind out of the email bundle (earlier 6.x pulled ~80 MB via top-level
-    imports). Do it on a focused pass, not batched with version bumps.
+  - `@react-email/components` — ✅ **resolved: migrated 2026-09-06** to the unified **`react-email`**
+    package (React Email 6). Templates import from `react-email` (runtime dep);
+    `@react-email/components` dropped (−~21 packages); `@react-email/render` + `@react-email/ui`
+    unchanged. Gate + email render tests green — the deprecation warning is gone. See
+    [decisions/0014](decisions/0014-email-transactional-messaging.md).
   - ~25 transitive "subdependencies" (the internal `@react-email/*` tree, plus
     `glob@10`, `uuid@10`, `@esbuild-kit/*`, etc.) and the `valibot@^1.4.0` peer
     warning (isolated inside the dev-only `@storybook/addon-mcp` tree) are **deps of

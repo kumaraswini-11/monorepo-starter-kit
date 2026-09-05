@@ -1,4 +1,4 @@
-import { Heading, Text } from "@react-email/components";
+import { Heading, Text } from "react-email";
 
 import { EmailLayout, styles } from "@workspace/email/components/email-layout";
 

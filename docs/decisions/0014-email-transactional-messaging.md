@@ -50,7 +50,7 @@ provider choice with zero risk.
 
 ## Decision
 
-- **Authoring — React Email** (`@react-email/components` + `@react-email/render`):
+- **Authoring — React Email** (`react-email` + `@react-email/render`):
   MIT, renders JSX to **provider-agnostic HTML + plain-text**, has a `<Tailwind>`
   component (reuse our design tokens), and a hot-reload preview server.
 - **Transport — a `sendEmail` port + swappable adapters:** a **console/stream stub**
@@ -197,26 +197,27 @@ Structured exactly like `packages/db` ([0012](0012-data-layer-postgres-drizzle.m
   (webhooks/analytics/suppression) — accept consciously, keep the SMTP adapter as the
   exit.
 
-## Note — the `@react-email/components` npm-deprecation warning is a false alarm
+## Note — migrated to the unified `react-email` package (2026-09-06)
 
-Installing `@react-email/components` prints an npm **deprecation** warning
-(`"Package no longer supported"`) — generic boilerplate, no named successor, and
-**`1.0.12` is still the latest published version**. It is **not** abandoned: React
-Email consolidated its packages into the unified **`react-email`** dev/CLI package
-and added the deprecation to steer imports there. But `react-email`'s main entry
-pulls **`prismjs` + `marked` + `tailwindcss`** into runtime bundles (no
-`sideEffects: false`, no subpath exports — [resend/react-email#3556]), so it is
-**dev tooling, not a runtime component source**; maintainers acknowledge the
-deprecation messaging is premature and that **`@react-email/components` remains the
-correct runtime import**.
+_Supersedes the earlier "the deprecation is a false alarm, keep `@react-email/components`" note._
+That stance was correct **at the time**: `@react-email/components` was deprecated because React
+Email 6 **unified** its components into the single **`react-email`** package, but `react-email`'s
+main entry then pulled **`prismjs` + `marked` + `tailwindcss`** into the bundle (no
+`sideEffects: false` / subpath exports — [resend/react-email#3556]), so switching would have
+dragged the CLI's heavy deps in.
 
-**So our split is deliberately correct and must stay:** `packages/email` imports
-components from **`@react-email/components`** (runtime dep) and depends on
-**`react-email`** only as a **devDependency** for the local preview CLI
-(`@react-email/ui` is its preview-UI companion, also dev-only). **Do not "fix" the
-warning** by switching imports to `react-email` — that would drag the CLI's heavy
-deps into the shipped bundle. Revisit if/when React Email ships tree-shakeable
-subpath exports for `react-email` (tracked by #3556).
+**That blocker is fixed** (tree-shakeable per-module output landed ~`react-email` 6.8), so on
+**2026-09-06** `packages/email` **migrated** to the unified package:
+
+- Components now import from **`react-email`** (a runtime **`dependency`**), replacing
+  `@react-email/components` in all templates + `email-layout`.
+- **`@react-email/render`** stays the separate renderer (not deprecated); **`@react-email/ui`**
+  stays the **dev-only** preview UI.
+- Dropping `@react-email/components` removed **~21 transitive packages**; `build` + `typecheck` +
+  the email render tests stayed green.
+
+The `sendEmail` port + adapters are unchanged — this was an authoring-layer package swap, not a
+transport change.
 
 ## Update — 2026-08-24: SMTP adapter implemented (Nodemailer); Resend as the first provider
 

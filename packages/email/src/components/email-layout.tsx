@@ -1,13 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import {
-  Body,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Preview,
-  Text,
-} from "@react-email/components";
+import { Body, Container, Head, Hr, Html, Preview, Text } from "react-email";
 
 /**
  * Shared shell for every auth email (ADR 0014). Styles are inline — email clients
