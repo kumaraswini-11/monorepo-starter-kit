@@ -25,7 +25,7 @@
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.1.0",
     "@workspace/env": "workspace:*",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^9.1.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "server-only": "catalog:"
@@ -40,7 +40,7 @@
     "@workspace/typescript-config": "workspace:*",
     "@workspace/vitest-config": "workspace:*",
     "eslint": "catalog:",
-    "react-email": "^6.9.2",
+    "react-email": "^6.9.3",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

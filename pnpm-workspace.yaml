@@ -13,16 +13,16 @@ catalog:
   # React & framework
   react: 19.2.8
   react-dom: 19.2.8
-  next: 16.3.0
+  next: 16.3.4
   next-themes: ^0.4.6
   "@types/react": ^19.2.18
-  "@types/react-dom": ^19.2.4
+  "@types/react-dom": ^19.2.7
   # Shared libraries
-  lucide-react: ^1.39.0
+  lucide-react: ^1.41.0
   # zod — shared by packages/ui and apps/web (form validation)
-  zod: ^4.4.3
+  zod: ^4.5.4
   # React Hook Form — packages/ui form layer + apps/web auth forms
-  react-hook-form: ^7.85.0
+  react-hook-form: ^7.87.0
   # server-only — build-time guard on server modules (db/auth/email)
   server-only: ^0.0.1
   # Vitest — unit test runner, shared by apps/storybook + packages/*. The @vitest/* family
@@ -37,8 +37,8 @@ catalog:
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   "@testing-library/jest-dom": ^6.9.1
-  "@testing-library/react": ^16.3.0
-  "@testing-library/user-event": ^14.6.6
+  "@testing-library/react": ^16.3.3
+  "@testing-library/user-event": ^14.6.7
   jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.7.2
@@ -48,7 +48,7 @@ catalog:
   typescript: ^5.9.3
   eslint: ^9.39.5
   # Tracks the Node LTS we run (24); bump with the runtime, not ahead of it.
-  "@types/node": ^24.0.0
+  "@types/node": ^24.13.3
   # Tailwind
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
@@ -56,8 +56,8 @@ catalog:
   # Storybook — shared by packages/ui (co-located stories) + apps/storybook. All Storybook
   # packages MUST move in lockstep (same version); keep the core + framework aligned here and
   # the apps/storybook addons at the same floor. (Dependabot bumped nextjs-vite alone → skew.)
-  storybook: ^10.5.10
-  "@storybook/nextjs-vite": ^10.5.10
+  storybook: ^10.6.0
+  "@storybook/nextjs-vite": ^10.6.0
 
 allowBuilds:
   sharp: true
