@@ -203,7 +203,34 @@ _Added 2026-08-27 (UI review)._
   content on wide viewports. Pending a single shared page-container width (tracked with the
   header/breadcrumb work in ADR 0023).
 
-## Sources
+## Addendum — motion tokens & where styling values live
+
+_Added 2026-09-06 (sidebar animation)._
+
+**One rule decides inline-utility vs `@theme` token — the same abstraction rule as
+[0026](0026-choosing-the-right-abstraction.md), applied to CSS:** a value that is **reused / part
+of the design-system vocabulary** becomes a **token in `@theme`** (`globals.css`); a **one-off /
+component-local** value stays an **inline utility** (arbitrary `[...]` if needed). **Don't
+pre-tokenize** — extract a token when a value _repeats_. This is Tailwind's own guidance (a
+constrained token set for the bulk, arbitrary values for pixel-perfect exceptions; _"if you use an
+arbitrary value in more than one file, extract it to a theme token"_), and it keeps `globals.css`
+**lean** — it holds the bounded vocabulary, not every value, so it never becomes a parallel
+registry (the over-tokenization anti-pattern).
+
+**Motion easing is tokenized on exactly that basis.** `--ease-snappy: cubic-bezier(0.2,0,0,1)` is
+the design system's **default** reveal / cross-fade / layout-transition curve (the better-ui
+skill's signature curve; the name matches Tailwind's own `--ease-snappy` for this exact curve). It
+is a **shared** value (the sidebar today; icon cross-fades, dropdowns and other reveals next), so
+it earns a token. Component-**bespoke** curves stay **inline** as deliberate exceptions (`drawer`
+overshoot `cubic-bezier(0.45,1.005,0,1.005)`, `toast` `cubic-bezier(0.22,1,0.36,1)`) — tokenizing a
+single-use curve would be the bloat the rule prevents.
+
+**Deliberately _one_ curve now, not a system.** Enterprise systems use **semantic, role-based**
+motion tokens (Carbon `easing-standard-productive` / `-expressive`; Material `standard` /
+`emphasized`) — the future-proof shape — but that presumes a _designed_ motion system (several
+curves + durations by role). Minting that vocabulary for a single curve would be over-tokenization.
+**Revisit trigger:** once several easings/durations recur by role, introduce a semantic motion
+vocabulary (fold `--ease-snappy` into it) plus a duration scale.
 
 - Base UI — Accessibility overview: <https://base-ui.com/react/overview/accessibility>
 - Base UI — `ScrollArea`, `Dialog` (modal / scroll-lock), `DirectionProvider`, `render`

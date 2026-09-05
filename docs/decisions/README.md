@@ -12,8 +12,9 @@ numbering of an existing record (`NNNN-short-title.md`) and add a row below.
 The set is organized thematically: **foundations & tooling** (0001–0006),
 **repo automation & agent config** (0007–0010), **foundation stack — auth, data,
 config, email, security** (0011–0015), **shared code, backend & scaling**
-(0016–0018), **front-end, UI & quality** (0019–0025), and **cross-cutting
-abstraction & reuse method** (0026, pairs with 0016).
+(0016–0018), **front-end, UI & quality** (0019–0025), **cross-cutting
+abstraction & reuse method** (0026, pairs with 0016), and **dependency evaluations**
+(0027).
 
 | #                                                                  | Decision                                                                                        | Status   | Date       |
 | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | -------- | ---------- |
@@ -43,6 +44,7 @@ abstraction & reuse method** (0026, pairs with 0016).
 | [0024](0024-storybook-and-component-testing.md)                    | Storybook (phased) for the UI library — component & visual testing                              | Accepted | 2026-08-01 |
 | [0025](0025-testing-strategy.md)                                   | Testing strategy — Vitest + Testing Library, Playwright, real-Postgres integration              | Accepted | 2026-08-22 |
 | [0026](0026-choosing-the-right-abstraction.md)                     | Choosing the right abstraction — shape & API of reusable code (defaults + escape hatch)         | Accepted | 2026-08-28 |
+| [0027](0027-class-merging-keep-clsx-tailwind-merge.md)             | Class merging — keep clsx + tailwind-merge; defer shadcn's `cn` engine                          | Accepted | 2026-09-06 |
 
 See also [../references.md](../references.md) for the sources behind these
 decisions, and [../future-improvements.md](../future-improvements.md) for the

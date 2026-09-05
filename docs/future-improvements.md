@@ -202,17 +202,28 @@ See [decisions/0006](decisions/0006-defer-typescript-7-and-eslint-10.md).
 - **Dependabot noise** — the npm ecosystem runs **quarterly** with the deferred
   majors above **ignored** in `.github/dependabot.yml` (so TS 7 / ESLint 10 stop
   reopening). Remove the relevant `ignore` entry when adopting each.
+- **shadcn `cn` class-merge engine** — evaluated and **deferred**; we keep `clsx` +
+  `tailwind-merge` ([decisions/0027](decisions/0027-class-merging-keep-clsx-tailwind-merge.md)).
+  The 30× speed claim is immaterial (class-merging isn't an app bottleneck), it's a v0 our
+  `minimumReleaseAge` cooldown blocks, ~26 KB (no bundle win), and a new engine risks Tailwind-v4
+  conflict-resolution regressions across every vendored component. **Trigger:** a stable,
+  widely-adopted 1.x past the cooldown with proven v4 parity → re-evaluate (manual swap of the
+  3 files, never the CLI in our Base-UI monorepo).
 - **Install-time deprecation warnings (benign — no action needed).** `pnpm install`
   prints a few `deprecated` notices; all are either deliberate or upstream-only:
   - `eslint@9.x` "no longer supported" — expected: ESLint marks every pre-10 line
     deprecated now that ESLint 10 shipped, and we deliberately stay on 9 (see the
     ESLint 10 entry above). Bumping within 9.x won't clear it; only the deferred
     major would.
-  - `@react-email/components@1.0.12` — upstream deprecated its **own latest** version
-    (its siblings `@react-email/render`, `react-email`, `@react-email/ui` are **not**
-    deprecated, and there is no newer version to move to). It's a dev-time
-    email-template lib; build + typecheck are green. Nothing to action — revisit if
-    Resend ships a non-deprecated release.
+  - `@react-email/components@1.0.12` — **deprecated because React Email 6 unified** all
+    components into the single **`react-email`** package (import from `react-email` directly;
+    `@react-email/render`, which we also use, stays separate and is **not** deprecated). Build +
+    typecheck are green today, so it isn't urgent, but there **is** now a migration path — it's a
+    deliberate, reviewed change for `@workspace/email` (rewrite the ~7 template imports
+    `@react-email/components` → `react-email`, add `react-email` as a runtime dep, drop
+    `@react-email/components`) **with a bundle check**: React Email ≥ 6.8 tree-shakes
+    prismjs/marked/tailwind out of the email bundle (earlier 6.x pulled ~80 MB via top-level
+    imports). Do it on a focused pass, not batched with version bumps.
   - ~25 transitive "subdependencies" (the internal `@react-email/*` tree, plus
     `glob@10`, `uuid@10`, `@esbuild-kit/*`, etc.) and the `valibot@^1.4.0` peer
     warning (isolated inside the dev-only `@storybook/addon-mcp` tree) are **deps of
