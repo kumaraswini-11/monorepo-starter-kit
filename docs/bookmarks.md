@@ -90,11 +90,28 @@ adopted; listed for when a real need lands.
   momentum arrows, value overlays, time windows, candlesticks, multi-series. For live
   feeds (prices, prediction markets) where a heavy charting lib is overkill. Canvas +
   no deps means it's cheap and easy to lazy-load behind `next/dynamic`.
-- [React Virtuoso](https://virtuoso.dev/) — the most complete React **virtualization**
-  library: lists, grids, tables (variable-size items, sticky columns, row grouping),
-  masonry, and chat/Message List. Reach for it when a list/table grows long enough to
-  need windowing. **Mostly MIT**; premium chat features are commercially licensed —
-  check the license per component before adopting.
+- [React Virtuoso](https://virtuoso.dev/) — batteries-included React **virtualization**
+  (lists, grids, tables, masonry, chat/Message List). **Mostly MIT**; premium chat features are
+  commercially licensed. **Prefer TanStack Virtual (below)** for our stack — headless + fully MIT +
+  aligned with Base UI's compose-your-own model.
+- [TanStack Virtual](https://tanstack.com/virtual/latest) — **headless** list/grid/table
+  virtualization (v3, MIT, stable, ~1B downloads). The **preferred** virtualization for us: a
+  coordinate system you render yourself, matching our shadcn/Base-UI approach. **Adopt at the first
+  100+ row scrollable list/table**, lazy-loaded via `next/dynamic`. Deferred work tracked in
+  [future-improvements](future-improvements.md).
+- [TanStack Hotkeys](https://tanstack.com/hotkeys/latest/docs/overview) — cross-platform
+  keyboard-shortcut manager (Mod-key resolution, input filtering, conflict detection, Vim
+  sequences, **recording UI**, platform-aware cheatsheet formatting). Maps to our deferred
+  **shortcut registry + ⌘/ sheet** (ADR 0023). **Currently alpha** — adopt once beta+ when we build
+  the registry; raw `keydown` listeners suffice for the 3 shortcuts today.
+- [TanStack Pacer](https://tanstack.com/pacer/latest/docs/overview) — one API for debounce /
+  throttle / rate-limit / queue / batch, with cancellation + renderable pending state
+  (`useDebouncedCallback`, `useThrottledValue`). **Currently beta.** No client-side timing need yet
+  (auth rate-limiting is server-side; `cmdk` filters internally) — revisit for a debounced search /
+  autosave, once stable.
+- [TanStack Highlight](https://tanstack.com/highlight/latest/docs/overview) — **evaluated, not for
+  us.** A syntax highlighter for **code samples in docs/blogs**; our product renders no code. Only
+  relevant if a docs/marketing surface with code blocks ever appears.
 
 ## Techniques to revisit
 

@@ -266,7 +266,8 @@ _Added 2026-08-27 (UI review)._
 - **Sign-out is shared** via a `useSignOut` hook (account menu + palette) so behaviour and copy
   stay identical.
 - **Still to refine (own task):** the three chords are separate `keydown` listeners today —
-  consolidate into one **registry** that also feeds a **shortcuts sheet** (e.g. ⌘/). A
+  consolidate into one **registry** that also feeds a **shortcuts sheet** (e.g. ⌘/) — candidate
+  tool **TanStack Hotkeys** once it leaves alpha (see `../future-improvements.md`). A
   `SidebarRail` edge-toggle was tried and **removed** — its hover highlight read as a stray box;
   the header trigger + ⌘B suffice.
 

@@ -133,6 +133,21 @@ Remaining, **deferred with triggers**:
 - **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
   observability backend is chosen / server→client data flows grow.
 
+## UI & app shell (deferred)
+
+- **Keyboard-shortcut registry + shortcuts sheet** — the three globals (⌘K palette, ⌘B sidebar,
+  ⌘⇧L theme) run as **separate `window.keydown` listeners** today, with hand-rolled platform
+  (`isMac`) `Kbd` formatting. **Trigger:** a 4th+ global shortcut, or building a **⌘/ shortcuts
+  sheet** (ADR 0023). Then consolidate into one registry that also feeds the sheet. **Candidate
+  tool:** [TanStack Hotkeys](https://tanstack.com/hotkeys/latest/docs/overview) (cross-platform
+  Mod-key, input filtering, conflict detection, cheatsheet formatting, recording UI) — **adopt once
+  it leaves alpha**; raw listeners are fine until then.
+- **List/table virtualization** — no long lists exist yet (dashboard/settings are placeholders).
+  **Trigger:** the first scrollable **100+ row** list/table/grid (members, activity log — the B2B
+  phase). Then adopt [TanStack Virtual](https://tanstack.com/virtual/latest) — headless (fits our
+  Base-UI compose-your-own model), MIT, stable — **over React Virtuoso** (whose chat features are
+  commercially licensed). Lazy-load via `next/dynamic` (dep-weight policy).
+
 ## Auth flow (wired; later screens deferred)
 
 The auth **UI** is complete and now **wired to Better Auth** (ADR 0017): the app-side seam
