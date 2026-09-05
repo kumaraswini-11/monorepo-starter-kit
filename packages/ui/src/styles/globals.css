@@ -128,6 +128,14 @@
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
   --font-mono: var(--font-mono);
+
+  /* Motion: the design system's default easing — a sharp-start / flat-settle decelerate. Named
+     `snappy` to match Tailwind's own token for this exact curve (its "adding custom styles" docs
+     name `cubic-bezier(0.2,0,0,1)` → `--ease-snappy`), and because it is snappy. Use `ease-snappy`
+     for reveals, cross-fades, and layout transitions so motion reads as one language; components
+     with a deliberately different feel (drawer overshoot, toast) keep their own tuned curve inline.
+     One curve for now — grow to a semantic motion vocabulary only if several recur (ADR 0020). */
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @layer base {

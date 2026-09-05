@@ -31,7 +31,11 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
+      {/* Fixed height (matches the app header's h-14) so the header never reflows between the
+          collapsed rail and the expanded state — otherwise the two brand marks' differing heights
+          (icon 20px vs wordmark 24px) shift everything below mid-animation. `justify-center`
+          centers whichever mark is shown; the logo also lines up with the top bar. */}
+      <SidebarHeader className="h-14 justify-center">
         <Link
           href="/dashboard"
           aria-label={`${brand.name} — go to dashboard`}
@@ -40,7 +44,7 @@ export function AppSidebar() {
           {/* The link carries the accessible name; the marks are decorative. Show the compact
               mark when collapsed to the icon rail, the full wordmark when expanded. */}
           <LogoIcon
-            className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block"
+            className="hidden size-6 shrink-0 group-data-[collapsible=icon]:block"
             aria-hidden="true"
           />
           <Logo
