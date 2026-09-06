@@ -1,22 +1,16 @@
 import type { CSSProperties, ReactNode } from "react";
-import {
-  Body,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Preview,
-  Text,
-} from "@react-email/components";
+import { Body, Container, Head, Hr, Html, Preview, Text } from "react-email";
+
+import { PRODUCT_NAME } from "@workspace/utils/product";
 
 /**
- * Shared shell for every auth email (ADR 0020). Styles are inline — email clients
- * don't reliably support external CSS — and map to the app's stone/neutral palette
- * so the emails read as part of the product.
+ * Shared shell for every auth email (ADR 0014). Styles are inline — email clients don't reliably
+ * support external CSS — and map to the app's stone/neutral palette so the emails read as part of
+ * the product. The product name is the shared leaf `@workspace/utils/product` (single source; the app
+ * UI reads the same value), re-exported here so the senders keep importing it from this module.
  */
 
-// TODO: swap for the real product name (or wire from config) when branding lands.
-export const PRODUCT_NAME = "Acme";
+export { PRODUCT_NAME };
 
 const fontFamily =
   'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';

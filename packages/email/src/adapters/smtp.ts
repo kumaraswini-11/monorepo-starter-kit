@@ -6,12 +6,12 @@ import type { SendEmail } from "@workspace/email/types";
 import { env } from "@workspace/env";
 
 /**
- * Nodemailer / SMTP adapter (ADR 0020) — the portable production sender. Works with **any** SMTP
+ * Nodemailer / SMTP adapter (ADR 0014) — the portable production sender. Works with **any** SMTP
  * provider (Resend / SES / Postmark / …) by credentials alone, so the provider stays a
  * deploy-time env choice with no code lock-in. `server-only`: it holds transport credentials.
  *
  * Per Nodemailer's official guidance we keep **one pooled transporter, created lazily and
- * reused** — never one per message. Lazy init also keeps `next build` credential-free (ADR 0021):
+ * reused** — never one per message. Lazy init also keeps `next build` credential-free (ADR 0013):
  * nothing connects at import.
  */
 
@@ -27,7 +27,7 @@ function getTransporter(): Transporter {
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
     throw new Error(
       "SMTP email is selected but incomplete — set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD " +
-        "(or unset SMTP_HOST to fall back to the console adapter). (ADR 0020)"
+        "(or unset SMTP_HOST to fall back to the console adapter). (ADR 0014)"
     );
   }
 
@@ -60,7 +60,7 @@ export const smtpEmailAdapter: SendEmail = async (message) => {
   const fromAddress = from ?? env.EMAIL_FROM;
   if (!fromAddress) {
     throw new Error(
-      "No From address — set EMAIL_FROM (or pass `from`) for SMTP sends. (ADR 0020)"
+      "No From address — set EMAIL_FROM (or pass `from`) for SMTP sends. (ADR 0014)"
     );
   }
 

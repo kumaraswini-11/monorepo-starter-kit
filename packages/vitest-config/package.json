@@ -13,6 +13,7 @@
     "./setup": "./setup.ts"
   },
   "dependencies": {
+    "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "vitest": "catalog:"

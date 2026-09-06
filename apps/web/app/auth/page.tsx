@@ -6,13 +6,12 @@ import { buttonVariants } from "@workspace/ui/components/shadcn/button";
 import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { AuthHeader } from "@/components/auth/auth-header";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { AuthHeader, GoogleSignInButton } from "@/features/auth";
 
 export const metadata: Metadata = { title: "Authentication" };
 
 /**
- * Auth entry — the method chooser at `/auth`. Static Server Component shell (ADR 0023):
+ * Auth entry — the method chooser at `/auth`. Static Server Component shell (ADR 0019):
  * it reads no request data, so it prerenders and is edge-cacheable. `/` dispatches
  * visitors here (or to `/dashboard` when a session already exists).
  */
@@ -34,7 +33,7 @@ export default function AuthEntryPage() {
        */}
       <div className="flex flex-col gap-2">
         {/*
-         * A client island (ADR 0023/0025): the page stays a static shell while just this button
+         * A client island (ADR 0019/0025): the page stays a static shell while just this button
          * hydrates to start the Google OAuth redirect via the seam (lib/auth/actions.ts).
          */}
         <GoogleSignInButton />

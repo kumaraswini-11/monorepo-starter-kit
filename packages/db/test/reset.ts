@@ -5,7 +5,7 @@ import { assertDisposableDatabase } from "@workspace/db/testing/migrate";
 
 /**
  * Truncate every table for integration-test isolation (fast; `beforeEach`). Shared across every
- * package's integration tests via `@workspace/db/testing/reset` (ADR 0029 §11).
+ * package's integration tests via `@workspace/db/testing/reset` (ADR 0025 §11).
  *
  * The table list is derived from `pg_tables` at runtime rather than hard-coded, so isolation
  * stays correct as the schema grows (downstream domain tables, new Better Auth plugin tables)

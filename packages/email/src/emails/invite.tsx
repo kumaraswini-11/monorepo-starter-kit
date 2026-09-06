@@ -1,5 +1,6 @@
-import { Button, Heading, Section, Text } from "@react-email/components";
+import { Heading, Text } from "react-email";
 
+import { EmailButton } from "@workspace/email/components/email-button";
 import { EmailLayout, styles } from "@workspace/email/components/email-layout";
 
 /**
@@ -29,11 +30,7 @@ export default function Invite({
       <Text style={styles.paragraph}>
         {inviterName} has invited you to join {organizationName}.
       </Text>
-      <Section style={{ margin: "24px 0" }}>
-        <Button href={inviteUrl} style={styles.button}>
-          Accept invitation
-        </Button>
-      </Section>
+      <EmailButton href={inviteUrl}>Accept invitation</EmailButton>
       <Text style={styles.muted}>
         If you weren't expecting this invitation, you can safely ignore this
         email.

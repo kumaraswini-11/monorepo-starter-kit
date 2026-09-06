@@ -1,5 +1,5 @@
 // Build-time guard: fail if the DB layer is ever imported into a client bundle
-// (ADR 0022 — server-only data access).
+// (ADR 0016 — server-only data access).
 import "server-only";
 
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -10,8 +10,8 @@ import { env } from "@workspace/env";
 
 /**
  * Pooled Postgres connection. `DATABASE_URL` is validated by `@workspace/env`
- * (fail-fast — ADR 0021); `pg` still connects lazily (on first query), so a CI
- * `next build` with `SKIP_ENV_VALIDATION=1` stays safe. (ADR 0019.)
+ * (fail-fast — ADR 0013); `pg` still connects lazily (on first query), so a CI
+ * `next build` with `SKIP_ENV_VALIDATION=1` stays safe. (ADR 0012.)
  *
  * Cached on `globalThis` so Turbopack HMR doesn't leak a new pool on every edit
  * ("too many clients" in dev); prod evaluates this module once, so the cache is a

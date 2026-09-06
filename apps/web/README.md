@@ -9,6 +9,7 @@ Next-specific layer — auth, data, and email live in `@workspace/*` packages, c
 
 The auth transport is isolated behind `lib/auth/` (the seam); component tests are co-located,
 end-to-end tests live in `apps/e2e`. See ADRs
-[0023](../../docs/decisions/0023-nextjs-rendering-and-performance-model.md) (rendering/perf),
-[0025](../../docs/decisions/0025-frontend-architecture-forms-data-state-routing.md) (frontend arch),
-[0027](../../docs/decisions/0027-backend-architecture-fullstack-and-migration.md) (fullstack + split).
+[0019](../../docs/decisions/0019-nextjs-rendering-and-performance.md) (rendering/perf),
+[0022](../../docs/decisions/0022-forms-rhf-submission-and-pending.md) (forms),
+[0023](../../docs/decisions/0023-app-shell-routing-and-boundaries.md) (app shell, routing & state),
+[0017](../../docs/decisions/0017-backend-architecture-and-migration.md) (fullstack + split).

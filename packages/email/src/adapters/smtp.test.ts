@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
- * Unit tests for the Nodemailer/SMTP adapter (ADR 0020). Nodemailer + the env are mocked, so
+ * Unit tests for the Nodemailer/SMTP adapter (ADR 0014). Nodemailer + the env are mocked, so
  * these assert the adapter's own contract — the official-docs behaviors we rely on: a pooled,
  * hardened transporter; TLS-by-port (465 implicit, 587 STARTTLS) with an explicit override; the
  * `EmailMessage → sendMail` mapping incl. the `EMAIL_FROM` default; transporter reuse; and the

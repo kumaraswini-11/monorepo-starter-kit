@@ -4,7 +4,7 @@ import { db } from "@workspace/db/client";
 import { session } from "@workspace/db/schema";
 
 /**
- * Session-aggregate queries (repository boundary, ADR 0019).
+ * Session-aggregate queries (repository boundary, ADR 0012).
  */
 
 /**

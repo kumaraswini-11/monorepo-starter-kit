@@ -11,13 +11,13 @@
 
 This spec is the **design north-star** for the auth surface; it is implemented
 **incrementally** per the phased plan in
-[ADR 0016 — Authentication strategy](../decisions/0016-authentication-strategy.md)
+[ADR 0011 — Authentication strategy](../decisions/0011-authentication-strategy.md)
 (Better Auth: email/password → OAuth → passwordless → passkeys → MFA → org/RBAC →
 SSO/SCIM). Identity, org, and session data persist via
-[ADR 0019 — Data layer (PostgreSQL + Drizzle)](../decisions/0019-data-layer-postgres-drizzle.md).
+[ADR 0012 — Data layer (PostgreSQL + Drizzle)](../decisions/0012-data-layer-postgres-drizzle.md).
 The UI builds on the existing design system — Base UI + shadcn
-([ADR 0007](../decisions/0007-base-ui-over-radix.md),
-[ADR 0014](../decisions/0014-base-ui-adoption.md)) — and inherits the security-headers
+([ADR 0021](../decisions/0021-base-ui-selection-and-adoption.md),
+[ADR 0021](../decisions/0021-base-ui-selection-and-adoption.md)) — and inherits the security-headers
 baseline ([ADR 0015](../decisions/0015-web-security-headers.md)). The **transactional
 emails** these flows send (verify, reset, security alerts) are specified separately in
 [Auth Email Templates](auth-email-templates-spec.md).
@@ -37,7 +37,7 @@ emails** these flows send (verify, reset, security alerts) are specified separat
 - **Progressive email verification** (banner, not a hard gate) is a deliberate product
   choice — Better Auth's `emailVerification` with `requireEmailVerification: false`;
   revisit if compliance mandates a hard gate.
-- **Scope vs first pass:** org / invite / SSO flows here are _later_ phases (ADR 0016);
+- **Scope vs first pass:** org / invite / SSO flows here are _later_ phases (ADR 0011);
   the first implementation pass is **email/password + the identity-resolution spine**.
 
 ---
@@ -579,13 +579,13 @@ Deep Link → Entry → Auth → Identity Resolution → Original URL restored
 - Later: `/auth/callback/google` (OAuth), `/auth/onboarding`, `/auth/invite/:token`
 
 **Reconciled during implementation** (see
-[ADR 0025](../decisions/0025-frontend-architecture-forms-data-state-routing.md)): the
+[ADR 0023](../decisions/0023-app-shell-routing-and-boundaries.md)): the
 single "Password" step (§3.3) is split into dedicated **`/auth/sign-in`** and
 **`/auth/sign-up`** routes — still identifier-first (the email decides; no manual toggle),
 but with single-responsibility components, distinct URLs, and room for sign-up to grow.
 The `/` dispatcher + per-area guards replace `PostAuthRouter`. Post-auth: **sign-up →
 auto-login → `/dashboard`**; **reset → sign in** (sessions revoked,
-[ADR 0016](../decisions/0016-authentication-strategy.md)). Sign-up uses a **strength
+[ADR 0011](../decisions/0011-authentication-strategy.md)). Sign-up uses a **strength
 meter, no confirm field** (2026 UX); the layout is **flat** (efferd brand) rather than a
 420px `AuthCard`; the email "Continue" stays **enabled** (validate-on-submit) rather than
 §5's "disabled until valid" (accessibility).

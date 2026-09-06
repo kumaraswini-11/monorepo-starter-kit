@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: brand.name,
     short_name: brand.name,
-    description: "Secure, self-hosted authentication starter.",
+    description: brand.description,
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

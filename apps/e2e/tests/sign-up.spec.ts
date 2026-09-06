@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { signUpViaUi, uniqueEmail } from "../support/auth.js";
 
 /**
- * Full sign-up journey against the real app + Postgres (ADR 0029): a never-seen email routes
+ * Full sign-up journey against the real app + Postgres (ADR 0025): a never-seen email routes
  * through the identifier-first flow to account creation and auto-login. Runs in the public
  * project (no stored session) — a genuine first-time visitor.
  */

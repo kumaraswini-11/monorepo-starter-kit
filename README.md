@@ -32,7 +32,7 @@ building scalable products. It ships:
 > **The auth UI is built; the backend is set up but intentionally _not yet wired_
 > to the UI.** The seam is explicit (each form takes an injected `onSubmit`), so
 > you clone this and wire auth per project. See
-> **[ADR 0027](docs/decisions/0027-backend-architecture-fullstack-and-migration.md)**
+> **[ADR 0017](docs/decisions/0017-backend-architecture-and-migration.md)**
 > for the fullstack decision, the step-by-step wiring plan, and a separate-backend
 > migration playbook.
 
@@ -45,10 +45,10 @@ building scalable products. It ships:
 | TypeScript   | 5       | Strict, `noUncheckedIndexedAccess`                   |
 | Tailwind CSS | 4       | CSS-first config, `tw-animate-css`                   |
 | shadcn/ui    | latest  | Base UI primitives — default `@base-ui/react`        |
-| Better Auth  | latest  | Self-hosted, framework-neutral auth (ADR 0016)       |
-| PostgreSQL   | 17      | Local via `docker-compose` (ADR 0019)                |
-| Drizzle ORM  | latest  | TS-first schema + migrations (ADR 0019)              |
-| React Email  | latest  | Templated email behind a `sendEmail` port (ADR 0020) |
+| Better Auth  | latest  | Self-hosted, framework-neutral auth (ADR 0011)       |
+| PostgreSQL   | 17      | Local via `docker-compose` (ADR 0012)                |
+| Drizzle ORM  | latest  | TS-first schema + migrations (ADR 0012)              |
+| React Email  | latest  | Templated email behind a `sendEmail` port (ADR 0014) |
 | Turborepo    | 2       | Task orchestration & caching                         |
 | pnpm         | 10      | Workspaces, pinned via `packageManager`              |
 | ESLint       | 9       | Flat config                                          |
@@ -63,10 +63,10 @@ building scalable products. It ships:
 │   └── storybook/   # Storybook for the shared UI library
 ├── packages/
 │   ├── ui/                  # Shared components (shadcn/ui + Base UI) — source-only
-│   ├── auth/                # Better Auth server + client (framework-neutral)  — ADR 0016
-│   ├── db/                  # PostgreSQL + Drizzle schema & client              — ADR 0019
-│   ├── email/               # React Email templates + `sendEmail` port          — ADR 0020
-│   ├── env/                 # Validated environment contract (fail-fast)        — ADR 0021
+│   ├── auth/                # Better Auth server + client (framework-neutral)  — ADR 0011
+│   ├── db/                  # PostgreSQL + Drizzle schema & client              — ADR 0012
+│   ├── email/               # React Email templates + `sendEmail` port          — ADR 0014
+│   ├── env/                 # Validated environment contract (fail-fast)        — ADR 0013
 │   ├── eslint-config/       # Shared ESLint flat configs
 │   └── typescript-config/   # Shared tsconfig presets
 └── docs/                    # Architecture decisions (ADRs), references, future work
@@ -120,7 +120,7 @@ today via a ~3-line route handler, or under a standalone Node service unchanged)
 To make auth **functional**, wire the UI to it. The recommended seam, the
 step-by-step wiring, the identifier-first existence-check nuance, and — if you later
 outgrow fullstack — the separate-backend migration are all documented in
-**[ADR 0027](docs/decisions/0027-backend-architecture-fullstack-and-migration.md)**.
+**[ADR 0017](docs/decisions/0017-backend-architecture-and-migration.md)**.
 Wiring points are marked in code with `// Wiring:` comments in
 `apps/web/components/auth/*-step.tsx`.
 
@@ -177,7 +177,7 @@ project**, update these spots:
 | Repo URLs      | CI / CodeQL badge URLs above → your GitHub org/repo                                                          |
 | License holder | `LICENSE` and the [License](#license) section (© your org)                                                   |
 | Email product  | `packages/email/src/components/email-layout.tsx` (product-name TODO)                                         |
-| Auth config    | `BETTER_AUTH_URL` + trusted origins for your domain; a real email provider (dev is a console stub, ADR 0020) |
+| Auth config    | `BETTER_AUTH_URL` + trusted origins for your domain; a real email provider (dev is a console stub, ADR 0014) |
 | Legal pages    | `/terms` and `/privacy` are linked from the auth entry — add real pages before launch                        |
 
 ## Documentation

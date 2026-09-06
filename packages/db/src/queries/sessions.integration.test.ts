@@ -7,7 +7,7 @@ import { session, user } from "@workspace/db/schema";
 import { resetDb } from "@workspace/db/testing/reset";
 
 /**
- * Integration tests for `isNewDeviceSignIn` against real Postgres (ADR 0029 §11) — this
+ * Integration tests for `isNewDeviceSignIn` against real Postgres (ADR 0025 §11) — this
  * verifies the actual SQL (the `userId = X AND id != current` filter and the user-agent
  * comparison), which a mocked db could never prove. Truncate between tests for isolation.
  */

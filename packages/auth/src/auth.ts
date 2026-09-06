@@ -1,5 +1,5 @@
 // Build-time guard: this holds the secret + DB adapter, so fail if a client bundle
-// ever imports it (ADR 0022). The client entry is the separate `./client` module.
+// ever imports it (ADR 0016). The client entry is the separate `./client` module.
 import "server-only";
 
 import { betterAuth } from "better-auth";
@@ -9,7 +9,7 @@ import { describeDevice, resolveLocation } from "@workspace/auth/device";
 import { accountExists } from "@workspace/auth/plugins/account-exists";
 import { getUserById, isNewDeviceSignIn } from "@workspace/db";
 // Raw Drizzle handle + schema namespace come from the narrow adapter subpath (only the
-// auth package needs them); repositories come from the db barrel (ADR 0019).
+// auth package needs them); repositories come from the db barrel (ADR 0012).
 import { db, schema } from "@workspace/db/client";
 import {
   sendNewDeviceEmail,
@@ -21,17 +21,17 @@ import { env } from "@workspace/env";
 import { firstWord } from "@workspace/utils/string";
 
 /**
- * Framework-neutral Better Auth server instance (ADR 0016). It imports **no**
+ * Framework-neutral Better Auth server instance (ADR 0011). It imports **no**
  * framework code — the app supplies the adapter (`toNextJsHandler` in apps/web; a
  * Node/Express service would use `toNodeHandler` against this same instance).
  *
- * Env comes from the validated `@workspace/env` contract (fail-fast, ADR 0021), not
+ * Env comes from the validated `@workspace/env` contract (fail-fast, ADR 0013), not
  * raw `process.env`. `pg` connects lazily and a CI `next build` sets
  * `SKIP_ENV_VALIDATION=1`, so building with no DB/secret stays safe.
  */
 /**
  * Google OAuth is enabled only when both credentials are present — a deploy-time choice
- * (ADR 0016), like the SMTP provider. Absent in dev / no-secret CI builds, so no social provider
+ * (ADR 0011), like the SMTP provider. Absent in dev / no-secret CI builds, so no social provider
  * is registered and the app still builds and runs.
  */
 const socialProviders =
@@ -104,7 +104,7 @@ export const auth = betterAuth({
   },
   // Security notification (spec §4): email the user when a session is created from a
   // device we haven't seen for them before. Runs on every sign-in; the check + user
-  // lookup stay behind packages/db (ADR 0019). Never throws into the auth flow.
+  // lookup stay behind packages/db (ADR 0012). Never throws into the auth flow.
   databaseHooks: {
     session: {
       create: {
@@ -139,9 +139,9 @@ export const auth = betterAuth({
     },
   },
   // Identifier-first existence check as a BA plugin endpoint — inherits BA's rate limiting
-  // (ADR 0027 §3); read-only via the internal adapter, adds no schema.
+  // (ADR 0017 §3); read-only via the internal adapter, adds no schema.
   plugins: [accountExists()],
-  // Social login (ADR 0016). Registered only when credentials are set (see `socialProviders`
+  // Social login (ADR 0011). Registered only when credentials are set (see `socialProviders`
   // above); Better Auth serves `/api/auth/callback/<provider>` automatically.
   socialProviders,
   // Account linking (security-critical): link a social sign-in to an existing account only on a
@@ -149,7 +149,7 @@ export const auth = betterAuth({
   // `trustedProviders`: that would force-link even an *unverified* email/password account to a
   // matching Google sign-in, enabling account takeover (progressive verification means our
   // email/password accounts can be unverified). Google's `email_verified` makes new Google users
-  // verified, so a same-email link only happens once the pre-existing account is verified. (ADR 0016)
+  // verified, so a same-email link only happens once the pre-existing account is verified. (ADR 0011)
   account: {
     accountLinking: { enabled: true },
   },
@@ -164,5 +164,5 @@ export const auth = betterAuth({
   advanced: {
     ipAddress: { ipAddressHeaders: ["x-forwarded-for", "x-real-ip"] },
   },
-  telemetry: { enabled: false }, // ADR 0016 — no PII leaves the box
+  telemetry: { enabled: false }, // ADR 0011 — no PII leaves the box
 });

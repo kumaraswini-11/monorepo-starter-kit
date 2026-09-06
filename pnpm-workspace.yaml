@@ -16,9 +16,9 @@ catalog:
   next: 16.3.4
   next-themes: ^0.4.6
   "@types/react": ^19.2.18
-  "@types/react-dom": ^19.2.4
+  "@types/react-dom": ^19.2.7
   # Shared libraries
-  lucide-react: ^1.39.0
+  lucide-react: ^1.41.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.5.4
   # React Hook Form — packages/ui form layer + apps/web auth forms
@@ -30,15 +30,31 @@ catalog:
   vitest: ^4.1.11
   "@vitest/coverage-v8": ^4.1.11
   "@vitest/browser-playwright": ^4.1.11
-  # Testcontainers — ephemeral real Postgres for integration tests (ADR 0029)
+  # Testcontainers — ephemeral real Postgres for integration tests (ADR 0025)
   "@testcontainers/postgresql": ^12.1.0
-  # Playwright — end-to-end tests (apps/e2e), ADR 0029
-  "@playwright/test": ^1.62.1
+  # Playwright — one release train (published in lockstep), split across two workspaces: the
+  # `@playwright/test` runner for e2e (apps/e2e) and the `playwright` browser driver for Storybook
+  # browser-mode tests (apps/storybook). Both live here so the two never drift to different browser
+  # versions. ADR 0025.
+  "@playwright/test": ^1.63.0
+  playwright: ^1.63.0
+  # Turborepo — the task runner (`turbo`, root), its codegen (`@turbo/gen`, packages/ui), and its
+  # lint plugin (`eslint-plugin-turbo`, packages/eslint-config). All published together as one
+  # release; catalog keeps the three in lockstep across the three manifests (one bump-site).
+  turbo: ^2.10.12
+  "@turbo/gen": ^2.10.12
+  eslint-plugin-turbo: ^2.10.12
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
-  "@testing-library/jest-dom": ^6.9.1
+  # jest-dom v7 makes @testing-library/dom a REQUIRED (non-optional) peer, so it is pinned here and
+  # added to @workspace/vitest-config (where jest-dom lives) rather than relied on transitively via RTL.
+  "@testing-library/jest-dom": ^7.0.1
+  "@testing-library/dom": ^10.4.1
   "@testing-library/react": ^16.3.3
-  "@testing-library/user-event": ^14.6.6
+  "@testing-library/user-event": ^14.6.7
+  # jsdom held at 26: jsdom 30 requires Node >=24.15.0 (24 line) and the dev env is on 24.13.0, so
+  # engine-strict blocks it. Bump jsdom -> ^30 and engines.node -> >=24.15.0 together once Node moves
+  # up (see docs/future-improvements.md). 26 is fully compatible with our tests.
   jsdom: ^26.1.0
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.7.2
@@ -48,7 +64,7 @@ catalog:
   typescript: ^5.9.3
   eslint: ^9.39.5
   # Tracks the Node LTS we run (24); bump with the runtime, not ahead of it.
-  "@types/node": ^24.0.0
+  "@types/node": ^24.13.3
   # Tailwind
   tailwindcss: ^4.3.3
   "@tailwindcss/postcss": ^4.3.3
@@ -56,8 +72,8 @@ catalog:
   # Storybook — shared by packages/ui (co-located stories) + apps/storybook. All Storybook
   # packages MUST move in lockstep (same version); keep the core + framework aligned here and
   # the apps/storybook addons at the same floor. (Dependabot bumped nextjs-vite alone → skew.)
-  storybook: ^10.5.10
-  "@storybook/nextjs-vite": ^10.5.10
+  storybook: ^10.6.0
+  "@storybook/nextjs-vite": ^10.6.0
 
 allowBuilds:
   sharp: true

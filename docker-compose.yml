@@ -1,5 +1,5 @@
 # Local development Postgres only. Production is self-hosted Postgres as the
-# system-of-record (ADR 0019); this compose file is never used in prod.
+# system-of-record (ADR 0012); this compose file is never used in prod.
 services:
   postgres:
     image: postgres:17

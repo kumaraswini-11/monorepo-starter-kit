@@ -4,7 +4,7 @@ import { STORAGE_STATE } from "./support/auth.js";
 import { DEFAULT_DATABASE_URL } from "./support/db.js";
 
 /**
- * End-to-end tests for apps/web (ADR 0029). A dedicated workspace so `@playwright/test` +
+ * End-to-end tests for apps/web (ADR 0025). A dedicated workspace so `@playwright/test` +
  * browsers never enter the app bundle. Runs against the production build (`next start`) for
  * realistic behavior; `turbo test:e2e` builds `web` first (`dependsOn: ["^build"]`).
  */
@@ -29,7 +29,7 @@ export default defineConfig({
   // round-trip + redirect; navigation must stay under the per-test budget.
   timeout: 60_000,
   expect: { timeout: 10_000 },
-  // Apply Drizzle migrations to the e2e Postgres before the app starts (ADR 0029).
+  // Apply Drizzle migrations to the e2e Postgres before the app starts (ADR 0025).
   globalSetup: "./global-setup.ts",
   use: {
     baseURL,
@@ -42,7 +42,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
-  // An ARRAY from day one: when the backend splits out (ADR 0027) it becomes a second entry
+  // An ARRAY from day one: when the backend splits out (ADR 0017) it becomes a second entry
   // here, and the e2e suite boots both services unchanged.
   webServer: [
     {

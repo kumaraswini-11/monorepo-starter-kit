@@ -1,16 +1,19 @@
 import { z } from "zod";
 
 /**
- * Client-side form schemas + the single-field rules they compose from. These mirror the
- * server rules (Better Auth enforces the real constraints — e.g. `minPasswordLength: 10`);
- * this is fast UX feedback via React Hook Form's zod resolver, not the source of truth.
- * Kept version-proof (a simple regex, no zod string-format helpers).
+ * Reusable, framework-agnostic form-field rules shared across the app's forms (auth today; the
+ * Settings change-password form later reuses `passwordField`). Client-side UX validation via React
+ * Hook Form's zod resolver — Better Auth enforces the real constraints server-side; these mirror
+ * them for fast feedback. Kept version-proof (a simple regex, no zod string-format helpers).
+ *
+ * Feature-specific *form* schemas compose these rules and live with their feature (e.g.
+ * `features/auth/schemas.ts`). Promote these rules to a shared `@workspace/validation` package
+ * when a second app — or the separate backend — needs the same contract (ADR 0016 / 0017).
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Reusable field rules — shared across the per-form schemas below (and, later, the
- * Settings change-password form: reuse `passwordField`). */
+/** A required, well-formed email. */
 export const emailField = z
   .string()
   .trim()
@@ -24,24 +27,3 @@ export const passwordField = z
   .string()
   .min(10, "Password must be at least 10 characters")
   .max(128, "Password must be at most 128 characters");
-
-/** Sign-in only checks the field isn't empty — the real policy is enforced server-side. */
-export const signInPasswordField = z.string().min(1, "Password is required");
-
-/**
- * Per-form schemas — each holds exactly the fields React Hook Form owns. On the credential
- * steps the email is fixed from the flow (a prop, not an editable field), so it isn't here;
- * only `/auth/email` and forgot-password put the email under the form.
- */
-export const emailFormSchema = z.object({ email: emailField });
-export const signInFormSchema = z.object({ password: signInPasswordField });
-export const signUpFormSchema = z.object({
-  name: z.string().trim().optional(),
-  password: passwordField,
-});
-export const newPasswordFormSchema = z.object({ password: passwordField });
-
-export type EmailFormValues = z.infer<typeof emailFormSchema>;
-export type SignInFormValues = z.infer<typeof signInFormSchema>;
-export type SignUpFormValues = z.infer<typeof signUpFormSchema>;
-export type NewPasswordFormValues = z.infer<typeof newPasswordFormSchema>;

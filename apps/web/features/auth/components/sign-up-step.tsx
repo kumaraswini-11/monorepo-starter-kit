@@ -1,0 +1,43 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import { brand } from "@workspace/ui/lib/brand";
+
+import { signUpWithEmail } from "../actions";
+import { useRequiredEmail } from "./auth-flow-provider";
+import { AuthHeader } from "./auth-header";
+import { AuthStepSkeleton } from "./auth-step-skeleton";
+import { SignUpForm } from "./sign-up-form";
+
+/**
+ * Client wiring + guard for `/auth/sign-up`. Requires the email captured at `/auth/email`;
+ * a refresh / direct nav without one restarts the flow there (ADR 0023 §4). Shows a
+ * skeleton while redirecting. Better Auth auto-signs-in on sign-up, so on success →
+ * `/dashboard`; a failure surfaces via `FormError` (ADR 0022 / 0027).
+ */
+export function SignUpStep() {
+  const router = useRouter();
+  const email = useRequiredEmail();
+  if (!email) {
+    return <AuthStepSkeleton />;
+  }
+
+  return (
+    <>
+      <AuthHeader
+        title="Create your account"
+        description={`Choose a password to finish setting up your ${brand.name} account.`}
+      />
+      <SignUpForm
+        email={email}
+        onSubmit={async ({ password, name }) => {
+          await signUpWithEmail({ email, password, name });
+          router.push("/dashboard");
+          // Sync server components with the just-created (auto-signed-in) session.
+          router.refresh();
+        }}
+      />
+    </>
+  );
+}

@@ -3,7 +3,7 @@ name: CodeQL
 # Static security + quality analysis (CodeQL) — free for public repositories.
 # This is the free path to "code quality on every PR": the `security-and-quality`
 # query suite adds maintainability/reliability checks on top of the security set.
-# (The paid GitHub Code Quality product is deliberately deferred — see ADR 0017.)
+# (The paid GitHub Code Quality product is deliberately deferred — see ADR 0007.)
 on:
   push:
     branches: [main]

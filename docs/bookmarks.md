@@ -17,7 +17,7 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   `/triage` (grouped Shaping / Upkeep / Productivity). **Adopted** — vendored + hash-pinned
   via `npx skills add mattpocock/skills` (`skills-lock.json`), alongside the first-party
   better-auth / shadcn / vercel sets, per the refined policy in
-  [decisions/0011](decisions/0011-project-mcp-servers.md) (reputable first-party/known-author
+  [decisions/0010](decisions/0010-agent-skills-vendoring.md) (reputable first-party/known-author
   skill sets in; unvetted community registries below stay browse-only).
 - [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/)
   — a course on **AI agent engineering**: how to build reliable "harnesses" that
@@ -32,9 +32,9 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   layout, and writing (concentric radius, optical alignment, no `transition: all`,
   `tabular-nums`, `text-wrap: balance`/`pretty`, semantic colour tokens, `:focus-visible`,
   24/44px hit areas, `prefers-reduced-motion`, gap 2× between groups, verb-first button
-  labels…). Much already matches our conventions (ADR 0024 a11y, the RHF form pattern, OKLCH
+  labels…). Much already matches our conventions (ADR 0020 a11y, the RHF form pattern, OKLCH
   tokens). Now **adopted first-party**: Jakub publishes these as free agent skills on GitHub
-  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0011) — so the rules are
+  (`jakubkrehel/skills`) — the vendored `better-*` set (see ADR 0010) — so the rules are
   applied directly in-repo, no hand-written copy needed.
 - [Jakub Krehel](https://jakub.kr/) — personal site of the **interfaces.dev** author
   (design engineer). Source of the `better-*` interface skills we vendor; follow for
@@ -62,13 +62,13 @@ We adopt only **reputable first-party / known-author** skill sets, vendored and
 hash-pinned (`skills-lock.json`); these **unvetted community registries** stay
 browse-only — kept for skill _ideas_, not `npx`-installed into this repo
 (private/proprietary + supply-chain caution — see
-[decisions/0011-project-mcp-servers.md](decisions/0011-project-mcp-servers.md)).
+[decisions/0010-agent-skills-vendoring.md](decisions/0010-agent-skills-vendoring.md)).
 
 - [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — by
   **VoltAgent**: a curated **"awesome list"** of 1000+ agent skills, organized by provider
   (Anthropic, Google, Stripe, Vercel, Microsoft…) and hand-picked from real engineering
   teams rather than mass AI-generated. Not a registry/installer — a directory. **Best
-  starting point to discover reputable first-party skills** worth vendoring (per ADR 0011);
+  starting point to discover reputable first-party skills** worth vendoring (per ADR 0010);
   browse, then `skills add` the vetted ones.
 - [autoskills.sh](https://www.autoskills.sh/) — by midudev; `npx autoskills`
   auto-detects your stack and installs curated, SHA-256-verified skills.
@@ -78,6 +78,22 @@ browse-only — kept for skill _ideas_, not `npx`-installed into this repo
   (`npx skills add`). Large registry spanning many tools.
 - [skillsmp.com](https://skillsmp.com/) — community registry aggregating 2M+
   skills from GitHub; **no curation/vetting** — lowest trust.
+- [TanStack Intent](https://tanstack.com/intent/latest/docs/overview) — a **different** skills model
+  from the registries above: a CLI that ships versioned **"Skills" inside npm packages**, discovered
+  from installed deps and injected into `AGENTS.md`/`CLAUDE.md`/`.cursorrules`, **version-matched** to
+  the library. Adjacent to our vendored-skills strategy
+  ([decisions/0010](decisions/0010-agent-skills-vendoring.md)), but **deferred**: thin ecosystem
+  today, unknown maturity, and auto-injecting dep-shipped skills into `AGENTS.md` cuts against our
+  **lean, hand-curated handbook** + **vetted / hash-pinned** posture. Watch as it (and the ecosystem)
+  matures.
+
+_Also evaluated in the same TanStack pass, not adopted:_
+[TanStack Devtools](https://tanstack.com/devtools/latest/docs/overview) — a framework-agnostic shell
+for building **custom** devtools panels (alpha); we have no custom-devtools need and rely on
+Next/React devtools. [TanStack Config](https://tanstack.com/config/latest/docs/overview) — a
+**library build/publish** toolchain (Vite / ESLint / release); **N/A** — our packages are private,
+source-only, never published ([decisions/0002](decisions/0002-proprietary-license-and-package-posture.md),
+[decisions/0016](decisions/0016-shared-code-and-package-boundaries.md)).
 
 ## UI libraries to evaluate
 
@@ -90,11 +106,28 @@ adopted; listed for when a real need lands.
   momentum arrows, value overlays, time windows, candlesticks, multi-series. For live
   feeds (prices, prediction markets) where a heavy charting lib is overkill. Canvas +
   no deps means it's cheap and easy to lazy-load behind `next/dynamic`.
-- [React Virtuoso](https://virtuoso.dev/) — the most complete React **virtualization**
-  library: lists, grids, tables (variable-size items, sticky columns, row grouping),
-  masonry, and chat/Message List. Reach for it when a list/table grows long enough to
-  need windowing. **Mostly MIT**; premium chat features are commercially licensed —
-  check the license per component before adopting.
+- [React Virtuoso](https://virtuoso.dev/) — batteries-included React **virtualization**
+  (lists, grids, tables, masonry, chat/Message List). **Mostly MIT**; premium chat features are
+  commercially licensed. **Prefer TanStack Virtual (below)** for our stack — headless + fully MIT +
+  aligned with Base UI's compose-your-own model.
+- [TanStack Virtual](https://tanstack.com/virtual/latest) — **headless** list/grid/table
+  virtualization (v3, MIT, stable, ~1B downloads). The **preferred** virtualization for us: a
+  coordinate system you render yourself, matching our shadcn/Base-UI approach. **Adopt at the first
+  100+ row scrollable list/table**, lazy-loaded via `next/dynamic`. Deferred work tracked in
+  [future-improvements](future-improvements.md).
+- [TanStack Hotkeys](https://tanstack.com/hotkeys/latest/docs/overview) — cross-platform
+  keyboard-shortcut manager (Mod-key resolution, input filtering, conflict detection, Vim
+  sequences, **recording UI**, platform-aware cheatsheet formatting). Maps to our deferred
+  **shortcut registry + ⌘/ sheet** (ADR 0023). **Currently alpha** — adopt once beta+ when we build
+  the registry; raw `keydown` listeners suffice for the 3 shortcuts today.
+- [TanStack Pacer](https://tanstack.com/pacer/latest/docs/overview) — one API for debounce /
+  throttle / rate-limit / queue / batch, with cancellation + renderable pending state
+  (`useDebouncedCallback`, `useThrottledValue`). **Currently beta.** No client-side timing need yet
+  (auth rate-limiting is server-side; `cmdk` filters internally) — revisit for a debounced search /
+  autosave, once stable.
+- [TanStack Highlight](https://tanstack.com/highlight/latest/docs/overview) — **evaluated, not for
+  us.** A syntax highlighter for **code samples in docs/blogs**; our product renders no code. Only
+  relevant if a docs/marketing surface with code blocks ever appears.
 
 ## Techniques to revisit
 
@@ -116,3 +149,38 @@ adopted; listed for when a real need lands.
   dependency versus our native GitHub CI/CodeQL status badges. Kept for reference —
   handy if `packages/ui` ever ships as a public design system, or for a personal /
   OSS project.
+
+## UI component galleries & design references (to explore)
+
+A dump of inspiration + component sources to browse later — shadcn-style component
+libraries, UI galleries, and design-token / checklist references. **Not adopted; notes
+are provisional until each is visited.** Any client-runtime component is still judged on
+bundle weight before adoption (dep-weight policy), and third-party libraries against
+[decisions/0021](decisions/0021-base-ui-selection-and-adoption.md) (Base UI over Radix) —
+so these are idea sources, not drop-ins.
+
+- [bestdesignsonx.com](https://bestdesignsonx.com/) — curated gallery of standout UI/product
+  designs shared on X (Twitter); interaction/visual inspiration _(to verify)_.
+- [Refero](https://styles.refero.design/) — searchable gallery of real product UI
+  screenshots; interaction/design inspiration.
+- [reui](https://reui.io/components) — open-source shadcn/Base-UI-flavoured component
+  collection (animated + data components); same lineage as our stack.
+- [Design System Checklist](https://designsystemchecklist.com/) — open checklist for
+  building/auditing a design system (foundations → components → governance).
+- [Emil Kowalski — You don't need animations](https://emilkowal.ski/ui/you-dont-need-animations)
+  — essay on motion restraint from the [animations.dev](https://animations.dev/) author;
+  complements our reduced-motion stance (ADR 0020).
+- [transitions.dev](https://transitions.dev/) — CSS transition/animation reference _(to verify)_.
+- [BuninUX — Design Tokens](https://buninux.com/design-tokens) — design-tokens reference
+  _(to verify)_.
+- [beautifului.dev](https://beautifului.dev/) — UI component / design resource _(to verify)_.
+- [beui.dev](https://beui.dev/) — UI component kit _(to verify)_.
+- [rareui.com](https://rareui.com/) — UI component collection _(to verify)_.
+- [coss.com/ui](https://coss.com/ui) — UI component resource _(to verify)_.
+- [awesome-ai-apps](https://github.com/Arindam200/awesome-ai-apps#-featured-ai-apps) —
+  curated list of AI/agent app examples + featured demos; build references for AI features.
+- [shadcn/ui](https://ui.shadcn.com/) — source of our vendored components and the
+  design-system baseline (ADR 0021); reference for new blocks/components.
+
+_(Already bookmarked above under "Design engineering & UI craft":
+[UI Skills](https://www.ui-skills.com/).)_

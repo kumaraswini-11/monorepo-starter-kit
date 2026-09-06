@@ -14,6 +14,6 @@ the single source of auth truth for any consumer (the Next app today; a standalo
 | `@workspace/auth/plugins/*` | Better Auth plugins (e.g. `account-exists`)                               |
 
 Server modules are guarded with `server-only`; the client entry ships no server code. See ADRs
-[0016](../../docs/decisions/0016-authentication-strategy.md) (strategy),
-[0027](../../docs/decisions/0027-backend-architecture-fullstack-and-migration.md) (wiring + split),
-[0028](../../docs/decisions/0028-rate-limiting-and-secondary-storage.md) (rate limiting).
+[0011](../../docs/decisions/0011-authentication-strategy.md) (strategy),
+[0017](../../docs/decisions/0017-backend-architecture-and-migration.md) (wiring + split),
+[0018](../../docs/decisions/0018-rate-limiting-and-secondary-storage.md) (rate limiting).

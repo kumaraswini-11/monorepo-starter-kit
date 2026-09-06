@@ -12,7 +12,7 @@ import {
  * match BA's schema (per its docs / upgrade guide — e.g. 1.7 added `account.issuer`), then
  * generate the migration with `pnpm --filter @workspace/db db:generate`. (The BA CLI
  * `generate` can't run here — it imports the auth instance, which pulls `server-only`.)
- * See ADR 0019 / 0016.
+ * See ADR 0012 / 0016.
  */
 
 export const user = pgTable("user", {
@@ -45,7 +45,7 @@ export const account = pgTable(
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     // Better Auth 1.7: account identity is scoped by issuer (credential accounts use
-    // "local:credential"). Populated on every account create (ADR 0016; BA 1.7 upgrade
+    // "local:credential"). Populated on every account create (ADR 0011; BA 1.7 upgrade
     // guide). The generated migration adds it NOT NULL directly — correct for fresh installs
     // and our disposable test/e2e DBs. A deployment that ALREADY holds account rows must
     // instead follow BA's guide (add nullable → backfill → SET NOT NULL) before applying it.

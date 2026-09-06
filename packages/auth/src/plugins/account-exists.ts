@@ -5,7 +5,7 @@ import { createAuthEndpoint } from "better-auth/api";
 import { z } from "zod";
 
 /**
- * Identifier-first account-existence check (ADR 0027 §3) as a Better Auth **plugin
+ * Identifier-first account-existence check (ADR 0017 §3) as a Better Auth **plugin
  * endpoint** — so it inherits BA's built-in rate limiting (tuned below) and uses BA's own
  * adapter, instead of a hand-rolled limiter + custom query. Identifier-first inherently
  * reveals existence (the accepted Google/Auth0 trade-off); the rate limit blunts

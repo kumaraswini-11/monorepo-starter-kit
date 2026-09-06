@@ -1,7 +1,7 @@
 # @workspace/db
 
 The **data layer** — Drizzle schema, repository functions, and the Postgres client. The single,
-one-way data-access boundary: the only package that touches `drizzle-orm` / `pg` (ADR 0019).
+one-way data-access boundary: the only package that touches `drizzle-orm` / `pg` (ADR 0012).
 
 ## Entry points
 
@@ -14,5 +14,5 @@ one-way data-access boundary: the only package that touches `drizzle-orm` / `pg`
 | `@workspace/db/testing/*` | integration-test harness (Testcontainers `global-setup`, `setup-env`, `resetDb`)   |
 
 Server-only; migrations live in `migrations/` (drizzle-kit — `pnpm --filter @workspace/db db:generate`).
-See ADRs [0019](../../docs/decisions/0019-data-layer-postgres-drizzle.md),
-[0029](../../docs/decisions/0029-testing-strategy.md) (test harness).
+See ADRs [0012](../../docs/decisions/0012-data-layer-postgres-drizzle.md),
+[0025](../../docs/decisions/0025-testing-strategy.md) (test harness).

@@ -1,9 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-import { E2E_PASSWORD, signUpViaUi, uniqueEmail } from "../support/auth.js";
+import {
+  E2E_PASSWORD,
+  signOutViaUi,
+  signUpViaUi,
+  uniqueEmail,
+} from "../support/auth.js";
 
 /**
- * Returning-user credentials sign-in journey (ADR 0029 §2). The storageState path proves session
+ * Returning-user credentials sign-in journey (ADR 0025 §2). The storageState path proves session
  * *reuse*, not the sign-in form — so this drives the real thing: create an account, sign out, then
  * come back through the identifier-first flow where an existing email routes to the password step.
  * Runs in the public project with its own fresh user, so it's isolated and idempotent.
@@ -13,7 +18,7 @@ test("a returning user signs in with email + password", async ({ page }) => {
 
   // Arrange: create the account (auto-signed-in), then sign out so we start signed-out.
   await signUpViaUi(page, email);
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOutViaUi(page);
   await expect(page).toHaveURL(/\/auth$/);
 
   // Act: start the flow fresh — a full load resets the in-memory auth-flow state ("restart,

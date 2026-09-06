@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 /**
  * Where the `setup` project persists an authenticated browser context so the authed projects
  * reuse the session instead of re-logging-in per test (Playwright `storageState`). Git-ignored
- * (`.auth/`) — a real session, never committed. (ADR 0029)
+ * (`.auth/`) — a real session, never committed. (ADR 0025)
  */
 export const STORAGE_STATE = ".auth/user.json";
 
@@ -39,4 +39,13 @@ export async function signUpViaUi(
   await page.getByRole("button", { name: "Create account" }).click();
 
   await page.waitForURL(/\/dashboard$/);
+}
+
+/**
+ * Sign out through the header account menu (avatar → "Sign out"). Sign-out lives in a dropdown,
+ * so we open the menu first, then click the destructive menu item.
+ */
+export async function signOutViaUi(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Account menu" }).click();
+  await page.getByRole("menuitem", { name: "Sign out" }).click();
 }

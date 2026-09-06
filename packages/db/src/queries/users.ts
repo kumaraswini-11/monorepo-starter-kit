@@ -5,7 +5,7 @@ import { user } from "@workspace/db/schema";
 
 /**
  * User-aggregate queries. Data access lives in packages/db (the repository
- * boundary, ADR 0019) so consumers never issue SQL directly. One module per
+ * boundary, ADR 0012) so consumers never issue SQL directly. One module per
  * aggregate keeps the data layer navigable as queries grow (see docs/decisions).
  */
 

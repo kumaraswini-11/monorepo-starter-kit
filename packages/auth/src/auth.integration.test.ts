@@ -15,7 +15,7 @@ import { env } from "@workspace/env";
 // Mock only the true port — the email transport — so the security hooks can be asserted
 // without rendering/sending; the adapter writes, hashing, and session creation all run for
 // real. `vi.mock` is hoisted above the imports, so `auth`'s own `@workspace/email` import is
-// mocked too, and the `sendNewDeviceEmail` imported here is the spy. (ADR 0029 §3)
+// mocked too, and the `sendNewDeviceEmail` imported here is the spy. (ADR 0025 §3)
 vi.mock("@workspace/email", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@workspace/email")>()),
   sendNewDeviceEmail: vi.fn().mockResolvedValue(undefined),
@@ -24,11 +24,11 @@ vi.mock("@workspace/email", async (importOriginal) => ({
 
 /**
  * Integration tests for the Better Auth email/password flow + our `account-exists` plugin
- * against real Postgres (ADR 0029 §11). These exercise the actual adapter writes (user +
+ * against real Postgres (ADR 0025 §11). These exercise the actual adapter writes (user +
  * account rows, password hashing) and our custom plugin's SQL — things a mocked db can't
  * prove. The auth instance binds the db client from `@workspace/db/client`, which the shared
  * harness has already pointed at the container. `drizzle-orm` is a test-only devDependency
- * here (direct DB assertions); production auth code still goes through @workspace/db (ADR 0019).
+ * here (direct DB assertions); production auth code still goes through @workspace/db (ADR 0012).
  */
 
 const PASSWORD = "correct-horse-battery-staple";
@@ -37,7 +37,7 @@ const PASSWORD = "correct-horse-battery-staple";
  * Test-only auth instance: same secret + db adapter as production, plus Better Auth's
  * `testUtils()` seeding helpers — kept OUT of the production config, per the Better Auth docs
  * (adding them there ships privileged `ctx.test` helpers). Users/sessions it creates
- * interoperate with the prod `auth` instance because they share the DB + secret. (ADR 0029 §11)
+ * interoperate with the prod `auth` instance because they share the DB + secret. (ADR 0025 §11)
  */
 const testAuth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,

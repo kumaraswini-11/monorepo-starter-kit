@@ -9,7 +9,7 @@ import { TooltipProvider } from "@workspace/ui/components/shadcn/tooltip";
 import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 
@@ -23,7 +23,7 @@ const fontMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: { default: brand.name, template: `%s · ${brand.name}` },
-  description: "Secure, self-hosted authentication starter.",
+  description: brand.description,
   applicationName: brand.name,
 };
 
