@@ -101,13 +101,13 @@ capability** — a domain noun you or your users would name. It earns a module w
 actions/data-access seam · its own route(s) · several components that collaborate. A lone
 presentational component with no domain is **not** a feature. Where non-features go:
 
-| It is…                                           | Home                                               | Why not a feature                       |
-| ------------------------------------------------ | -------------------------------------------------- | --------------------------------------- |
-| Presentational, reusable, no domain (a `Button`) | `@workspace/ui`                                    | no domain, no data                      |
-| Pure / generic helper                            | `@workspace/utils`                                 | no UI, no domain                        |
-| Route-local & single-use                         | the route's `_components`/`_lib`                   | one consumer, one place                 |
-| Cross-cutting infra (theme provider, analytics)  | app-level infra (`features/theme` or `providers/`) | plumbing, not a domain                  |
-| Domain/data logic that must survive the split    | a `@workspace/*` package                           | it lives deeper than the app (ADR 0017) |
+| It is…                                           | Home                                             | Why not a feature                       |
+| ------------------------------------------------ | ------------------------------------------------ | --------------------------------------- |
+| Presentational, reusable, no domain (a `Button`) | `@workspace/ui`                                  | no domain, no data                      |
+| Pure / generic helper                            | `@workspace/utils`                               | no UI, no domain                        |
+| Route-local & single-use                         | the route's `_components`/`_lib`                 | one consumer, one place                 |
+| Cross-cutting infra (theme provider, analytics)  | `components/` (app chrome) or a `providers/` dir | plumbing, not a domain                  |
+| Domain/data logic that must survive the split    | a `@workspace/*` package                         | it lives deeper than the app (ADR 0017) |
 
 **Test 2 — feature vs sub-feature (nesting)?** Ask: _could it be described, deleted, or
 lifted on its own without touching the parent's logic, and does it own its own
@@ -124,8 +124,13 @@ This is the same split as the sub-feature decision tree below, reduced to one qu
 | --------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `notifications` | **feature**                            | domain noun + owns type, coming actions, coming `/notifications` route, bell→list→item                                               |
 | `auth`          | **feature** (multi-part)               | domain noun + forms/steps + seam (`actions.ts`) + routes; one feature with internal `components/` structure, not nested sub-features |
-| `app-shell`     | **feature module, composition widget** | no _domain_ of its own, but it is the composition root that wires the others (a "widget")                                            |
-| `theme`         | **app-level infra**                    | a provider + menu, no domain — plumbing, not a product capability                                                                    |
+| `app-shell`     | **not a feature** — composition widget | no domain; the composition root that wires features into the shell → stays in `components/app-shell/`                                |
+| `theme`         | **not a feature** — app-level infra    | a provider + menu, no domain → stays in `components/theme/`                                                                          |
+
+**`features/` is reserved for domain features** (`auth`, `notifications`, …). App chrome (the
+`app-shell` composition widget) and cross-cutting infra (`theme`) stay in `components/` — they
+_compose_ or _support_ features but are not themselves product capabilities. (This resolves, in
+favor of `components/`, the choice the "app-shell & theme" section below had left open.)
 
 > A feature classified by trajectory can legitimately **start as one file** (e.g.
 > notifications today = a bell + a type). That is expected — classify by domain + where
@@ -222,11 +227,15 @@ The feature module _consumes_ the domain package, keeping the ADR 0017 split a t
 
 ### app-shell & theme
 
-- **`app-shell`** is a **composition widget**, not a domain feature — it wires the shell
-  chrome and pulls in other features' public entries. It is the one module allowed to
-  import several features. (Kept under `features/app-shell/`.)
-- **`theme`** is an **app-level cross-cutting concern** (provider + menu), no domain —
-  treat as infrastructure. `features/theme/` is fine; be consistent.
+Both are **not** domain features, so neither goes under `features/` — that directory is reserved
+for domain capabilities.
+
+- **`app-shell`** is a **composition widget** — it wires the shell chrome (sidebar, breadcrumb,
+  command palette, user menu) and pulls in features' public entries. It is the one non-route module
+  allowed to import several features. It stays in **`components/app-shell/`**.
+- **`theme`** is **app-level cross-cutting infra** (provider + menu), no domain. It stays in
+  **`components/theme/`** (a `providers/` dir would be equally valid; `components/` keeps it beside
+  the other app UI).
 
 ### Worked example — notifications
 
@@ -316,12 +325,13 @@ liftable folder — the plug-and-play goal.
 
 Fully **incremental and low-risk** — file moves + import-path updates, no logic changes;
 `@/*`, `typedRoutes`, and the per-file `@workspace/ui` exports make churn mechanical and
-the gate catches misses. Suggested order (smallest blast radius first): **notifications**
-(proves the pattern; the files already document the seam) → **theme** (trivial) → **auth**
-(largest payoff; preserves the ADR 0017 seam, colocated) → **app-shell** (last; it composes
-the others) → **add the ESLint cross-feature boundary rule** → **docs** (this ADR + a note
-in ADR 0016 that its "feature-based app code" half is now specified here; cross-link 0017 &
-0026). `packages/*` are untouched. **Not started** — this ADR records the decision; the
+the gate catches misses. Only **domain features** migrate: **notifications** (done — proved the
+pattern) → **auth** (the remaining one: `components/auth/*`, `lib/auth/*`, `auth-client.ts`,
+`validation.ts` → `features/auth/`, preserving the ADR 0017 seam; `lib/session.ts` moves last, with
+its `@workspace/auth` swap point, once the temporary dev-bypass is removed) → **add the ESLint
+cross-feature boundary rule** → **docs** (cross-link 0016/0017/0026). **`theme` and `app-shell` do
+not move** — they are infra / a composition widget and stay in `components/` (see the classification
+above). `packages/*` are untouched. **In progress** — this ADR records the decision; the
 migration is separate work.
 
 ## Non-goals / not now
