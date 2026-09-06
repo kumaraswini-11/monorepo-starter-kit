@@ -57,15 +57,19 @@ function AccordionContent({
   children,
   ...props
 }: AccordionPrimitive.Panel.Props) {
+  // Height collapse via Base UI's --accordion-panel-height + transition-[height] on the Panel
+  // (data-starting/ending-style: h-0) — the Base UI-correct mechanism. (Was previously a no-op:
+  // the old tw-animate-css accordion keyframes targeted Radix vars Base UI never sets, and the
+  // height hooks sat on a div with no transition.) ADR 0030.
   return (
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
-      className="overflow-hidden text-sm data-open:animate-accordion-down data-closed:animate-accordion-up"
+      className="h-(--accordion-panel-height) overflow-hidden text-sm transition-[height] duration-200 ease-snappy data-ending-style:h-0 data-starting-style:h-0"
       {...props}
     >
       <div
         className={cn(
-          "h-(--accordion-panel-height) pt-0 pb-4 data-ending-style:h-0 data-starting-style:h-0 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+          "pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
           className
         )}
       >

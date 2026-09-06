@@ -103,7 +103,12 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
   compatibility proof; **(3)** for a major, follow the migration guide and add an ADR
   if it changes how we work. `taze` also reorders/tightens manifests — **audit its
   diff** before committing.
-- **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`.
+- **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`. These are
+  **vendored source we own** — never blind `shadcn add --overwrite` (it silently restores upstream
+  keyframes/Radix attrs and wipes our deviations). To update or add one: review the upstream diff,
+  re-apply our documented deviations (`grep -rn "Deviation\|ADR 00" packages/ui/src/components/shadcn`),
+  and use our **CSS-transition** animation idiom (not `tw-animate-css` keyframes) — check first, then
+  gate incl. Storybook build. (ADR 0030)
 - **Component placement & shape (ADR 0016, 0026):** atomic-design as a _lens_ to pick the home
   — no literal `atoms/molecules/organisms` folders. **`@workspace/ui`** is the single design
   system (atoms + agnostic _and_ form-bound molecules; `react-hook-form` is a deliberate `ui`
