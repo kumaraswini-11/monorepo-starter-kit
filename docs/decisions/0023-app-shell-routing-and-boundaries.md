@@ -167,6 +167,11 @@ The `(app)` shell owns the page's single `<main>` (`SidebarInset`), so every bou
    guard). `getSession()` is `cache()`-memoized, so a page re-reading it is free. The trade-off
    — the guard runs **above** the `loading.tsx` boundary, so during the (fast, memoized)
    session read the previous route stays visible rather than the skeleton — is accepted.
+   **Being revisited (2026-09-07):** under Cache Components' instant-navigation validation this
+   layout redirect-guard drops child segments (`instant-unrendered-segment`), and Next now flags
+   a layout guard as _not_ a security boundary. A move to a Data-Access-Layer / page-level guard
+   is proposed in [0032](0032-instant-navigation-page-transitions-and-route-guards.md) (§ Route
+   protection) — recorded there; decision + implementation pending.
 4. **No `(app)/not-found.tsx` yet.** A segment `not-found` fires only on an explicit
    `notFound()`, which no authed page currently calls; unmatched URLs go to the **root**
    `not-found`. Adding one now would be dead code. **Add it when a page actually calls
