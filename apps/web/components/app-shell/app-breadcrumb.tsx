@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/shadcn/breadcrumb";
 import { Separator } from "@workspace/ui/components/shadcn/separator";
 
-import { NAV_ITEMS } from "@/components/app-shell/nav";
+import { activeNavItem } from "@/components/app-shell/nav";
 
 /**
  * Header breadcrumb — a "you are here" anchor in the (sticky) header, so it survives scroll and
@@ -21,9 +21,7 @@ import { NAV_ITEMS } from "@/components/app-shell/nav";
  */
 export function AppBreadcrumb() {
   const pathname = usePathname() ?? "";
-  const current = NAV_ITEMS.find(
-    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
-  );
+  const current = activeNavItem(pathname);
 
   if (!current) {
     return null;

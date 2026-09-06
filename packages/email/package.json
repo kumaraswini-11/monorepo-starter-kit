@@ -24,6 +24,7 @@
   "dependencies": {
     "@react-email/render": "^2.1.0",
     "@workspace/env": "workspace:*",
+    "@workspace/utils": "workspace:*",
     "nodemailer": "^9.1.1",
     "react": "catalog:",
     "react-dom": "catalog:",

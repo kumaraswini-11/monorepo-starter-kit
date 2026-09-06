@@ -1,5 +1,6 @@
-import { Button, Heading, Section, Text } from "react-email";
+import { Heading, Text } from "react-email";
 
+import { EmailButton } from "@workspace/email/components/email-button";
 import { EmailLayout, styles } from "@workspace/email/components/email-layout";
 
 interface AccountUnlockedProps {
@@ -18,11 +19,7 @@ export default function AccountUnlocked({
       <Text style={styles.paragraph}>
         Your account has been unlocked. You can sign in again.
       </Text>
-      <Section style={{ margin: "24px 0" }}>
-        <Button href={signInUrl} style={styles.button}>
-          Sign in
-        </Button>
-      </Section>
+      <EmailButton href={signInUrl}>Sign in</EmailButton>
       <Text style={styles.muted}>
         If you continue to have trouble signing in, reset your password or
         contact support.

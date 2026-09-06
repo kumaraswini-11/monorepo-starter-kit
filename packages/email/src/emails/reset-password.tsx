@@ -1,5 +1,6 @@
-import { Button, Heading, Section, Text } from "react-email";
+import { Heading, Text } from "react-email";
 
+import { EmailButton } from "@workspace/email/components/email-button";
 import { EmailLayout, styles } from "@workspace/email/components/email-layout";
 
 interface ResetPasswordProps {
@@ -20,11 +21,7 @@ export default function ResetPassword({
       <Text style={styles.paragraph}>
         We received a request to reset the password for your account ({email}).
       </Text>
-      <Section style={{ margin: "24px 0" }}>
-        <Button href={resetUrl} style={styles.button}>
-          Reset password
-        </Button>
-      </Section>
+      <EmailButton href={resetUrl}>Reset password</EmailButton>
       <Text style={styles.muted}>
         This link expires in 30 minutes and can only be used once.
       </Text>

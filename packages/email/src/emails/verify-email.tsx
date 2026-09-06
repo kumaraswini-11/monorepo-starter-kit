@@ -1,5 +1,6 @@
-import { Button, Heading, Section, Text } from "react-email";
+import { Heading, Text } from "react-email";
 
+import { EmailButton } from "@workspace/email/components/email-button";
 import { EmailLayout, styles } from "@workspace/email/components/email-layout";
 
 interface VerifyEmailProps {
@@ -20,11 +21,7 @@ export default function VerifyEmail({
         away. To unlock full access and keep your account secure, please verify
         your email.
       </Text>
-      <Section style={{ margin: "24px 0" }}>
-        <Button href={verifyUrl} style={styles.button}>
-          Verify email address
-        </Button>
-      </Section>
+      <EmailButton href={verifyUrl}>Verify email address</EmailButton>
       <Text style={styles.muted}>This link expires in 24 hours.</Text>
       <Text style={styles.muted}>
         You're already inside the product — verification just removes the banner

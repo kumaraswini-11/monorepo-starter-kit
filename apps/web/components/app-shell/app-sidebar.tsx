@@ -16,7 +16,7 @@ import {
 } from "@workspace/ui/components/shadcn/sidebar";
 import { brand } from "@workspace/ui/lib/brand";
 
-import { NAV_ITEMS } from "@/components/app-shell/nav";
+import { isActiveNav, NAV_ITEMS } from "@/components/app-shell/nav";
 
 /**
  * The app's primary navigation (ADR 0016: a feature organism, so it lives in the app, not the
@@ -63,9 +63,7 @@ export function AppSidebar() {
             <nav aria-label="Main">
               <SidebarMenu>
                 {NAV_ITEMS.map((item) => {
-                  const isActive =
-                    pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`);
+                  const isActive = isActiveNav(pathname, item.href);
                   return (
                     <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
