@@ -135,6 +135,20 @@ Remaining, **deferred with triggers**:
 
 ## UI & app shell (deferred)
 
+- **Shared error/status-page component (considered — deliberately not extracted).** The route
+  boundaries (`error.tsx`, `(app)/error.tsx`, `not-found.tsx`, `global-error.tsx`) share a centered
+  heading + message + action shape, but were left independent on purpose. `global-error` **replaces**
+  the root layout — it renders its own `<html>/<body>` and cannot consume `@workspace/ui` (no
+  providers/tokens/fonts), so it's a hard exclusion; and `not-found` + `global-error` are expected to
+  get bespoke, branded designs — coupling surfaces that are built to diverge is the wrong trade
+  (variant-prop creep to re-absorb the divergence later). The only real overlap is the two error
+  boundaries: ~6 lines differing by container (`<main min-h-svh>` vs `<div flex-1>`, per ADR 0020) —
+  incidental similarity, too thin to earn a component + its container prop. `EmptyState` covers inline
+  empty _regions_ (its dashed border/padding are region-scoped); it is not a full-page status screen.
+  **Trigger:** a 3rd+ generic error surface with identical chrome, or a decision to visually lock all
+  status pages together. Related deferred item: `(app)/not-found.tsx` (a 404 scoped to the app shell,
+  mirroring `(app)/error.tsx`) — a new behavior, not this extraction; deferred while `not-found`'s
+  design is still expected to change.
 - **Keyboard-shortcut registry + shortcuts sheet** — the three globals (⌘K palette, ⌘B sidebar,
   ⌘⇧L theme) run as **separate `window.keydown` listeners** today, with hand-rolled platform
   (`isMac`) `Kbd` formatting. **Trigger:** a 4th+ global shortcut, or building a **⌘/ shortcuts
