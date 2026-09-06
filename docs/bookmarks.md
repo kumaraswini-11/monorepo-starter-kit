@@ -159,6 +159,8 @@ bundle weight before adoption (dep-weight policy), and third-party libraries aga
 [decisions/0021](decisions/0021-base-ui-selection-and-adoption.md) (Base UI over Radix) —
 so these are idea sources, not drop-ins.
 
+- [bestdesignsonx.com](https://bestdesignsonx.com/) — curated gallery of standout UI/product
+  designs shared on X (Twitter); interaction/visual inspiration _(to verify)_.
 - [Refero](https://styles.refero.design/) — searchable gallery of real product UI
   screenshots; interaction/design inspiration.
 - [reui](https://reui.io/components) — open-source shadcn/Base-UI-flavoured component
