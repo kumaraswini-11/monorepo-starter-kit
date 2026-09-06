@@ -69,10 +69,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <AppSidebarTrigger />
           <AppBreadcrumb />
           <div className="ml-auto flex items-center gap-2">
+            <CommandPalette />
             {/* Sample data (throwaway) — swap `sampleNotifications` for a real source and delete
                 sample-data.ts when the notifications backend lands (the bell is source-agnostic). */}
             <NotificationBell notifications={sampleNotifications} />
-            <CommandPalette />
             <UserMenu user={user} />
           </div>
         </header>
