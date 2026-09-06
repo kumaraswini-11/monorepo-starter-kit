@@ -27,25 +27,31 @@ import type { Notification } from "../types";
 /**
  * Header notification bell (ADR 0023 app shell). A `Popover` — rich, scrollable content, not a menu
  * of actions — with an unread dot, mark-all-read, per-item read state, and an `Empty` state.
- * Data arrives as a prop (fed by the app-shell layout), so the component is source-agnostic. Read
- * state is optimistic + local for now; a real backend swaps the mutations for server actions with
- * no change to this contract.
+ * Data arrives as a prop (fed by the app-shell layout), so it's source-agnostic and fresh data
+ * reconciles every render. Read state is a local optimistic overlay (a set of read ids) layered over
+ * the prop data; when a real backend lands, `markRead`/`markAllRead` become server actions and this
+ * overlay is the optimistic layer (or `useOptimistic`) — the render contract is unchanged.
  */
 export function NotificationBell({
   notifications,
 }: {
   notifications: Notification[];
 }) {
-  const [items, setItems] = useState(notifications);
+  // Base data comes from props every render (so fresh server data reconciles); the only local
+  // state is an optimistic overlay of ids the user has marked read this session.
+  const [readIds, setReadIds] = useState<ReadonlySet<string>>(
+    () => new Set<string>()
+  );
+  const items = notifications.map((n) =>
+    n.read || readIds.has(n.id) ? { ...n, read: true } : n
+  );
   const unread = items.filter((n) => !n.read).length;
 
   function markAllRead() {
-    setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+    setReadIds(new Set(notifications.map((n) => n.id)));
   }
   function markRead(id: string) {
-    setItems((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    setReadIds((prev) => new Set(prev).add(id));
   }
 
   return (

@@ -31,10 +31,10 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      {/* Fixed height (matches the app header's h-14) so the header never reflows between the
-          collapsed rail and the expanded state — otherwise the two brand marks' differing heights
-          (icon 20px vs wordmark 24px) shift everything below mid-animation. `justify-center`
-          centers whichever mark is shown; the logo also lines up with the top bar. */}
+      {/* Fixed height (matches the app header's h-14) so the header row stays put as the icon mark
+          and the full wordmark swap on collapse/expand — a fixed height keeps everything below from
+          shifting mid-animation regardless of each mark's intrinsic size. `justify-center` centers
+          whichever mark is shown; the logo also lines up with the top bar. */}
       <SidebarHeader className="h-14 justify-center">
         <Link
           href="/dashboard"

@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/shadcn/card";
+import { firstWord } from "@workspace/utils/string";
 
 import { getSession } from "@/lib/session";
 
@@ -14,8 +15,8 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 /**
  * Dashboard — the authed landing page. Rendered inside the app shell (see the `(app)` layout),
- * so it's a normal content pane: the theme toggle and the account menu (which holds sign-out)
- * live in the shell header (reachable from every page), not here.
+ * so it's a normal content pane: the global controls (search, notifications, and the account menu —
+ * which holds the theme control and sign-out) live in the shell header, not here.
  */
 export default async function DashboardPage() {
   const session = await getSession();
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            Welcome{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+            Welcome{user?.name ? `, ${firstWord(user.name) ?? user.name}` : ""}
             {user?.emailVerified ? (
               <Badge variant="secondary">Verified</Badge>
             ) : (
