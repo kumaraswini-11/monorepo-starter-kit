@@ -20,7 +20,7 @@ catalog:
   # Shared libraries
   lucide-react: ^1.39.0
   # zod — shared by packages/ui and apps/web (form validation)
-  zod: ^4.4.3
+  zod: ^4.5.4
   # React Hook Form — packages/ui form layer + apps/web auth forms
   react-hook-form: ^7.87.0
   # server-only — build-time guard on server modules (db/auth/email)
