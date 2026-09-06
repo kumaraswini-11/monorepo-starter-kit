@@ -27,6 +27,8 @@ export function GoogleSignInButton() {
         title: "Couldn't start Google sign-in",
         description: "Please try again, or continue with your email.",
         type: "error",
+        // Errors persist until dismissed (better-accessibility) and announce assertively.
+        timeout: 0,
         priority: "high",
       });
       setPending(false);
