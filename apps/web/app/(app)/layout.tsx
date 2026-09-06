@@ -13,7 +13,9 @@ import { AppSidebarTrigger } from "@/components/app-shell/app-sidebar-trigger";
 import { CommandPalette } from "@/components/app-shell/command-palette";
 import { UserMenu } from "@/components/app-shell/user-menu";
 import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
+import { NotificationBell } from "@/features/notifications";
 import { getSession } from "@/lib/session";
+import { sampleNotifications } from "@/sample-data";
 
 /**
  * The authed area reads the session (`headers()`) on every request, so it's dynamic with
@@ -67,6 +69,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <AppSidebarTrigger />
           <AppBreadcrumb />
           <div className="ml-auto flex items-center gap-2">
+            {/* Sample data (throwaway) — swap `sampleNotifications` for a real source and delete
+                sample-data.ts when the notifications backend lands (the bell is source-agnostic). */}
+            <NotificationBell notifications={sampleNotifications} />
             <CommandPalette />
             <UserMenu user={user} />
           </div>
