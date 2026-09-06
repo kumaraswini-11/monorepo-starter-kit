@@ -32,8 +32,18 @@ catalog:
   "@vitest/browser-playwright": ^4.1.11
   # Testcontainers — ephemeral real Postgres for integration tests (ADR 0025)
   "@testcontainers/postgresql": ^12.1.0
-  # Playwright — end-to-end tests (apps/e2e), ADR 0025
+  # Playwright — one release train (published in lockstep), split across two workspaces: the
+  # `@playwright/test` runner for e2e (apps/e2e) and the `playwright` browser driver for Storybook
+  # browser-mode tests (apps/storybook). Both live here so the two never drift to different browser
+  # versions. ADR 0025.
   "@playwright/test": ^1.62.1
+  playwright: ^1.62.1
+  # Turborepo — the task runner (`turbo`, root), its codegen (`@turbo/gen`, packages/ui), and its
+  # lint plugin (`eslint-plugin-turbo`, packages/eslint-config). All published together as one
+  # release; catalog keeps the three in lockstep across the three manifests (one bump-site).
+  turbo: ^2.10.12
+  "@turbo/gen": ^2.10.12
+  eslint-plugin-turbo: ^2.10.12
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   "@testing-library/jest-dom": ^6.9.1

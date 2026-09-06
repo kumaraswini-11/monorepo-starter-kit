@@ -21,7 +21,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@workspace/typescript-config": "workspace:*",
     "eslint-plugin-storybook": "^10.6.0",
-    "playwright": "^1.62.1",
+    "playwright": "catalog:",
     "storybook": "catalog:",
     "typescript": "catalog:",
     "vite": "^8.2.2",
