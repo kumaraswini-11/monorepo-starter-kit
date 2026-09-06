@@ -260,6 +260,17 @@ explicitly **not** a deciding factor — AGENTS.md, "Build for the enterprise.")
 `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`. Selection: SMTP when
 `SMTP_HOST` is set, else the console stub.
 
+## Update — 2026-09-07: Nodemailer v9 → v10
+
+Bumped `nodemailer` `^9 → ^10` (a full TypeScript rewrite that now ships dual ESM/CJS builds and
+**bundles its own type definitions**; minimum Node raised to `>=20`, satisfied by our Node 24). No
+runtime API we use changed — `createTransport`, `sendMail`, the `Transporter` type, and every
+transport option in `adapters/smtp.ts` (`host`/`port`/`secure`/`auth`/`pool`/`maxConnections`/
+`maxMessages`/`disableFileAccess`/`disableUrlAccess`) are stable, so the adapter and its mocked test
+needed no edits. Because v10 bundles its types, the separate **`@types/nodemailer` devDep was removed**
+(there is no `@types/nodemailer@10`; keeping the `@8` stub would be dead weight ignored under our
+`nodenext` resolution). Compatibility proven by the green gate + `@workspace/email` tests.
+
 ## Revisit triggers
 
 - **Outlook-desktop-heavy B2B** becomes primary → evaluate **MJML** for templates.

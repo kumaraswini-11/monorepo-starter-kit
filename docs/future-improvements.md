@@ -215,6 +215,20 @@ newPassword, revokeOtherSessions })`.
 
 See [decisions/0006](decisions/0006-defer-typescript-7-and-eslint-10.md).
 
+- **Vitest 5** — the `vitest` + `@vitest/coverage-v8` + `@vitest/browser-playwright` catalog family
+  is v5-ready (the v5 browser provider is published; Vite ≥6.4 + Node ≥22.12 are met), **but**
+  `@storybook/addon-vitest@10.6` still peers `vitest ^3 || ^4` and requires `@vitest/runner`, which
+  Vitest 5 no longer publishes as a separate package. Splitting the catalog to run two vitest majors
+  is against our lockstep convention, so we wait. **Trigger:** `@storybook/addon-vitest` ships a
+  release whose peers include `vitest ^5` (and drops the `@vitest/runner` peer). Then bump the family
+  together and write a short ADR — v5 flips the repo-wide `clearMocks` default to `true` (our mock
+  tests already `clearAllMocks` in `beforeEach`, so no behavior change is expected, but it's worth
+  recording).
+- **jsdom 30** — jsdom 30 raises its Node floor to `>=24.15.0` (on the 24 line); the dev env is
+  currently on Node **24.13.0**, so `engine-strict` blocks the install. Held at jsdom **26** (fully
+  compatible — our tests assert roles/behaviour, not computed CSS, so nothing in the 27→30 range
+  affects us). **Trigger:** bump dev/CI Node to the latest 24 LTS patch (`>=24.15.0`), then bump
+  `jsdom` → `^30` and tighten `engines.node` to match (a one-liner each).
 - **TypeScript 7** — adopt when typescript-eslint supports it (~7.1).
 - **ESLint 10** — adopt when `eslint-plugin-react` / `eslint-config-next` declare
   support.
