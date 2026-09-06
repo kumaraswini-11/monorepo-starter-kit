@@ -8,9 +8,9 @@ import { toast } from "@workspace/ui/components/shadcn/toast";
 import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { AuthHeader } from "@/components/auth/auth-header";
-import { ResetPasswordForm } from "@/components/auth/reset-password-form";
-import { resetPassword } from "@/lib/auth/actions";
+import { resetPassword } from "../actions";
+import { AuthHeader } from "./auth-header";
+import { ResetPasswordForm } from "./reset-password-form";
 
 /**
  * Client wiring for `/auth/reset-password`. The reset token rides the URL (a signed,

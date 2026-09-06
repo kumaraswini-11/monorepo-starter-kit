@@ -2,7 +2,7 @@
 
 import { FormSubmitError } from "@workspace/ui/components/form/form-submit";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "./lib/auth-client";
 
 /**
  * Client-side auth seam (ADR 0017 §1) — the ONLY module that talks to the Better Auth

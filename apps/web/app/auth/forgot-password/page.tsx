@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-import { AuthBackLink } from "@/components/auth/auth-back-link";
-import { ForgotPasswordStep } from "@/components/auth/forgot-password-step";
+import { AuthBackLink, ForgotPasswordStep } from "@/features/auth";
 
 export const metadata: Metadata = { title: "Reset your password" };
 

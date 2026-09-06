@@ -12,8 +12,8 @@ import {
 import { SubmitButton } from "@workspace/ui/components/form/submit-button";
 import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
-import { AuthEmailField } from "@/components/auth/auth-email-field";
-import { signUpFormSchema, type SignUpFormValues } from "@/lib/validation";
+import { signUpFormSchema, type SignUpFormValues } from "../schemas";
+import { AuthEmailField } from "./auth-email-field";
 
 /**
  * Sign-up credential form (new user). Optional name + password with a live strength meter

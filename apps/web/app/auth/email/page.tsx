@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 
-import { AuthBackLink } from "@/components/auth/auth-back-link";
-import { AuthHeader } from "@/components/auth/auth-header";
-import { EmailStep } from "@/components/auth/email-step";
+import { AuthBackLink, AuthHeader, EmailStep } from "@/features/auth";
 
 export const metadata: Metadata = { title: "Continue with email" };
 

@@ -9,7 +9,7 @@ import { FormTextField } from "@workspace/ui/components/form/form-field";
 import { SubmitButton } from "@workspace/ui/components/form/submit-button";
 import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
-import { emailFormSchema, type EmailFormValues } from "@/lib/validation";
+import { emailFormSchema, type EmailFormValues } from "../schemas";
 
 /**
  * Email capture — step 2 of the method-first auth flow (auth-ui-ux spec §3.2, §11).

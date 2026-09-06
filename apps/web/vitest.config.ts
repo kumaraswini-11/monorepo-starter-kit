@@ -5,9 +5,9 @@ import { dom } from "@workspace/vitest-config";
 /**
  * Component tests for apps/web — the shared jsdom `dom` preset (ADR 0025), with two
  * app-specific overrides:
- * - `include`: this app's tests live under app/ · components/ · lib/, not `src/`.
+ * - `include`: this app's tests live under app/ · components/ · features/ · lib/, not `src/`.
  * - `resolve.alias`: map the `@/*` tsconfig path (Vitest doesn't read tsconfig paths) so
- *   components importing `@/lib/...` resolve in tests.
+ *   components importing `@/...` resolve in tests.
  */
 export default mergeConfig(
   dom,
@@ -16,7 +16,7 @@ export default mergeConfig(
       alias: { "@": import.meta.dirname },
     },
     test: {
-      include: ["{app,components,lib}/**/*.test.{ts,tsx}"],
+      include: ["{app,components,features,lib}/**/*.test.{ts,tsx}"],
     },
   })
 );

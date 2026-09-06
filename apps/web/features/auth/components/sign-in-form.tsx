@@ -10,8 +10,8 @@ import { FormPasswordField } from "@workspace/ui/components/form/form-field";
 import { SubmitButton } from "@workspace/ui/components/form/submit-button";
 import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
-import { AuthEmailField } from "@/components/auth/auth-email-field";
-import { signInFormSchema, type SignInFormValues } from "@/lib/validation";
+import { signInFormSchema, type SignInFormValues } from "../schemas";
+import { AuthEmailField } from "./auth-email-field";
 
 /**
  * Sign-in credential form (returning user). Presentational per ADR 0022 — the email is a

@@ -16,7 +16,7 @@ import {
 } from "@workspace/ui/components/shadcn/dropdown-menu";
 
 import { ThemeMenuSub } from "@/components/theme/theme-menu-sub";
-import { useSignOut } from "@/lib/auth/use-sign-out";
+import { useSignOut } from "@/features/auth";
 
 /**
  * Account menu in the app header (ADR 0023): an avatar button that opens the user's identity, the

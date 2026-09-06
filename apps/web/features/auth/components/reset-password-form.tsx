@@ -9,10 +9,7 @@ import { FormPasswordField } from "@workspace/ui/components/form/form-field";
 import { SubmitButton } from "@workspace/ui/components/form/submit-button";
 import { FieldGroup } from "@workspace/ui/components/shadcn/field";
 
-import {
-  newPasswordFormSchema,
-  type NewPasswordFormValues,
-} from "@/lib/validation";
+import { newPasswordFormSchema, type NewPasswordFormValues } from "../schemas";
 
 /**
  * Reset-password form — set a new password (with a live strength meter and the

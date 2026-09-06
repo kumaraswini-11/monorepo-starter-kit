@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 
-import { useRequiredEmail } from "@/components/auth/auth-flow-provider";
-import { AuthHeader } from "@/components/auth/auth-header";
-import { AuthStepSkeleton } from "@/components/auth/auth-step-skeleton";
-import { SignInForm } from "@/components/auth/sign-in-form";
-import { signInWithEmail } from "@/lib/auth/actions";
+import { signInWithEmail } from "../actions";
+import { useRequiredEmail } from "./auth-flow-provider";
+import { AuthHeader } from "./auth-header";
+import { AuthStepSkeleton } from "./auth-step-skeleton";
+import { SignInForm } from "./sign-in-form";
 
 /**
  * Client wiring + guard for `/auth/sign-in`. Requires the email captured at `/auth/email`;

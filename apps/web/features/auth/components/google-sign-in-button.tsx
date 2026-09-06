@@ -7,7 +7,7 @@ import { Button } from "@workspace/ui/components/shadcn/button";
 import { Spinner } from "@workspace/ui/components/shadcn/spinner";
 import { toast } from "@workspace/ui/components/shadcn/toast";
 
-import { signInWithGoogle } from "@/lib/auth/actions";
+import { signInWithGoogle } from "../actions";
 
 /**
  * "Continue with Google" — a client island on the otherwise-static `/auth` page (ADR 0019/0025),

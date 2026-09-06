@@ -6,7 +6,7 @@ import { MailWarningIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/shadcn/button";
 import { toast } from "@workspace/ui/components/shadcn/toast";
 
-import { resendVerificationEmail } from "@/lib/auth/actions";
+import { resendVerificationEmail } from "../actions";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 

@@ -12,7 +12,7 @@ import { AppSidebar } from "@/components/app-shell/app-sidebar";
 import { AppSidebarTrigger } from "@/components/app-shell/app-sidebar-trigger";
 import { CommandPalette } from "@/components/app-shell/command-palette";
 import { UserMenu } from "@/components/app-shell/user-menu";
-import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
+import { VerifyEmailBanner } from "@/features/auth";
 import { NotificationBell } from "@/features/notifications";
 import { getSession } from "@/lib/session";
 import { sampleNotifications } from "@/sample-data";

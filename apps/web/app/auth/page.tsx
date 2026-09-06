@@ -6,8 +6,7 @@ import { buttonVariants } from "@workspace/ui/components/shadcn/button";
 import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { AuthHeader } from "@/components/auth/auth-header";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { AuthHeader, GoogleSignInButton } from "@/features/auth";
 
 export const metadata: Metadata = { title: "Authentication" };
 

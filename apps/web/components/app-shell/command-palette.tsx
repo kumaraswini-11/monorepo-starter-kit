@@ -20,7 +20,7 @@ import { Kbd } from "@workspace/ui/components/shadcn/kbd";
 
 import { NAV_ITEMS } from "@/components/app-shell/nav";
 import { THEME_OPTIONS } from "@/components/theme/theme-options";
-import { useSignOut } from "@/lib/auth/use-sign-out";
+import { useSignOut } from "@/features/auth";
 
 /**
  * ⌘K command palette — the discoverable hub for shell actions (navigation, theme, sign-out), per

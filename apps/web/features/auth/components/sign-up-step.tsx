@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 
 import { brand } from "@workspace/ui/lib/brand";
 
-import { useRequiredEmail } from "@/components/auth/auth-flow-provider";
-import { AuthHeader } from "@/components/auth/auth-header";
-import { AuthStepSkeleton } from "@/components/auth/auth-step-skeleton";
-import { SignUpForm } from "@/components/auth/sign-up-form";
-import { signUpWithEmail } from "@/lib/auth/actions";
+import { signUpWithEmail } from "../actions";
+import { useRequiredEmail } from "./auth-flow-provider";
+import { AuthHeader } from "./auth-header";
+import { AuthStepSkeleton } from "./auth-step-skeleton";
+import { SignUpForm } from "./sign-up-form";
 
 /**
  * Client wiring + guard for `/auth/sign-up`. Requires the email captured at `/auth/email`;

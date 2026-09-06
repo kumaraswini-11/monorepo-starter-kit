@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { AuthFlowProvider } from "@/components/auth/auth-flow-provider";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { AuthFlowProvider } from "@/features/auth";
 
 /**
  * Shell for the auth screens under `/auth/*` (see ADR 0020). Layout conventions

@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@workspace/ui/components/shadcn/button";
 import { toast } from "@workspace/ui/components/shadcn/toast";
 
-import { useAuthFlow } from "@/components/auth/auth-flow-provider";
-import { AuthHeader } from "@/components/auth/auth-header";
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import { requestPasswordReset } from "@/lib/auth/actions";
+import { requestPasswordReset } from "../actions";
+import { useAuthFlow } from "./auth-flow-provider";
+import { AuthHeader } from "./auth-header";
+import { ForgotPasswordForm } from "./forgot-password-form";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 

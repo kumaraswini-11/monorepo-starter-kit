@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { AuthBackLink } from "@/components/auth/auth-back-link";
-import { AuthStepSkeleton } from "@/components/auth/auth-step-skeleton";
-import { ResetPasswordStep } from "@/components/auth/reset-password-step";
+import {
+  AuthBackLink,
+  AuthStepSkeleton,
+  ResetPasswordStep,
+} from "@/features/auth";
 
 export const metadata: Metadata = { title: "Set a new password" };
 

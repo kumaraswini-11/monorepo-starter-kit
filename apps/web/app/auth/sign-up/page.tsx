@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-import { AuthBackLink } from "@/components/auth/auth-back-link";
-import { SignUpStep } from "@/components/auth/sign-up-step";
+import { AuthBackLink, SignUpStep } from "@/features/auth";
 
 export const metadata: Metadata = { title: "Create account" };
 

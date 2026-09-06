@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 
-import { useAuthFlow } from "@/components/auth/auth-flow-provider";
-import { EmailCaptureForm } from "@/components/auth/email-capture-form";
-import { resolveAuthRoute } from "@/lib/auth/actions";
+import { resolveAuthRoute } from "../actions";
+import { useAuthFlow } from "./auth-flow-provider";
+import { EmailCaptureForm } from "./email-capture-form";
 
 /**
  * Client wiring for the email step: captures the address into the auth-flow state and

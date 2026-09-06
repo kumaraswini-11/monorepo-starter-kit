@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { toast } from "@workspace/ui/components/shadcn/toast";
 
-import { signOut } from "@/lib/auth/actions";
+import { signOut } from "../actions";
 
 /**
  * Sign out through the seam (`lib/auth/actions`), then land on `/auth`; on failure, toast and
