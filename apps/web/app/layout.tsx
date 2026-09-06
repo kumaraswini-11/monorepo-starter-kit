@@ -23,7 +23,7 @@ const fontMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: { default: brand.name, template: `%s · ${brand.name}` },
-  description: "Secure, self-hosted authentication starter.",
+  description: brand.description,
   applicationName: brand.name,
 };
 
