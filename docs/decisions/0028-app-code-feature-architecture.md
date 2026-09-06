@@ -331,8 +331,12 @@ pattern) → **auth** (the remaining one: `components/auth/*`, `lib/auth/*`, `au
 its `@workspace/auth` swap point, once the temporary dev-bypass is removed) → **add the ESLint
 cross-feature boundary rule** → **docs** (cross-link 0016/0017/0026). **`theme` and `app-shell` do
 not move** — they are infra / a composition widget and stay in `components/` (see the classification
-above). `packages/*` are untouched. **In progress** — this ADR records the decision; the
-migration is separate work.
+above). `packages/*` are untouched.
+
+**Status: done.** `notifications` and `auth` are migrated to `features/`; the cross-feature boundary
+is enforced in `apps/web/eslint.config.js` (`no-restricted-imports` bans `@/features/*/**` — the
+barrel `@/features/<name>` is the only entry). The one deferred piece is `lib/session.ts` → moves to
+`features/auth/lib/` once the temporary dev-bypass is removed.
 
 ## Non-goals / not now
 

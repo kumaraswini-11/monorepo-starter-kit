@@ -1,15 +1,20 @@
 import { nextJsConfig } from "@workspace/eslint-config/next-js";
 
 /**
- * Seam boundary (ADR 0017 §1): the Better Auth transport must stay behind the seam so the
- * app-side enumeration-safe error mapping can never be bypassed and the backend split stays a
- * one-file change. Only `features/auth/lib/auth-client.ts` may import the shared client, and only
- * the seam (`features/auth/actions.ts`) may reference that app-local re-export; everything else
- * goes through the seam's exported wrappers.
+ * App-local import governance, layered on the shared config. Two boundaries:
  *
- * Because ESLint flat config *replaces* (not merges) a rule's options, the app-wide entry below
- * re-declares the shared deep-import guard (ADR 0016) alongside the seam patterns, and the two
- * exemptions keep it — dropping only the pattern each exempt location legitimately needs.
+ * 1. **Feature boundary (ADR 0028):** a feature is imported only through its public API
+ *    (`@/features/<name>`), never its internals (`@/features/<name>/...`). Inside a feature, use
+ *    relative imports. Keeps features self-contained/liftable and their public surface a single,
+ *    reviewable file. Composition roots (routes, the app shell) compose features via their barrels.
+ * 2. **Seam boundary (ADR 0017 §1):** the Better Auth transport stays behind the seam so the
+ *    app-side enumeration-safe error mapping can't be bypassed and the backend split stays a
+ *    one-file change. Only `features/auth/lib/auth-client.ts` may import the shared client, and only
+ *    the seam (`features/auth/actions.ts`) may reference that app-local re-export.
+ *
+ * Because ESLint flat config *replaces* (not merges) a rule's options, every `no-restricted-imports`
+ * entry below re-declares the shared deep-import guard (ADR 0016) + the feature boundary alongside
+ * the seam patterns; the two seam exemptions drop only the one pattern each exempt file needs.
  */
 const noDeepImports = {
   group: ["@workspace/*/src/*", "@workspace/*/src/**"],
@@ -26,6 +31,11 @@ const noSeamBypass = {
   message:
     "Use the seam wrappers in features/auth/actions.ts (enumeration-safe error mapping), not the raw auth client (ADR 0017 §1).",
 };
+const noCrossFeatureInternals = {
+  group: ["@/features/*/**"],
+  message:
+    "Import a feature through its public API (@/features/<name>), not its internals (ADR 0028). Inside a feature, use relative imports.",
+};
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
@@ -34,7 +44,14 @@ export default [
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [noDeepImports, noRawAuthClient, noSeamBypass] },
+        {
+          patterns: [
+            noDeepImports,
+            noRawAuthClient,
+            noSeamBypass,
+            noCrossFeatureInternals,
+          ],
+        },
       ],
     },
   },
@@ -44,7 +61,7 @@ export default [
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [noDeepImports, noSeamBypass] },
+        { patterns: [noDeepImports, noSeamBypass, noCrossFeatureInternals] },
       ],
     },
   },
@@ -54,7 +71,7 @@ export default [
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [noDeepImports, noRawAuthClient] },
+        { patterns: [noDeepImports, noRawAuthClient, noCrossFeatureInternals] },
       ],
     },
   },
