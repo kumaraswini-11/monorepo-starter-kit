@@ -28,7 +28,7 @@
     "nodemailer": "^10.0.0",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-email": "^6.9.3",
+    "react-email": "^6.9.5",
     "server-only": "catalog:"
   },
   "devDependencies": {
