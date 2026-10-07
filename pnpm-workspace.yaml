@@ -2,12 +2,40 @@ packages:
   - "apps/*"
   - "packages/*"
 
-# Supply-chain hardening: delay installing just-published versions so a
-# compromised release has time to be caught and pulled. This is pnpm 11's
-# default (1 day = 1440 min); set explicitly here for pnpm 10.
-# REMOVE after upgrading to pnpm 11, where it is on by default
-# (see docs/future-improvements.md).
+# ---------------------------------------------------------------------------
+# pnpm settings (pnpm >= 11 reads only auth/registry settings from .npmrc; every
+# other setting lives here). Keep this block the complete, explicit security
+# posture of the repo — see docs/decisions/0033 and https://pnpm.io/supply-chain-security.
+# ---------------------------------------------------------------------------
+
+# Refuse to install when the running Node/pnpm don't satisfy `engines` (root and
+# every package). Formerly `engine-strict=true` in .npmrc.
+engineStrict: true
+
+# Supply-chain hardening (pnpm 11 defaults, written explicitly so a derived repo
+# on another pnpm line gets the same posture):
+# - minimumReleaseAge: a just-published version must age 24h before it resolves,
+#   so a compromised release has time to be caught and pulled (applies transitively).
+#   pnpm 11 turns on minimumReleaseAgeStrict when this is set: resolution FAILS
+#   instead of silently falling back to an older version.
 minimumReleaseAge: 1440
+# - strictDepBuilds: a dependency with a lifecycle script that is not listed in
+#   `allowBuilds` fails the install instead of merely warning.
+strictDepBuilds: true
+# - blockExoticSubdeps: transitive deps may only come from the registry (no git/
+#   tarball/URL sub-dependencies sneaking into the graph).
+blockExoticSubdeps: true
+# - trustPolicy: refuse a resolution that downgrades a package's provenance/trust
+#   level versus what the lockfile already has.
+trustPolicy: no-downgrade
+# trustPolicyIgnoreAfter: the downgrade check only makes sense for RECENT releases
+# (a takeover shows up as a fresh version that drops provenance). Versions older
+# than 180 days (minutes) predate trusted publishing for many transitive packages
+# (e.g. semver@6, chokidar@4) and are waived — the documented mechanism for this.
+trustPolicyIgnoreAfter: 259200
+# - verifyDepsBeforeRun: `pnpm run`/`exec` check node_modules matches the lockfile
+#   and install first if not (no "works on my machine" from a stale install).
+verifyDepsBeforeRun: install
 
 catalog:
   # React & framework
@@ -52,9 +80,8 @@ catalog:
   "@testing-library/dom": ^10.4.1
   "@testing-library/react": ^16.3.3
   "@testing-library/user-event": ^14.6.7
-  # jsdom held at 26: jsdom 30 requires Node >=24.15.0 (24 line) and the dev env is on 24.13.0, so
-  # engine-strict blocks it. Bump jsdom -> ^30 and engines.node -> >=24.15.0 together once Node moves
-  # up (see docs/future-improvements.md). 26 is fully compatible with our tests.
+  # jsdom 30 requires Node >=24.15.0; the repo pins Node 24.21.0 (.nvmrc + devEngines.runtime),
+  # so engines.node >=24.15.0 is satisfied everywhere. Bump jsdom and the Node pin together.
   jsdom: ^30.0.1
   # Auth — shared by packages/auth (server) + apps/web (the Next route handler)
   better-auth: ^1.7.3
@@ -75,11 +102,17 @@ catalog:
   storybook: ^10.6.0
   "@storybook/nextjs-vite": ^10.6.0
 
+# Build-script allow/deny list (strictDepBuilds makes an unlisted script a hard
+# error). true = the package genuinely needs its native/postinstall step;
+# false = reviewed and not needed (optional native addons fall back to JS,
+# notice-only postinstalls are noise).
 allowBuilds:
-  sharp: true
-  unrs-resolver: true
-  esbuild: true
-  msw: false
+  sharp: true # next/image optimizer (native)
+  esbuild: true # downloads its platform binary
+  msw: false # postinstall only prints a message
+  cpu-features: false # optional native addon for ssh2 (testcontainers); JS fallback
+  ssh2: false # testcontainers transitive; its install step only tries cpu-features
+  protobufjs: false # testcontainers transitive; postinstall is a notice script
 
 # Security patches for transitive deps flagged by `pnpm audit --prod`. None are exploitable in
 # the shipped app (dev/CLI tooling or unreachable resolver branches — we use the zod resolver,
