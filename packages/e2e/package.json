@@ -1,5 +1,5 @@
 {
-  "name": "e2e",
+  "name": "@workspace/e2e",
   "version": "0.0.0",
   "private": true,
   "type": "module",

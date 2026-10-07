@@ -16,7 +16,7 @@ already built.
   Phase 1 (unit + component + CI test job + coverage), Phase 2 (db **and** auth integration
   vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`, plus a
   CI **integration** job — Testcontainers on the runner), **Phase 3 (e2e)** — a Playwright
-  `apps/e2e` workspace + CI job (Postgres service): smoke, protected-route redirect, the full
+  `packages/e2e` workspace + CI job (Postgres service): smoke, protected-route redirect, the full
   **sign-up** and **sign-out** journeys, and a returning-authenticated journey via the
   **`storageState`** pattern (a `setup` project authenticates once), aligned to the vendored
   `playwright-best-practices` skill; and the **Phase 4 MSW seam tests** (ADR 0025 §11 Q4).

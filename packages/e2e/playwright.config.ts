@@ -29,8 +29,6 @@ export default defineConfig({
   // round-trip + redirect; navigation must stay under the per-test budget.
   timeout: 60_000,
   expect: { timeout: 10_000 },
-  // Apply Drizzle migrations to the e2e Postgres before the app starts (ADR 0025).
-  globalSetup: "./global-setup.ts",
   use: {
     baseURL,
     // Bound action/navigation waits so a hung step fails fast instead of stalling to the
@@ -52,7 +50,7 @@ export default defineConfig({
       timeout: 120_000,
       // Real Postgres for DB-backed journeys (sign-up hits the DB). `DATABASE_URL` is the
       // docker-compose Postgres locally / a Postgres service in CI (defaulted to the compose
-      // creds); global-setup migrates it first. Throwaway auth secret — e2e signs up fresh users.
+      // creds); the `db` setup project resets + migrates it first. Throwaway auth secret — e2e signs up fresh users.
       env: {
         DATABASE_URL: process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
         BETTER_AUTH_SECRET:
@@ -62,13 +60,21 @@ export default defineConfig({
       },
     },
   ],
+  // Setup work runs as *projects with dependencies* rather than `globalSetup` — the form
+  // Playwright recommends (it shows up in the HTML report, traces and fixtures apply, and the
+  // ordering is explicit). Order: reset + migrate the disposable DB -> authenticate once ->
+  // the browser projects. Every browser project depends (transitively) on `db`, so no test can
+  // race the schema reset.
   projects: [
+    // Drop + recreate the schema and apply the committed migrations (ADR 0025).
+    { name: "db", testMatch: /db\.setup\.ts$/ },
     // Authenticate once; the authed project reuses the saved session (storageState).
-    { name: "setup", testMatch: /auth\.setup\.ts$/ },
+    { name: "setup", testMatch: /auth\.setup\.ts$/, dependencies: ["db"] },
     {
       // First-time-visitor journeys (sign-up, sign-out, redirects) — no stored session.
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      dependencies: ["db"],
       testIgnore: /\.authed\.spec\.ts$/,
     },
     {

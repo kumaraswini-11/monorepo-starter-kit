@@ -54,7 +54,7 @@ scalability, enterprise, monorepo, and don't assume):
 | **Unit** (pure logic)     | **Vitest 4** (already adopted)                                                                     | node                                |
 | **Component**             | **Vitest 4 + React Testing Library v16** + `user-event` + `jest-dom`                               | **jsdom** (browser mode for layout) |
 | **Integration** (DB/auth) | Vitest + **real Postgres** via **Testcontainers** (primary) / **pglite** (fallback)                | node + real pg                      |
-| **E2E**                   | **Playwright Test** (`@playwright/test`, TS) in a dedicated `apps/e2e`                             | real browsers, prod build           |
+| **E2E**                   | **Playwright Test** (`@playwright/test`, TS) in a dedicated `packages/e2e`                         | real browsers, prod build           |
 | **Shared config**         | **`@workspace/vitest-config`** (source-only): `base` (node) + `dom` (jsdom) presets                | —                                   |
 | **Coverage**              | **`@vitest/coverage-v8`** (already in the lockfile via Storybook), blob-merge, report-only → gated | —                                   |
 | **Orchestration**         | **Turborepo** tasks split by type: `test` (cacheable) · `test:integration` · `test:e2e` (uncached) | —                                   |
@@ -211,7 +211,7 @@ different tool for a different job** — ad-hoc, agent-driven UI reconnaissance/
 a committed, versioned, CI-gated regression suite. Keep it for exploration; use
 `@playwright/test` for the durable suite.
 
-**Location — a dedicated `apps/e2e` workspace.** Its own `package.json` pins
+**Location — a dedicated `packages/e2e` workspace.** Its own `package.json` pins
 `@playwright/test` + browsers, so nothing e2e enters `apps/web`'s bundle or `next build`; it
 gets its own Turbo task and can exercise multiple apps later. (Co-locating in `apps/web/e2e`
 couples test deps to the shipped app and muddies caching.)
@@ -356,7 +356,7 @@ warrants (already noted in `future-improvements.md`).
 | **Unit**        | every change | each package, co-located `*.test.ts`     | ✅        | pure logic, zod, helpers, device parsing               |
 | **Component**   | every change | `@workspace/ui`, `apps/web` `*.test.tsx` | ✅        | primitives, RHF forms, a11y tree, pending/error states |
 | **Integration** | its own lane | `packages/db`, `packages/auth`           | ❌        | repositories, Drizzle SQL, Better Auth flows, hooks    |
-| **E2E**         | PR / nightly | `apps/e2e`                               | ❌        | critical user journeys, auth end-to-end, redirects     |
+| **E2E**         | PR / nightly | `packages/e2e`                           | ❌        | critical user journeys, auth end-to-end, redirects     |
 
 Many fast tests at the bottom, few slow ones at the top — the shape that keeps CI fast as
 the codebase grows. **The enforcing property is _location_:** because units live in their
@@ -438,7 +438,7 @@ repo/team split needs no test migration.
    **CI unit job**.
 2. **Integration** — `packages/db` repos + `packages/auth` flows against Testcontainers/
    pglite; `test:integration` task; CI integration job.
-3. **E2E** — `apps/e2e` (Playwright, `storageState`, `webServer` array); CI e2e job with a
+3. **E2E** — `packages/e2e` (Playwright, `storageState`, `webServer` array); CI e2e job with a
    Postgres service (single chromium browser, unsharded now — shard + a blob-merge job when the
    suite grows).
 4. **Hardening for the split** — **MSW** seam tests (**done**, §11 Q4); a shared **contract
@@ -544,7 +544,7 @@ backend split cheap; standards centralized in one config package.
 
 **Negative / costs:** integration + e2e need infrastructure (Docker/Postgres, Playwright
 browsers) → slower, uncached lanes and more CI wiring; Testcontainers wants Docker (Windows
-friction — mitigated by pglite); more moving parts (a new config package, an `apps/e2e`
+friction — mitigated by pglite); more moving parts (a new config package, an `packages/e2e`
 workspace) to maintain.
 
 **Neutral:** implementation is deferred/phased (this ADR records the direction, like
