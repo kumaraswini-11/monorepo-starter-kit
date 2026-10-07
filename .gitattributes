@@ -5,6 +5,7 @@
 
 # Lockfiles: keep LF, and collapse in diffs / mark as generated.
 pnpm-lock.yaml -diff linguist-generated
+skills-lock.json linguist-generated
 
 # Binary assets (never modify line endings).
 *.png binary

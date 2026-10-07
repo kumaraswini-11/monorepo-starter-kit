@@ -16,12 +16,12 @@
       "url": "https://mcp.inkeep.com/better-auth/mcp"
     },
     "shadcn": {
-      "command": "npx",
-      "args": ["shadcn@latest", "mcp"]
+      "command": "pnpm",
+      "args": ["dlx", "shadcn@4.21.3", "mcp"]
     },
     "next-devtools": {
-      "command": "npx",
-      "args": ["-y", "next-devtools-mcp@latest"]
+      "command": "pnpm",
+      "args": ["dlx", "next-devtools-mcp@0.4.0"]
     }
   }
 }
