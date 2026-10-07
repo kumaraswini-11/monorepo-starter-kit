@@ -408,6 +408,9 @@ importers:
       react-hook-form:
         specifier: 'catalog:'
         version: 7.87.0(react@19.2.8)
+      server-only:
+        specifier: 'catalog:'
+        version: 0.0.1
       zod:
         specifier: 'catalog:'
         version: 4.5.4

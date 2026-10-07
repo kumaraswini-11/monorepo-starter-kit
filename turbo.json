@@ -1,5 +1,5 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
   "globalPassThroughEnv": [
     "DATABASE_URL",
@@ -16,25 +16,27 @@
     "TESTCONTAINERS_*"
   ],
   "tasks": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
     "build": {
       "dependsOn": ["^build"],
+      "env": ["BETTER_AUTH_URL"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "!**/*.stories.*", "!**/*.mdx"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "build:storybook": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["topo"],
       "outputs": ["storybook-static/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["topo"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
-    },
-    "//#format": {
-      "cache": false
+      "dependsOn": ["topo"]
     },
     "test": {
+      "dependsOn": ["topo"],
       "outputs": ["coverage/**"]
     },
     "test:integration": {
@@ -48,6 +50,33 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "//#format": {
+      "cache": false
+    }
+  },
+  "boundaries": {
+    "tags": {
+      "leaf": {
+        "dependencies": { "deny": ["domain", "ui", "app", "test"] }
+      },
+      "config": {
+        "dependencies": { "deny": ["leaf", "domain", "ui", "app", "test"] }
+      },
+      "domain": {
+        "dependencies": { "deny": ["ui", "app", "test"] }
+      },
+      "ui": {
+        "dependencies": { "deny": ["domain", "app", "test"] }
+      },
+      "app": {
+        "dependents": { "deny": ["leaf", "config", "domain", "ui", "app"] }
+      },
+      "test": {
+        "dependents": {
+          "deny": ["leaf", "config", "domain", "ui", "app", "test"]
+        }
+      }
     }
   }
 }
