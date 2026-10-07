@@ -19,6 +19,8 @@ node_modules
 
 # testing
 coverage
+# vitest 5 writes run artifacts here
+.vitest/
 
 # next.js
 .next/

@@ -108,29 +108,29 @@ catalog:
   # one release train split across the e2e runner (@playwright/test) and the browser driver used
   # by Storybook browser-mode tests (playwright). jest-dom v7 requires @testing-library/dom as
   # a non-optional peer, so it is pinned here and owned by @workspace/vitest-config.
-  vitest: ^4.1.11
-  "@vitest/coverage-v8": ^4.1.11
-  "@vitest/browser-playwright": ^4.1.11
+  vitest: ^5.0.3
+  "@vitest/coverage-v8": ^5.0.3
+  "@vitest/browser-playwright": ^5.0.3
   "@testing-library/jest-dom": ^7.0.1
   "@testing-library/dom": ^10.4.1
   "@testing-library/react": ^16.3.3
   "@testing-library/user-event": ^14.6.7
   jsdom: ^30.0.1
   msw: ^2.15.0
-  "@testcontainers/postgresql": ^12.1.0
+  "@testcontainers/postgresql": ^12.2.0
   "@playwright/test": ^1.63.0
   playwright: ^1.63.0
 
   # Storybook (ADR 0024) — every @storybook/* package MUST move in lockstep (same version);
   # a Dependabot bump of one of them alone has caused skew before. `vite` is Storybook's
   # bundler (nextjs-vite framework).
-  storybook: ^10.6.0
-  "@storybook/nextjs-vite": ^10.6.0
-  "@storybook/addon-a11y": ^10.6.0
-  "@storybook/addon-docs": ^10.6.0
-  "@storybook/addon-mcp": ^10.6.0
-  "@storybook/addon-vitest": ^10.6.0
-  eslint-plugin-storybook: ^10.6.0
+  storybook: ^10.6.1
+  "@storybook/nextjs-vite": ^10.6.1
+  "@storybook/addon-a11y": ^10.6.1
+  "@storybook/addon-docs": ^10.6.1
+  "@storybook/addon-mcp": ^10.6.1
+  "@storybook/addon-vitest": ^10.6.1
+  eslint-plugin-storybook: ^10.6.1
   vite: ^8.2.2
 
   # Lint & format (ADR 0004/0005/0033). `typescript-eslint` is the meta-package (parser + plugin).
@@ -144,9 +144,9 @@ catalog:
   "@eslint-react/eslint-plugin": ^5.24.0
   eslint-plugin-react-hooks: ^7.1.1
   "@next/eslint-plugin-next": ^16.3.4
-  eslint-plugin-turbo: ^2.10.12
+  eslint-plugin-turbo: ^2.11.7
   globals: ^17.12.0
-  prettier: ^3.9.6
+  prettier: ^3.9.9
   "@ianvs/prettier-plugin-sort-imports": ^4.7.1
   prettier-plugin-tailwindcss: ^0.8.1
 
@@ -154,9 +154,9 @@ catalog:
   # and stay in lockstep. @types/node tracks the Node line we run (24) — bump with the runtime.
   typescript: ^6.0.3
   "@types/node": ^24.13.3
-  turbo: ^2.10.12
-  "@turbo/gen": ^2.10.12
-  taze: ^21.1.0
+  turbo: ^2.11.7
+  "@turbo/gen": ^2.11.7
+  taze: ^21.3.0
 
 # Build-script allow/deny list (strictDepBuilds makes an unlisted script a hard
 # error). true = the package genuinely needs its native/postinstall step;
@@ -169,6 +169,19 @@ allowBuilds:
   cpu-features: false # optional native addon for ssh2 (testcontainers); JS fallback
   ssh2: false # testcontainers transitive; its install step only tries cpu-features
   protobufjs: false # testcontainers transitive; postinstall is a notice script
+
+# Peer ranges we have verified to be stale rather than real incompatibilities. Each entry keeps
+# the install log free of a known-benign warning so a NEW warning is a real signal; remove an entry
+# when the upstream peer range catches up (the trigger is named per line).
+peerDependencyRules:
+  allowedVersions:
+    # jsx-a11y rules run on ESLint 10 (lint gate green); upstream issue jsx-eslint/eslint-plugin-jsx-a11y#1075.
+    "eslint-plugin-jsx-a11y>eslint": "10"
+    # better-auth's optional vitest peer (its testUtils) only declares ^2-^4; verified on 5 in the
+    # auth integration suite. Remove when better-auth declares ^5.
+    "better-auth>vitest": "5"
+    # tsconfck only parses tsconfig JSON; its ^5 peer predates TS 6. Remove when it declares ^6.
+    "tsconfck>typescript": "6"
 
 # Security patches for transitive deps flagged by `pnpm audit --prod`. None are exploitable in
 # the shipped app (dev/CLI tooling or unreachable resolver branches — we use the zod resolver,
