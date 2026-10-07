@@ -9,6 +9,7 @@ import { auth } from "@workspace/auth";
 import { db, schema } from "@workspace/db/client";
 import { account, session, user } from "@workspace/db/schema";
 import { resetDb } from "@workspace/db/testing/reset";
+import type * as EmailModule from "@workspace/email";
 import { sendNewDeviceEmail } from "@workspace/email";
 import { env } from "@workspace/env";
 
@@ -17,7 +18,7 @@ import { env } from "@workspace/env";
 // real. `vi.mock` is hoisted above the imports, so `auth`'s own `@workspace/email` import is
 // mocked too, and the `sendNewDeviceEmail` imported here is the spy. (ADR 0025 §3)
 vi.mock("@workspace/email", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@workspace/email")>()),
+  ...(await importOriginal<typeof EmailModule>()),
   sendNewDeviceEmail: vi.fn().mockResolvedValue(undefined),
   sendVerifyEmail: vi.fn().mockResolvedValue(undefined),
 }));

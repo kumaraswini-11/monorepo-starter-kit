@@ -7,7 +7,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "moduleDetection": "force",
-    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
     "resolveJsonModule": true,
     "strict": true,

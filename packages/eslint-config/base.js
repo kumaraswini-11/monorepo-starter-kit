@@ -14,6 +14,18 @@ export const config = [
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
   {
+    // verbatimModuleSyntax (typescript-config/base.json) requires type-only imports to be
+    // marked; these two rules make that mechanical (autofixable) and keep the elision
+    // deterministic for every single-file transpiler (Turbopack, Vite, Node type-stripping).
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "separate-type-imports" },
+      ],
+      "@typescript-eslint/no-import-type-side-effects": "error",
+    },
+  },
+  {
     plugins: {
       turbo: turboPlugin,
     },
