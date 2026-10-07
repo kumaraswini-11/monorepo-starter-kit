@@ -4,6 +4,7 @@
   2026-08-13; Phase 2 (Google OAuth) implemented 2026-08-24; later phases (passwordless,
   passkeys, MFA, orgs/SSO) pending — see **Phased adoption plan** below.
 - **Date:** 2026-07-16
+- **Amended:** 2026-10-07 — the `account.issuer` column and `(issuer, accountId)` unique index described below were required only by Better Auth 1.7.0–1.7.2; 1.7.3 removed the requirement and stopped writing the column, which made every sign-up fail against our `NOT NULL` column. Migration `0002_drop_account_issuer` drops the index, then the column (BA 1.7 upgrade guide, Drizzle path). A deployment holding account rows can apply it as-is (dropping data the library no longer reads).
 
 ## Context
 
