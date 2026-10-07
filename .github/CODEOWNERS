@@ -1,41 +1,33 @@
-# CODEOWNERS
+# CODEOWNERS — https://docs.github.com/articles/about-code-owners
 #
-# Requests review from the owners of matching files when a PR touches them.
-# Docs: https://docs.github.com/articles/about-code-owners
-#
-# Rules:
-#   - .gitignore-style patterns map paths to owners.
-#   - The LAST matching rule wins, so keep broad defaults first and specific
-#     paths later.
-#   - Owners need write access. Prefer teams (@org/team) over individuals so any
-#     member can unblock a PR.
-#
-# The repo is solo today, so @aswini-kumar-11 owns everything. Replace it with
-# a real GitHub account or team as the org grows.
+# Rules: .gitignore-style patterns; the LAST matching pattern wins, so broad defaults come
+# first and sensitive paths last. Owners need write access; prefer teams (@org/team) so any
+# member can unblock a review. The repo is solo today — replace @aswini-kumar-11 with real
+# teams as the organisation forms (e.g. @org/platform for tooling, @org/security for auth).
 
-# Default owner for everything not matched below.
+# Default owner for everything.
 * @aswini-kumar-11
 
-# Documentation
-*.md @aswini-kumar-11
-/docs/ @aswini-kumar-11
-
-# Applications
-/apps/web/** @aswini-kumar-11
-/apps/docs/** @aswini-kumar-11
-
-# Shared packages
-/packages/ui/** @aswini-kumar-11
-/packages/eslint-config/** @aswini-kumar-11
-/packages/typescript-config/** @aswini-kumar-11
-
-# CI, automation, and repository governance
-/.github/** @aswini-kumar-11
+# Repository foundation: toolchain, task graph, dependency policy, CI and governance.
 /package.json @aswini-kumar-11
 /pnpm-workspace.yaml @aswini-kumar-11
 /pnpm-lock.yaml @aswini-kumar-11
 /turbo.json @aswini-kumar-11
+/turbo/ @aswini-kumar-11
+/knip.ts @aswini-kumar-11
+/packages/eslint-config/ @aswini-kumar-11
+/packages/typescript-config/ @aswini-kumar-11
+/packages/vitest-config/ @aswini-kumar-11
+/.github/ @aswini-kumar-11
 
-# Legal and security
+# Security-sensitive application surface: authentication, data access, environment contract.
+/packages/auth/ @aswini-kumar-11
+/packages/db/ @aswini-kumar-11
+/packages/env/ @aswini-kumar-11
+/apps/web/next.config.ts @aswini-kumar-11
+
+# Decisions and policy.
+/docs/decisions/ @aswini-kumar-11
+/AGENTS.md @aswini-kumar-11
 /LICENSE @aswini-kumar-11
 /SECURITY.md @aswini-kumar-11

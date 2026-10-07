@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/kumaraswini-11/monorepo-starter-kit/security/policy
+    about: Never file security issues publicly. Use the private process in SECURITY.md.
+  - name: Architecture decisions (ADRs)
+    url: https://github.com/kumaraswini-11/monorepo-starter-kit/tree/main/docs/decisions
+    about: Read the "why" behind existing conventions before proposing a change.

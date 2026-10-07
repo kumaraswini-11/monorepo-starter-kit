@@ -1,11 +1,14 @@
 version: 2
 
-# Noise + supply-chain policy:
-# - GROUP minor/patch bumps into a single PR per ecosystem (less churn); MAJOR
-#   bumps stay ungrouped so each gets its own PR and individual review.
-# - COOLDOWN lets just-published versions age before a PR is even opened — the
-#   same "give a compromised release time to be caught and pulled" rationale as
-#   pnpm `minimumReleaseAge` (pnpm-workspace.yaml); majors wait the longest.
+# Policy (ADR 0007, ADR 0033):
+# - GROUP minor/patch bumps into one PR per ecosystem; MAJOR bumps stay ungrouped so each gets
+#   its own review — read the changelog, run the full gate, write an ADR if it changes how we
+#   work. Never blind-merge (AGENTS.md).
+# - COOLDOWN lets just-published versions age before a PR is opened — the same rationale as
+#   pnpm `minimumReleaseAge` (dependabot-core honours the larger of the two). Majors wait longest.
+# - Dependabot reads pnpm `catalog:` entries (pnpm-workspace.yaml), so the single-version
+#   catalog is the only place it edits for npm.
+# - Security updates are a separate mechanism (Dependabot alerts) and are not throttled here.
 updates:
   # Keep the SHA-pinned GitHub Actions current (and patch action advisories).
   - package-ecosystem: "github-actions"
@@ -22,17 +25,10 @@ updates:
         patterns: ["*"]
         update-types: ["minor", "patch"]
 
-  # Keep npm/pnpm dependencies current — low-noise (quarterly + grouped).
-  # Dependabot now reads pnpm `catalog:` entries (pnpm-workspace.yaml), so it also
-  # proposes catalog deps; `taze` (`pnpm deps:check`) still handles routine catalog
-  # refreshes. `quarterly` = every 3 months (GitHub Dependabot options reference;
-  # GitHub Enterprise Server needs 3.19+). Majors for the deliberately-deferred
-  # tooling are IGNORED below (ADR 0006) so they stop reopening — adopt those
-  # manually when the ecosystem is ready.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "quarterly"
+      interval: "monthly"
     open-pull-requests-limit: 10
     cooldown:
       default-days: 3
@@ -44,15 +40,14 @@ updates:
         patterns: ["*"]
         update-types: ["minor", "patch"]
     ignore:
-      # TypeScript 7 / ESLint 10 — deferred until typescript-eslint / the ESLint
-      # plugin ecosystem support them (ADR 0006 / future-improvements.md).
-      # `@eslint/js` moves with eslint's major, not ahead of it.
+      # Deferred majors with a named trigger (docs/future-improvements.md):
+      # - TypeScript 7 (Go-native, no JS API yet) waits for typescript-eslint support.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "eslint"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@eslint/js"
-        update-types: ["version-update:semver-major"]
-      # `@types/node` tracks the Node LTS we run (24); don't jump to Current (26+).
+      # - @types/node tracks the Node line we run (devEngines.runtime); it moves with the
+      #   runtime bump (Node 26 LTS on 2026-10-28), not ahead of it.
       - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # - jsdom majors move with the Node pin (engines floor), not independently.
+      - dependency-name: "jsdom"
         update-types: ["version-update:semver-major"]

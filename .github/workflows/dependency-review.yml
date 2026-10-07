@@ -1,0 +1,41 @@
+name: Dependency review
+
+# GitHub's PR-time supply-chain gate: blocks a pull request that introduces a dependency with
+# a known vulnerability or a disallowed licence (diffed from the lockfile via the dependency
+# graph). Complements Dependabot alerts (which fire after the fact) and `pnpm audit` (which
+# checks what is already installed). Availability: public repositories, and private ones with
+# GitHub Code Security — a derived private repo without that licence should remove this file.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  # Only for the PR comment summary on failure.
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # Known vulnerabilities: block high and critical (lower severities surface in the
+          # summary and in Dependabot alerts).
+          fail-on-severity: high
+          # Proprietary product (ADR 0002): copyleft licences that would reach the shipped
+          # bundle are not acceptable. Dev-only tooling is not exempt here on purpose — review
+          # and add an explicit allow if a tool with such a licence is ever needed.
+          deny-licenses: AGPL-1.0-only, AGPL-1.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later, GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only, LGPL-3.0-or-later, SSPL-1.0
+          comment-summary-in-pr: on-failure

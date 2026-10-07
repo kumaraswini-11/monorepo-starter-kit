@@ -159,6 +159,12 @@ catalog:
   taze: ^21.3.0
   # knip: unused files / exports / dependencies (incl. catalog entries) and Turbo-aware entries.
   knip: ^6.39.0
+  # Git hooks (ADR 0037): husky runs lint-staged (format + lint staged files) on pre-commit and
+  # commitlint (Conventional Commits) on commit-msg. CI + the branch ruleset remain the gate.
+  husky: ^9.1.7
+  lint-staged: ^17.6.0
+  "@commitlint/cli": ^21.2.3
+  "@commitlint/config-conventional": ^21.2.3
 
 # Build-script allow/deny list (strictDepBuilds makes an unlisted script a hard
 # error). true = the package genuinely needs its native/postinstall step;
