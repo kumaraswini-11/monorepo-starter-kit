@@ -81,9 +81,10 @@ held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:inte
 - **Prettier owns all formatting**, run once from the root. Import order is enforced
   by `@ianvs/prettier-plugin-sort-imports`; keep `prettier-plugin-tailwindcss`
   **last**. Never hand-format or add ESLint stylistic rules. (ADR 0004, 0010)
-- **Cross-package dependency versions go through pnpm catalogs**: use `catalog:` in
-  `package.json` and pin the version in `pnpm-workspace.yaml`. Package-only deps may
-  be inlined. Never inline a version for something two packages share.
+- **Single-version dependency policy (`catalogMode: strict`, ADR 0034):** every third-party
+  dependency is declared once in the `pnpm-workspace.yaml` catalog and referenced as `catalog:`
+  from manifests — never an inline version. Add with `pnpm add --filter <pkg> --catalog <dep>`;
+  group and comment the catalog entry.
 - **Supply chain:** new packages sit behind `minimumReleaseAge`; prefer widely-used,
   maintained deps and justify additions. Don't disable the cooldown.
 - **Dependency weight:** judge a dep by _where it runs_. Dev tooling (devDeps)

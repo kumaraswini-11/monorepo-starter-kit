@@ -13,7 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.9.1",
+    "@hookform/resolvers": "catalog:",
     "@workspace/auth": "workspace:*",
     "@workspace/env": "workspace:*",
     "@workspace/ui": "workspace:*",
@@ -38,10 +38,10 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "@workspace/vitest-config": "workspace:*",
-    "babel-plugin-react-compiler": "^1.0.0",
+    "babel-plugin-react-compiler": "catalog:",
     "eslint": "catalog:",
     "jsdom": "catalog:",
-    "msw": "^2.15.0",
+    "msw": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
