@@ -1,0 +1,9 @@
+import { describe, expect, it } from "vitest";
+
+import { PACKAGE_NAME } from "@workspace/{{ name }}";
+
+describe("@workspace/{{ name }}", () => {
+  it("exposes its public entry", () => {
+    expect(PACKAGE_NAME).toBe("@workspace/{{ name }}");
+  });
+});

@@ -157,6 +157,8 @@ catalog:
   turbo: ^2.11.7
   "@turbo/gen": ^2.11.7
   taze: ^21.3.0
+  # knip: unused files / exports / dependencies (incl. catalog entries) and Turbo-aware entries.
+  knip: ^6.39.0
 
 # Build-script allow/deny list (strictDepBuilds makes an unlisted script a hard
 # error). true = the package genuinely needs its native/postinstall step;

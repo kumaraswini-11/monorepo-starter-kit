@@ -53,6 +53,9 @@
     },
     "//#format": {
       "cache": false
+    },
+    "//#typecheck:tooling": {
+      "inputs": ["tsconfig.json", "turbo/generators/**", "knip.ts"]
     }
   },
   "boundaries": {
