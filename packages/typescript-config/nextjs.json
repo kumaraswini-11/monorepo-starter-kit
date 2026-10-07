@@ -1,13 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Next.js",
+  "display": "Next.js app",
   "extends": "./base.json",
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
+    "lib": ["es2024", "dom"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "allowJs": true,
     "jsx": "preserve",
-    "noEmit": true
+    "allowJs": true,
+    "plugins": [{ "name": "next" }]
   }
 }

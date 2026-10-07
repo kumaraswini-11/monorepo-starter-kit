@@ -131,7 +131,7 @@ catalog:
   # prettier plugins: sort-imports first, tailwindcss LAST.
   eslint: ^9.39.5
   "@eslint/js": ^9.39.5
-  typescript-eslint: ^8.69.0
+  typescript-eslint: ^8.71.1
   eslint-config-prettier: ^10.1.8
   eslint-plugin-jsx-a11y: ^6.10.2
   eslint-plugin-react: ^7.37.5
@@ -146,7 +146,7 @@ catalog:
 
   # Toolchain. Turborepo's three packages (turbo, @turbo/gen, eslint-plugin-turbo) are one release
   # and stay in lockstep. @types/node tracks the Node line we run (24) — bump with the runtime.
-  typescript: ^5.9.3
+  typescript: ^6.0.3
   "@types/node": ^24.13.3
   turbo: ^2.10.12
   "@turbo/gen": ^2.10.12
