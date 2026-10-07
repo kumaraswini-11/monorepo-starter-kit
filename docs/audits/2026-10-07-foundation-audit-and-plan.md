@@ -1,7 +1,13 @@
 # Foundation audit & modernization plan — 2026-10-07
 
-**Status:** PLAN — nothing below has been executed yet. This document is the review gate;
-execution starts only after sign-off on the decisions in §7.
+**Status:** EXECUTED on 2026-10-07 (branch `chore/foundation-2026-10`; ADRs 0033–0037 record the
+decisions, `docs/guides/` the resulting workflows). Deviations from the plan as written: no
+editor-specific directory was committed (editor-agnostic by request); the CI audit gate uses
+`--audit-level=high` with explicit `auditConfig.ignoreGhsas` entries instead of
+`--ignore-unfixable`, which turned out to be a silent write mode that exits 0; Next.js 16.4 +
+React 19.3 wait for the release-age gate (trigger recorded); and an in-range dependency refresh
+was included to clear a critical Next.js advisory the audit surfaced. Everything else below was
+implemented as described.
 
 **Scope:** the monorepo _foundation_ only — package manager, workspace, task graph, TypeScript,
 lint/format, testing architecture, CI/CD, security & supply chain, env management, git hygiene,

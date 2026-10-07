@@ -69,10 +69,12 @@ jobs:
         continue-on-error: true
 
       - name: Security audit (production dependencies)
-        # Blocking on FIXABLE high/critical advisories: a known, patchable vulnerability in
-        # something we ship must force a decision (bump or `overrides`). Advisories with no
-        # fix available are informational (`--ignore-unfixable`).
-        run: pnpm audit --prod --audit-level=high --ignore-unfixable
+        # Blocking on high/critical advisories in what we ship: a known vulnerability must
+        # force a decision — bump, pin via `overrides`, or (only when no patched version
+        # exists) an explicit, commented entry in `auditConfig.ignoreGhsas`
+        # (pnpm-workspace.yaml). Never `--ignore-unfixable`: it silently WRITES ignores and
+        # exits 0 without reporting the fixable ones.
+        run: pnpm audit --prod --audit-level=high
 
   test:
     name: Test (unit + component)

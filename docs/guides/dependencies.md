@@ -50,7 +50,8 @@ entry.
 
 - Dependabot alerts + security updates (repository setting) are the after-the-fact signal.
 - `dependency-review` blocks a PR that introduces a high/critical advisory or a copyleft
-  licence; `pnpm audit --prod --audit-level=high --ignore-unfixable` blocks fixable advisories
-  in CI. Fix by bumping, or pin a transitive with `overrides` (record the GHSA id).
+  licence; `pnpm audit --prod --audit-level=high` blocks high/critical advisories in CI. Fix by
+  bumping, or pin a transitive with `overrides` (record the GHSA id); only an advisory with no
+  patched version goes into `auditConfig.ignoreGhsas`, with a comment and a removal condition.
 - `peerDependencyRules.allowedVersions` only for peer ranges you have verified are merely
   stale; every entry names its removal trigger.

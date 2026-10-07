@@ -27,8 +27,10 @@ husky`, `HUSKY=0` in CI) runs:
 3. **Dependency review** (`actions/dependency-review-action`) blocks a PR that introduces a
    high/critical vulnerability or a copyleft licence (AGPL/GPL/LGPL/SSPL — the product is
    proprietary, [0002](0002-proprietary-license-and-package-posture.md)). `pnpm audit` in CI
-   now **blocks on fixable high/critical** advisories (`--ignore-unfixable` keeps unfixable ones
-   informational).
+   now **blocks on high/critical** advisories in production dependencies; an advisory with no
+   patched version is recorded explicitly (and commented) in `auditConfig.ignoreGhsas` rather
+   than silenced with `--ignore-unfixable`, which writes ignores and exits 0 without reporting
+   the fixable ones.
 4. **The `main` ruleset is committed** as importable JSON (`.github/rulesets/main.json`): PR
    required, strict status checks for every CI job plus CodeQL, dependency review and PR title,
    conversation resolution, linear history, squash only, no force-push or deletion. Approvals
