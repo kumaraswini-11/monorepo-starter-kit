@@ -15,7 +15,7 @@ const { sendMail, createTransport, state } = vi.hoisted(() => {
     sendMail,
     createTransport: vi.fn(() => ({ sendMail })),
     // Mutable env read through a getter, so each test supplies its own values.
-    state: { env: {} as Record<string, unknown> },
+    state: { env: {} },
   };
 });
 

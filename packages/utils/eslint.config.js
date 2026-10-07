@@ -1,8 +1,10 @@
-import { config } from "@workspace/eslint-config/base";
+import { defineConfig } from "eslint/config";
 
-/** @type {import("eslint").Linter.Config[]} */
-export default [
+import { config, typeAware } from "@workspace/eslint-config/base";
+
+export default defineConfig([
   ...config,
+  typeAware(import.meta.dirname),
   {
     // @workspace/utils is a leaf: pure, isomorphic, zero-dependency (ADR 0016). It must not
     // import any other internal package — that would invert the dependency direction.
@@ -22,4 +24,4 @@ export default [
       ],
     },
   },
-];
+]);

@@ -42,7 +42,7 @@ export function GoogleSignInButton() {
       size="lg"
       className="w-full"
       disabled={pending}
-      onClick={onClick}
+      onClick={() => void onClick()}
     >
       {pending ? <Spinner /> : <GoogleIcon data-icon="inline-start" />}
       <span className="min-w-38 text-start">Continue with Google</span>

@@ -1,13 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, use, useEffect, useState, type ReactNode } from "react";
 
 type AuthFlow = {
   /** Email captured at `/auth/email`, carried to the credential step. Empty until set. */
@@ -30,14 +24,12 @@ export function AuthFlowProvider({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState("");
 
   return (
-    <AuthFlowContext.Provider value={{ email, setEmail }}>
-      {children}
-    </AuthFlowContext.Provider>
+    <AuthFlowContext value={{ email, setEmail }}>{children}</AuthFlowContext>
   );
 }
 
 export function useAuthFlow(): AuthFlow {
-  const context = useContext(AuthFlowContext);
+  const context = use(AuthFlowContext);
   if (!context) {
     throw new Error("useAuthFlow must be used within <AuthFlowProvider>.");
   }

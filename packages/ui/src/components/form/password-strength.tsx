@@ -51,9 +51,9 @@ export function PasswordStrength({ password }: { password: string }) {
       {level ? (
         <div className="flex items-center gap-2" aria-hidden="true">
           <div className="flex flex-1 gap-1">
-            {LEVELS.map((_, index) => (
+            {LEVELS.map((item, index) => (
               <span
-                key={index}
+                key={item.label}
                 className={cn(
                   "h-1 flex-1 rounded-full transition-colors",
                   index <= score ? level.bar : "bg-muted"

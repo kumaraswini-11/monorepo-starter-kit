@@ -53,8 +53,8 @@ const nextConfig: NextConfig = {
     "@workspace/env",
     "@workspace/utils",
   ],
-  async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+  headers() {
+    return Promise.resolve([{ source: "/(.*)", headers: securityHeaders }]);
   },
 };
 

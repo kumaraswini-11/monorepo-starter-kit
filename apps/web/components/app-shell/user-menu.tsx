@@ -86,7 +86,7 @@ export function UserMenu({
         <DropdownMenuSeparator />
         {/* Default (not destructive) — sign-out is reversible; red is reserved for irreversible
             loss (ADR 0020). */}
-        <DropdownMenuItem disabled={pending} onClick={onSignOut}>
+        <DropdownMenuItem disabled={pending} onClick={() => void onSignOut()}>
           <LogOutIcon aria-hidden="true" />
           Sign out
         </DropdownMenuItem>

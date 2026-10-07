@@ -44,6 +44,7 @@
     "@workspace/typescript-config": "workspace:*",
     "@workspace/vitest-config": "workspace:*",
     "eslint": "catalog:",
+    "eslint-plugin-storybook": "catalog:",
     "jsdom": "catalog:",
     "shadcn": "catalog:",
     "storybook": "catalog:",

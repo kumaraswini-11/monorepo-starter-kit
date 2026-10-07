@@ -2,6 +2,7 @@ import {
   cloneElement,
   isValidElement,
   type ComponentProps,
+  type ReactElement,
   type ReactNode,
 } from "react";
 
@@ -32,6 +33,12 @@ import { cn } from "@workspace/ui/lib/utils";
  * <EmptyState size="sm" icon={<BellIcon />} title="No notifications" description="You're all caught up." />
  * <EmptyState icon={<SearchIcon />} title="No results" action={<Button>Clear filters</Button>} />
  */
+/* eslint-disable @eslint-react/no-clone-element -- sizes the caller's svg while keeping its own
+   className override-able; a `[&>svg]` wrapper selector would out-specify that override. */
+const sizeIcon = (icon: ReactElement<{ className?: string }>) =>
+  cloneElement(icon, { className: cn("size-5", icon.props.className) });
+/* eslint-enable @eslint-react/no-clone-element */
+
 export function EmptyState({
   icon,
   title,
@@ -59,9 +66,7 @@ export function EmptyState({
   // svg also disables the primitive's auto-sizing, and a caller-supplied class still wins (merged
   // last) — so the icon stays overridable.
   const renderedIcon =
-    sm && isValidElement<{ className?: string }>(icon)
-      ? cloneElement(icon, { className: cn("size-5", icon.props.className) })
-      : icon;
+    sm && isValidElement<{ className?: string }>(icon) ? sizeIcon(icon) : icon;
 
   return (
     <Empty className={cn(sm && "gap-3 p-8", className)} {...props}>
