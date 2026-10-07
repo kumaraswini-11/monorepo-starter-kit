@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-22
+- **Amended:** 2026-10-07 — pre-commit hooks are no longer deferred — husky + lint-staged + commitlint were adopted directly (not via the vendored `setup-pre-commit` skill); see [0037](0037-git-hooks-commit-governance-and-pr-gates.md).
 
 ## Context
 

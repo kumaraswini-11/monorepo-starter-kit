@@ -1,6 +1,6 @@
 # 0006. Tooling versions — defer TypeScript 7 & ESLint 10
 
-- **Status:** Accepted
+- **Status:** Superseded by [0033](0033-toolchain-version-policy-and-2026-10-modernization.md) (2026-10-07): ESLint 9 reached end-of-life and ESLint 10 was adopted; TypeScript moved to 6.0 (the bridge release); TypeScript 7 keeps a named trigger (typescript-eslint support).
 - **Date:** 2026-07-12
 
 ## Context

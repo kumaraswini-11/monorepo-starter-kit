@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-07 — `eslint-plugin-only-warn` is removed (with `--max-warnings 0` the CI outcome is identical, but it erased error/warning semantics in editors); the vendored exception is now a documented block of idiom/typing rules scoped to `packages/ui/src/components/shadcn/**` — see `packages/ui/eslint.config.js` and [0033](0033-toolchain-version-policy-and-2026-10-modernization.md).
 
 ## Context
 

@@ -1,277 +1,148 @@
 # Future Improvements
 
-A single place for everything we **consciously deferred** at this early stage, so
-it can be reviewed and picked up as the project (and team) grows. Nothing here is
-broken — these are intentional "not yet" items.
+A single place for everything we **consciously deferred**, so it can be reviewed and picked up as
+the project (and team) grows. Nothing here is broken — these are intentional "not yet" items,
+and **every item names its trigger** (a date, a release, or an observable condition). An item
+without a trigger does not belong here.
 
-See the [Architecture Decision Records](decisions/) for the _why_ behind what we
-already built.
+See the [Architecture Decision Records](decisions/) for the _why_ behind what we already built,
+the [guides](guides/) for the _how_, and the [2026-10 foundation audit](audits/2026-10-07-foundation-audit-and-plan.md)
+for the last full re-evaluation.
+
+## Toolchain upgrades (dated or release-gated — ADR 0033)
+
+| Item                                | Trigger                                                                                                                                    | What to do                                                                                                                                                                                                                                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Next.js 16.4 + React 19.3**       | 16.4.0 was published 2026-10-06T18:35Z; the 24h `minimumReleaseAge` gate clears 2026-10-07T18:35Z                                          | bump `next`, `@next/eslint-plugin-next` → `^16.4.0`, `react`/`react-dom` → `19.3.x`, `@types/react*` → `^19.3.0` together; add `partialPrefetching: true` beside `cacheComponents` (16.4 logs a warning without it); read the [16.4 post](https://nextjs.org/blog/next-16-4); full gate + Storybook + e2e |
+| **Node 26 LTS**                     | 2026-10-28 (Active LTS)                                                                                                                    | bump `.nvmrc`, `devEngines.runtime`, `engines.node` (`>=26 <27`), `@types/node` → 26, Dependabot ignore; verify Next, Playwright, Testcontainers, jsdom; CI follows automatically (`pnpm/setup` reads the pin)                                                                                            |
+| **pnpm 12** (Rust rewrite)          | dependabot-core issue [#16434](https://github.com/dependabot/dependabot-core/issues/16434) closed **and** ≥ 3 months of 12.x patch cadence | `packageManager` → `pnpm@12.x`; check `ERR_PNPM_UNRECOGNIZED_WORKSPACE_SETTINGS` (unknown keys hard-fail), stricter transitive `engineStrict`, `--no-frozen-lockfile` spelling; lockfile becomes byte-deterministic                                                                                       |
+| **TypeScript 7** (Go-native)        | typescript-eslint declares TS 7 support (7.0 ships no JavaScript API; "7.1 will ship a new API")                                           | `typescript` → 7; consider `tsc -b` parallelism only if typecheck time becomes a problem (project references are otherwise rejected — ADR 0036)                                                                                                                                                           |
+| **Turborepo Boundaries → blocking** | Turborepo marks Boundaries stable                                                                                                          | drop `continue-on-error` on the CI step; keep the ESLint rules                                                                                                                                                                                                                                            |
+| **`eslint-plugin-jsx-a11y` peer**   | upstream declares `eslint ^10` ([#1075](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/issues/1075))                                 | remove its `peerDependencyRules` entry                                                                                                                                                                                                                                                                    |
+| **`better-auth` vitest peer**       | better-auth declares `vitest ^5`                                                                                                           | remove its `peerDependencyRules` entry                                                                                                                                                                                                                                                                    |
+| **`tsconfck` TypeScript peer**      | tsconfck declares `typescript ^6`                                                                                                          | remove its `peerDependencyRules` entry                                                                                                                                                                                                                                                                    |
+| **Prettier experimental CLI**       | shipped unflagged (Prettier 4)                                                                                                             | re-check `--cache` semantics; nothing else changes                                                                                                                                                                                                                                                        |
+
+Routine minor/patch refreshes (`pnpm deps:check`, Dependabot monthly) are not tracked here.
 
 ## CI / CD
 
-- **Testing** — the full strategy is in
-  [decisions/0025](decisions/0025-testing-strategy.md) (Vitest + Testing Library,
-  Playwright e2e, real-Postgres integration via Testcontainers, `@workspace/vitest-config`,
-  Turbo task split, coverage report-only → gated, monorepo/backend-split-aware). **Done:**
-  Phase 1 (unit + component + CI test job + coverage), Phase 2 (db **and** auth integration
-  vs real Postgres via Testcontainers, sharing the harness at `@workspace/db/testing`, plus a
-  CI **integration** job — Testcontainers on the runner), **Phase 3 (e2e)** — a Playwright
-  `packages/e2e` workspace + CI job (Postgres service): smoke, protected-route redirect, the full
-  **sign-up** and **sign-out** journeys, and a returning-authenticated journey via the
-  **`storageState`** pattern (a `setup` project authenticates once), aligned to the vendored
-  `playwright-best-practices` skill; and the **Phase 4 MSW seam tests** (ADR 0025 §11 Q4).
-  **Remaining (deferred to their triggers — deliberately not built on day one):** a shared
-  contract package and flipping coverage report-only → thresholds.
-  - **MSW seam tests — done (Phase 4, ADR 0025 §11 Q4).** The seam's HTTP contract
-    (enumeration-safe status→error mapping, identifier-first routing) is proven against
-    MSW-intercepted `/api/auth/*`, with **no** client internals mocked, so it survives the ADR
-    0027 split (only `lib/auth-client.ts`'s baseURL moves). The earlier interception failure was
-    root-caused: Better Auth snapshots `globalThis.fetch` into `customFetchImpl` at client
-    construction, so the seam is dynamically imported **after** `server.listen()` — under the
-    standard jsdom preset, no node-env or bespoke `baseURL` needed.
-  - **Shared contract package (deferred — needs a 2nd party).** A zod/OpenAPI contract feeding
-    both MSW handlers and provider assertions only earns its keep once a **separate backend or a
-    2nd client** exists (ADR 0025 §8.3, §9). Today there is one client and the request/response
-    types are already inferred (Better Auth types + the `account-exists` zod schema), so a
-    contract package now would be a single-consumer abstraction with no counterparty. Build it at
-    the split; full Pact only with a 2nd client/team.
-  - **Coverage thresholds (deferred — needs a baseline).** Coverage stays **report-only** until a
-    representative baseline exists; gating on day one either fails CI or bakes in a meaningless
-    bar (ADR 0025 §7 maturity path). Flip on global thresholds once the suite is broad, then
-    tighten to per-package/glob gates.
-  - **Shared integration-test harness — done:** the Testcontainers container+migrate+env-inject
-    setup + `resetDb()` are exported from `@workspace/db/testing` and reused by both
-    `packages/db` and `packages/auth` tests. Extract to a standalone test-support package only
-    if a **non-db** consumer ever needs it (ADR 0025 §11).
-  - **Better Auth `testUtils()`** — ✅ done: bumped to **1.7.1** and adopted (session
-    factories + `login()` from a test-only auth instance). The 1.7 bump also required an
-    `account.issuer` column + unique index (BA 1.7 upgrade guide); ADR 0018's Redis
-    secondary-storage snippet needs the 1.7 API (`increment` + `getAndDelete`) when wired.
-  - **Real-SMTP email integration test (deferred).** The Nodemailer/SMTP adapter (ADR 0014) is
-    covered by unit tests (mocked transport). A follow-up should add one integration test that
-    starts a **Mailpit** container (Testcontainers `GenericContainer`, image `axllent/mailpit`,
-    SMTP 1025 / API 8025), points the adapter's env at it, sends, then asserts receipt via
-    Mailpit's `/api/v1/messages` — proving the real connect/TLS/wire path. Add `testcontainers`
-    (already in the tree) as a `packages/email` devDep + a `test:integration` script so
-    `turbo run test:integration` picks it up automatically.
-  - **OAuth end-to-end test (deferred).** Google sign-in (ADR 0011) is covered by an MSW seam
-    test (error mapping) + config, but a full browser e2e needs a **mock OAuth provider** (the
-    real Google login can't be automated). Add a Playwright e2e against a stub IdP (e.g. a mock
-    OAuth server / Better Auth's test helpers) when the OAuth surface grows.
-- **Turbo remote caching** — set `TURBO_TOKEN` / `TURBO_TEAM` (Vercel) to share the
-  build/lint cache across CI runs.
-- **Parallel CI jobs** — currently one job (cheapest at this size); split into
-  per-check jobs (lint / typecheck / build / test / security) if the repo grows.
-- **Preview deployments** — a per-PR preview (Vercel or similar).
-- **Release automation** — Changesets for versioning + changelogs, _if_ any package
-  is ever published.
-- **Deeper security scanning** — OpenSSF Scorecard and `dependency-review-action`
-  on PRs (free on public repos). _CodeQL is now enabled — see
-  [decisions/0007](decisions/0007-github-automation-governance-and-branch-protection.md)._
-- **Workflow lockfile** — adopt GitHub's upcoming `dependencies:` block (2026
-  roadmap) to pin transitive action SHAs once it is GA.
+- **Turbo remote caching** — shares the task cache across CI runs and machines. **Trigger:** a
+  compliance decision on Vercel Remote Cache (OIDC, no long-lived token) vs a self-hosted server
+  (open API). Then set `remoteCache.signature: true` + a ≥ 32-byte
+  `TURBO_REMOTE_CACHE_SIGNATURE_KEY` (see the [CI/CD guide](guides/ci-cd.md)).
+- **Coverage thresholds** — coverage stays report-only until a representative baseline exists;
+  gating on day one either fails CI or bakes in a meaningless bar (ADR 0025 §7). **Trigger:** the
+  suite covers the auth + data paths end to end; then global thresholds, later per-package.
+- **Sharded e2e** (blob reports + `merge-reports`) — **Trigger:** the e2e job exceeds ~10 minutes.
+- **Deployment / Docker** — no target chosen (ADR 0013/0017). **Trigger:** the hosting decision.
+  Then `output: 'standalone'` + `outputFileTracingRoot`, `turbo prune --docker`, a Dockerfile
+  **with** a CI job that builds it (an unbuilt Dockerfile rots), attestations if on Enterprise.
+- **Preview deployments** — per-PR previews. **Trigger:** with the deployment target.
+- **Release automation** — nothing is published and `main` deploys; see the
+  [release guide](guides/release.md). **Trigger:** a changelog or version is wanted → release-please
+  or Changesets (`privatePackages`), recorded as an ADR.
+- **Workflow lockfile for actions** (`dependencies:` block, `gh actions pin`) — on GitHub's 2026
+  roadmap, not GA. **Trigger:** GA announcement.
+- **Private-repo licensing** — CodeQL and dependency review are free here because the repo is
+  public. **Trigger:** a derived private repo → license GitHub Code Security or delete those
+  workflows (each header says so).
 
-## Storybook
+## Testing (ADR 0025)
 
-- The addon trim decision, Chromatic (Phase 3), and publishing (Phase 4) are
-  tracked in [decisions/0024](decisions/0024-storybook-and-component-testing.md).
-- **Stories for the promoted molecules** — the shadcn _atoms_ each have a co-located
-  `*.stories.tsx`; the form molecules just promoted into `@workspace/ui` (`Form`,
-  `SubmitButton`, `FormError`, `FormTextField`/`FormPasswordField`, `PasswordInput`,
-  `PasswordStrength`) and the brand `Logo` don't yet
-  ([decisions/0016](decisions/0016-shared-code-and-package-boundaries.md) §Component
-  placement). RHF-bound molecules need a `useForm` wrapper in the story.
+- **Shared contract package** — a zod/OpenAPI contract feeding MSW handlers and provider
+  assertions earns its keep once a separate backend or a second client exists (§8.3, §9).
+  **Trigger:** the backend split. Full Pact only with a second client/team.
+- **Real-SMTP email integration test** — Mailpit container via Testcontainers, adapter pointed
+  at it, assert receipt via its API. **Trigger:** the real email transport is wired (ADR 0014).
+- **OAuth end-to-end test** — needs a mock IdP (real Google login cannot be automated).
+  **Trigger:** the OAuth surface grows beyond the single Google button.
+- **Storybook phase 3 (Chromatic)** — **Trigger:** compliance sign-off on the SaaS; then re-add
+  `@chromatic-com/storybook` and TurboSnap (ADR 0024). Phase 4 (publishing): a hosting decision;
+  never GitHub Pages.
+- **Stories for the promoted molecules** (`Form`, `SubmitButton`, `FormError`,
+  `FormTextField`/`FormPasswordField`, `PasswordInput`, `PasswordStrength`, `Logo`) — the shadcn
+  atoms have stories; the molecules do not. **Trigger:** the next change to any of them (write
+  the story then; RHF-bound ones need a `useForm` wrapper).
 
-## Pull requests & developer experience
+## Repository governance (owner actions)
 
-- **Ticket linking (Linear / Jira / …)** — connect PRs to issues:
-  - Install the **Linear** or **Jira** GitHub app (auto-links PRs and syncs status).
-  - Adopt a branch/commit convention, e.g. `feat/PROJ-123-short-desc` and
-    `Closes PROJ-123` in the PR body.
-  - Add a "Related ticket" line to the PR template once a tracker is chosen.
-- **Issue templates** — `.github/ISSUE_TEMPLATE/` (bug + feature forms) with a
-  `config.yml` that routes security reports to `SECURITY.md`.
-- **PR title / commit linting** — commitlint + a Conventional-Commit PR-title check;
-  Husky + lint-staged for pre-commit format/lint.
-- **Auto-labeling** — `actions/labeler` to label PRs by the paths they touch.
-
-## Repository governance (GitHub settings — after first push)
-
-- **Branch protection / ruleset on `main`** — policy defined in
-  [decisions/0007](decisions/0007-github-automation-governance-and-branch-protection.md) (require a PR,
-  require CI + CodeQL checks, disallow force-push/deletion); enable it in
-  **Settings → Rules → Rulesets**. Raise required approvals 0 → 1+ and enforce Code
-  Owner review as the team grows.
-- Set **`main` as the default branch** on GitHub.
-- Replace the CODEOWNERS placeholder owner with real **teams** as they form.
-- Consider **required signed commits**.
+- Import `.github/rulesets/main.json`; enable Dependabot alerts + security updates and the
+  dependency graph; squash-merge default + delete-branch-on-merge; Actions policy "require SHA
+  pinning" and read-only workflow permissions (see the [CI/CD guide](guides/ci-cd.md)).
+  **Trigger:** now — these are settings, not code.
+- Raise required approvals 0 → 1+ and require Code-Owner review; replace the CODEOWNERS
+  placeholder with teams. **Trigger:** the second maintainer.
+- Required signed commits. **Trigger:** every committer (humans and bots) signs.
+- Ticket linking (Linear/Jira app, `Closes PROJ-123`), `actions/labeler`. **Trigger:** a tracker
+  is chosen.
 
 ## App & framework hardening
 
-Most of the original list is **done**: security headers
-([decisions/0015](decisions/0015-web-security-headers.md)), `poweredByHeader: false`,
-root `metadata`/`viewport`/`robots`/`manifest`, `eslint-plugin-jsx-a11y`
-([decisions/0021](decisions/0021-base-ui-selection-and-adoption.md)), `.env.example`
-([decisions/0013](decisions/0013-env-and-secrets-management.md)), `zod` adopted for
-form validation, Node pinning + DX files, and the rendering/perf model
-([decisions/0019](decisions/0019-nextjs-rendering-and-performance.md)).
+Most of the original list is **done**: security headers (ADR 0015), `poweredByHeader: false`,
+root `metadata`/`viewport`/`robots`/`manifest`, jsx-a11y, `.env.example` (ADR 0013), zod form
+validation, the Node/pnpm pins, typed routes, and the rendering/perf model (ADR 0019).
 
 Remaining, **deferred with triggers**:
 
-- **`typedRoutes: true`** — commented in `apps/web/next.config.ts`. **Trigger:** all
-  auth routes exist (it errors on `<Link>`s to not-yet-created routes). Then uncomment.
-- **`useReportWebVitals`** — report real-user Core Web Vitals (LCP/INP/CLS/FCP/TTFB).
-  **How:** a `next/web-vitals` client component in the root layout that POSTs metrics.
-  **Trigger:** an analytics sink is chosen (otherwise it reports nowhere).
-- **SEO for public pages** — `opengraph-image`/`twitter-image`, JSON-LD, canonical
-  URLs. **Trigger:** public/marketing pages exist (auth pages stay `noindex`; a
-  minimal `sitemap.ts` + `robots` already ship).
-- **`forbidden.tsx` / `unauthorized.tsx`** — custom 403/401 UI paired with
-  `forbidden()`/`unauthorized()`. **Trigger:** RBAC (auth org/permissions phase).
-- **`serverExternalPackages`** — re-check `pg` / `better-auth` server bundling if a
-  server-bundle issue ever appears (`next build` is green today).
-- **`instrumentation.ts` + tainting (`experimental.taint`)** — **Trigger:** an
-  observability backend is chosen / server→client data flows grow.
+- **`useReportWebVitals`** — real-user Core Web Vitals. **Trigger:** an analytics sink is chosen.
+- **SEO for public pages** — `opengraph-image`/`twitter-image`, JSON-LD, canonical URLs.
+  **Trigger:** public/marketing pages exist (auth pages stay `noindex`).
+- **`forbidden.tsx` / `unauthorized.tsx`** — custom 403/401 UI. **Trigger:** RBAC.
+- **`serverExternalPackages`** — re-check `pg` / `better-auth` bundling only if a server-bundle
+  issue appears (`next build` is green).
+- **`instrumentation.ts` + tainting** — **Trigger:** an observability backend is chosen.
+- **`experimental.turbopackRustReactCompiler`** — the Rust compiler path. **Trigger:** it leaves
+  experimental.
 
 ## UI & app shell (deferred)
 
 - **Shared error/status-page component (considered — deliberately not extracted).** The route
-  boundaries (`error.tsx`, `(app)/error.tsx`, `not-found.tsx`, `global-error.tsx`) share a centered
-  heading + message + action shape, but were left independent on purpose. `global-error` **replaces**
-  the root layout — it renders its own `<html>/<body>` and cannot consume `@workspace/ui` (no
-  providers/tokens/fonts), so it's a hard exclusion; and `not-found` + `global-error` are expected to
-  get bespoke, branded designs — coupling surfaces that are built to diverge is the wrong trade
-  (variant-prop creep to re-absorb the divergence later). The only real overlap is the two error
-  boundaries: ~6 lines differing by container (`<main min-h-svh>` vs `<div flex-1>`, per ADR 0020) —
-  incidental similarity, too thin to earn a component + its container prop. `EmptyState` covers inline
-  empty _regions_ (its dashed border/padding are region-scoped); it is not a full-page status screen.
-  **Trigger:** a 3rd+ generic error surface with identical chrome, or a decision to visually lock all
-  status pages together. Related deferred item: `(app)/not-found.tsx` (a 404 scoped to the app shell,
-  mirroring `(app)/error.tsx`) — a new behavior, not this extraction; deferred while `not-found`'s
-  design is still expected to change.
+  boundaries (`error.tsx`, `(app)/error.tsx`, `not-found.tsx`, `global-error.tsx`) share a shape
+  but were left independent on purpose: `global-error` replaces the root layout and cannot
+  consume `@workspace/ui`; `not-found` + `global-error` are expected to get bespoke designs; the
+  two error boundaries differ by ~6 lines. **Trigger:** a 3rd+ generic error surface with
+  identical chrome, or a decision to visually lock all status pages together. Related:
+  `(app)/not-found.tsx` (a 404 scoped to the app shell) — deferred while `not-found`'s design is
+  expected to change.
 - **Keyboard-shortcut registry + shortcuts sheet** — the three globals (⌘K palette, ⌘B sidebar,
-  ⌘⇧L theme) run as **separate `window.keydown` listeners** today, with hand-rolled platform
-  (`isMac`) `Kbd` formatting. **Trigger:** a 4th+ global shortcut, or building a **⌘/ shortcuts
-  sheet** (ADR 0023). Then consolidate into one registry that also feeds the sheet. **Candidate
-  tool:** [TanStack Hotkeys](https://tanstack.com/hotkeys/latest/docs/overview) (cross-platform
-  Mod-key, input filtering, conflict detection, cheatsheet formatting, recording UI) — **adopt once
-  it leaves alpha**; raw listeners are fine until then.
-- **List/table virtualization** — no long lists exist yet (dashboard/settings are placeholders).
-  **Trigger:** the first scrollable **100+ row** list/table/grid (members, activity log — the B2B
-  phase). Then adopt [TanStack Virtual](https://tanstack.com/virtual/latest) — headless (fits our
-  Base-UI compose-your-own model), MIT, stable — **over React Virtuoso** (whose chat features are
-  commercially licensed). Lazy-load via `next/dynamic` (dep-weight policy).
+  ⌘⇧L theme) run as separate `window.keydown` listeners. **Trigger:** a 4th+ global shortcut, or
+  a ⌘/ shortcuts sheet (ADR 0023). Candidate: TanStack Hotkeys once it leaves alpha.
+- **List/table virtualization** — no long lists exist yet. **Trigger:** the first scrollable
+  100+ row list/table. Then TanStack Virtual (headless, MIT), lazy-loaded via `next/dynamic`.
 
-## Auth flow (wired; later screens deferred)
+## Auth flow (wired; later screens deferred — ADR 0011/0017)
 
-The auth **UI** is complete and now **wired to Better Auth** (ADR 0017): the app-side seam
-(`apps/web/lib/auth/`) injects `signIn.email` / `signUp.email` / `requestPasswordReset` /
-`resetPassword` into the steps, routes the email step via a rate-limited identifier-first
-existence check, and sends **sign-up → auto-login → `/dashboard`** and **reset → sign in**
-(sessions revoked, [decisions/0011](decisions/0011-authentication-strategy.md)). Remaining:
-
-- **Rate-limit / secondary storage** — BA rate-limits its endpoints (incl. the
-  `account-exists` plugin) by default, but the store defaults to **in-memory** (per-instance).
+- **Rate-limit / secondary storage** — Better Auth rate-limits by default with an in-memory store.
   **Decided:** Redis (`secondary-storage`) is the production store, wired at the deploy/scale
-  trigger — turnkey steps in
-  [decisions/0018](decisions/0018-rate-limiting-and-secondary-storage.md). Dev stays on the
-  default (rate limiting is off in dev). Identifier-first is an intentional enumeration
-  trade-off (ADR 0017 §3).
-- **Change password (Settings)** — a future settings screen needs current + new password
-  (± confirm). **Reuse the form layer** (ADR 0025 §2): `FormPasswordField` (with
-  `showStrength`), `FormError`, `submitWithFormError`, and the `passwordField` schema rule
-  (`PasswordInput` / `PasswordStrength` underlie the field component). If sign-up and
-  change-password end up duplicating the "new password + strength" block, extract a shared
-  field then (rule of three). Better Auth: `authClient.changePassword({ currentPassword,
-newPassword, revokeOtherSessions })`.
-- **Verify-email banner** — ✅ done: `VerifyEmailBanner` in the authed-area layout prompts
-  signed-in-but-unverified users with a rate-limited resend; the emailed link is handled by
-  BA's route handler (progressive verification, ADR 0011).
-- **Lightweight onboarding, OAuth (Google) callback** — later phases per the
-  [auth-ui-ux spec](specs/auth-ui-ux-spec.md) and
-  [decisions/0011](decisions/0011-authentication-strategy.md). The `/auth` "Continue with
-  Google" button is intentionally presentational until then (ADR 0025).
+  trigger (ADR 0018; the 1.7 API: `increment` + `getAndDelete`).
+- **Change password (Settings)** — reuse the form layer (`FormPasswordField` with `showStrength`,
+  `FormError`, `submitWithFormError`, the `passwordField` schema rule); Better Auth
+  `authClient.changePassword({ currentPassword, newPassword, revokeOtherSessions })`.
+  **Trigger:** the settings screen. If sign-up and change-password duplicate the "new password +
+  strength" block, extract then (rule of three).
+- **Lightweight onboarding, OAuth callback UX** — later phases per the
+  [auth-ui-ux spec](specs/auth-ui-ux-spec.md).
 
-### Auth hardening — deploy-time + follow-ups (from the 2026-08-22 audit)
+### Auth hardening — deploy-time follow-ups (from the 2026-08-22 audit)
 
 - **New-device email is on the sign-in critical path.** The `databaseHooks.session.create.after`
-  hook (`packages/auth/src/auth.ts`) is awaited by Better Auth, so on a new device it runs a
-  query + an SMTP send before the sign-in response returns. Harmless with the console stub, but
-  when a real email transport is wired, move the send off the response path (a queue/background
-  worker; framework `after()` isn't reachable from the framework-neutral auth package). Pair
-  this with the "real email transport" step.
-- **Cookie/proxy hardening (deployment-dependent):** set `advanced.useSecureCookies: true` in
-  production (guards against a misconfigured `http` `BETTER_AUTH_URL` silently dropping
-  `Secure`); and once the trusted proxy is known, set
-  `advanced.ipAddress.trustedProxyHeaders: true` together with an `ipv6Subnet` — the leftmost
-  `x-forwarded-for` is client-spoofable until strictly behind a
-  trusted proxy, which would let a caller poison/bypass the per-IP rate-limit key. Fold into the
-  deploy checklist alongside Redis (ADR 0018) and the real email transport.
-- **Audit logging (compliance):** beyond the new-device email, a compliance-bound product will
-  want durable audit events (sign-in, email change, password reset) via Better Auth
-  `databaseHooks`. Not needed yet; recorded so it isn't forgotten.
-
-## Dependency / tooling upgrades (deferred on ecosystem readiness)
-
-See [decisions/0006](decisions/0006-defer-typescript-7-and-eslint-10.md).
-
-- **Vitest 5** — the `vitest` + `@vitest/coverage-v8` + `@vitest/browser-playwright` catalog family
-  is v5-ready (the v5 browser provider is published; Vite ≥6.4 + Node ≥22.12 are met), **but**
-  `@storybook/addon-vitest@10.6` still peers `vitest ^3 || ^4` and requires `@vitest/runner`, which
-  Vitest 5 no longer publishes as a separate package. Splitting the catalog to run two vitest majors
-  is against our lockstep convention, so we wait. **Trigger:** `@storybook/addon-vitest` ships a
-  release whose peers include `vitest ^5` (and drops the `@vitest/runner` peer). Then bump the family
-  together and write a short ADR — v5 flips the repo-wide `clearMocks` default to `true` (our mock
-  tests already `clearAllMocks` in `beforeEach`, so no behavior change is expected, but it's worth
-  recording).
-- **jsdom 30** — jsdom 30 raises its Node floor to `>=24.15.0` (on the 24 line); the dev env is
-  currently on Node **24.13.0**, so `engine-strict` blocks the install. Held at jsdom **26** (fully
-  compatible — our tests assert roles/behaviour, not computed CSS, so nothing in the 27→30 range
-  affects us). **Trigger:** bump dev/CI Node to the latest 24 LTS patch (`>=24.15.0`), then bump
-  `jsdom` → `^30` and tighten `engines.node` to match (a one-liner each).
-- **TypeScript 7** — adopt when typescript-eslint supports it (~7.1).
-- **ESLint 10** — adopt when `eslint-plugin-react` / `eslint-config-next` declare
-  support.
-- **pnpm 11** — adopt for its security-by-default (`minimumReleaseAge`,
-  `blockExoticSubdeps`, `strictDepBuilds` all default-on). Its **Node ≥ 22.13**
-  prerequisite is now **met**: the repo runs **Node 24 LTS** (`engines: >=24`,
-  `.nvmrc`, CI via `node-version-file`, and `@types/node ^24` all aligned). The
-  remaining blocker is env-specific — attempted 2026-07-12 but blocked in the
-  Windows dev env: Corepack could not write its shim (`EPERM` on
-  `C:\Program Files\nodejs`, needs admin) and pnpm's self-managed pnpm-11 launcher
-  failed. Do it where Corepack can activate (an elevated `corepack enable`, or a
-  repaired Node/Corepack install), then bump `packageManager` → `pnpm@11`,
-  re-install, verify, and commit.
-- **Dependabot noise** — the npm ecosystem runs **quarterly** with the deferred
-  majors above **ignored** in `.github/dependabot.yml` (so TS 7 / ESLint 10 stop
-  reopening). Remove the relevant `ignore` entry when adopting each.
-- **shadcn `cn` class-merge engine** — evaluated and **deferred**; we keep `clsx` +
-  `tailwind-merge` ([decisions/0027](decisions/0027-class-merging-keep-clsx-tailwind-merge.md)).
-  The 30× speed claim is immaterial (class-merging isn't an app bottleneck), it's a v0 our
-  `minimumReleaseAge` cooldown blocks, ~26 KB (no bundle win), and a new engine risks Tailwind-v4
-  conflict-resolution regressions across every vendored component. **Trigger:** a stable,
-  widely-adopted 1.x past the cooldown with proven v4 parity → re-evaluate (manual swap of the
-  3 files, never the CLI in our Base-UI monorepo).
-- **Install-time deprecation warnings (benign — no action needed).** `pnpm install`
-  prints a few `deprecated` notices; all are either deliberate or upstream-only:
-  - `eslint@9.x` "no longer supported" — expected: ESLint marks every pre-10 line
-    deprecated now that ESLint 10 shipped, and we deliberately stay on 9 (see the
-    ESLint 10 entry above). Bumping within 9.x won't clear it; only the deferred
-    major would.
-  - `@react-email/components` — ✅ **resolved: migrated 2026-09-06** to the unified **`react-email`**
-    package (React Email 6). Templates import from `react-email` (runtime dep);
-    `@react-email/components` dropped (−~21 packages); `@react-email/render` + `@react-email/ui`
-    unchanged. Gate + email render tests green — the deprecation warning is gone. See
-    [decisions/0014](decisions/0014-email-transactional-messaging.md).
-  - ~25 transitive "subdependencies" (the internal `@react-email/*` tree, plus
-    `glob@10`, `uuid@10`, `@esbuild-kit/*`, etc.) and the `valibot@^1.4.0` peer
-    warning (isolated inside the dev-only `@storybook/addon-mcp` tree) are **deps of
-    deps** — not declared by us and not shippable; they resolve away as those
-    upstreams update.
+  hook (`packages/auth/src/auth.ts`) is awaited, so on a new device it runs a query + an SMTP send
+  before the sign-in response returns. Harmless with the console stub; **when a real transport is
+  wired**, move the send off the response path (queue/background worker — framework `after()` is
+  not reachable from the framework-neutral package).
+- **Cookie/proxy hardening (deployment-dependent):** `advanced.useSecureCookies: true` in
+  production; once the trusted proxy is known, `advanced.ipAddress.trustedProxyHeaders: true` with
+  an `ipv6Subnet` (the leftmost `x-forwarded-for` is client-spoofable until strictly behind a
+  trusted proxy). Fold into the deploy checklist with Redis (ADR 0018) and the email transport.
+- **Audit logging (compliance):** durable audit events (sign-in, email change, password reset) via
+  Better Auth `databaseHooks`. **Trigger:** the compliance programme defines the event set.
 
 ## Production readiness (when this backs a real product)
 
-- Error monitoring (e.g. Sentry), analytics, structured logging.
-- A "Safe Harbor" clause in `SECURITY.md`.
-- License review before any public/open-source release (currently proprietary — see
-  [decisions/0002](decisions/0002-proprietary-license-and-package-posture.md)).
+- Error monitoring (e.g. Sentry), analytics, structured logging. **Trigger:** the observability
+  decision.
+- A "Safe Harbor" clause in `SECURITY.md`. **Trigger:** the legal review before launch.
+- Licence review before any public/open-source release (currently proprietary — ADR 0002).
+- Agent-skill vendoring hygiene: `.agents/skills/` carries ~330 third-party files (ADR 0010).
+  **Trigger:** when deriving a new product repo, prune to the skills that team uses.

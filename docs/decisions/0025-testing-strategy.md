@@ -2,6 +2,7 @@
 
 - **Status:** Accepted (strategy + tool choices); implementation **phased** (§10), three provisioning sub-decisions confirmed at implementation time (§8 Open decisions).
 - **Date:** 2026-08-22
+- **Amended:** 2026-10-07 — the e2e harness moved to `packages/e2e` and its database reset runs as a Playwright `db` setup project (not `globalSetup`); `test` now depends on the `topo` transit node so cached results are invalidated by dependency source changes; Vitest 5. See [0035](0035-task-graph-correctness-and-affected-ci.md), [0036](0036-package-boundaries-dead-code-and-scaffolding.md) and the [testing guide](../guides/testing.md).
 
 ## Context
 

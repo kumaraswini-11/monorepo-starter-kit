@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
+- **Amended:** 2026-10-07 — file paths updated to the feature-first layout of [0028](0028-app-code-feature-architecture.md) (`apps/web/features/auth/...`); the e2e harness lives in `packages/e2e` ([0036](0036-package-boundaries-dead-code-and-scaffolding.md)). The decision is unchanged.
 
 > Resolves the fullstack-vs-separate-backend decision that
 > [0023](0023-app-shell-routing-and-boundaries.md) deliberately deferred. This
@@ -21,15 +22,15 @@ Constraint recap (ADR 0011 / 0023): enterprise, compliance-bound, **reusable as 
 
 ## Current state (what already exists)
 
-| Piece          | File                                                                | Note                                                                                                                                                                          |
-| -------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Auth core      | `packages/auth/src/auth.ts`                                         | **Framework-neutral** `betterAuth(...)` — email/password, verification, reset + password-changed + new-device emails, sessions, telemetry off. Imports **no** framework code. |
-| Next glue      | `apps/web/app/api/auth/[...all]/route.ts`                           | `toNextJsHandler(auth)` — the **only** Next-specific line.                                                                                                                    |
-| Browser client | `apps/web/lib/auth-client.ts`                                       | Re-exports `authClient`; `baseURL` repointable in one place.                                                                                                                  |
-| Server session | `apps/web/lib/session.ts`                                           | `cache(() => auth.api.getSession({ headers }))`.                                                                                                                              |
-| Guards         | `app/(app)/layout.tsx`, `app/page.tsx`                              | `getSession()` + redirect (`instant = false`).                                                                                                                                |
-| Data / email   | `packages/db` (Drizzle + Postgres), `packages/email` (console stub) | Own the schema + delivery port.                                                                                                                                               |
-| UI             | `packages/ui/components/form/*`, `apps/web/components/auth/*`       | Presentational forms + step wrappers with injected `onSubmit`.                                                                                                                |
+| Piece          | File                                                                       | Note                                                                                                                                                                          |
+| -------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth core      | `packages/auth/src/auth.ts`                                                | **Framework-neutral** `betterAuth(...)` — email/password, verification, reset + password-changed + new-device emails, sessions, telemetry off. Imports **no** framework code. |
+| Next glue      | `apps/web/app/api/auth/[...all]/route.ts`                                  | `toNextJsHandler(auth)` — the **only** Next-specific line.                                                                                                                    |
+| Browser client | `apps/web/features/auth/lib/auth-client.ts`                                | Re-exports `authClient`; `baseURL` repointable in one place.                                                                                                                  |
+| Server session | `apps/web/lib/session.ts`                                                  | `cache(() => auth.api.getSession({ headers }))`.                                                                                                                              |
+| Guards         | `app/(app)/layout.tsx`, `app/page.tsx`                                     | `getSession()` + redirect (`instant = false`).                                                                                                                                |
+| Data / email   | `packages/db` (Drizzle + Postgres), `packages/email` (console stub)        | Own the schema + delivery port.                                                                                                                                               |
+| UI             | `packages/ui/src/components/form/*`, `apps/web/features/auth/components/*` | Presentational forms + step wrappers with injected `onSubmit`.                                                                                                                |
 
 **Implication:** "do the backend" ≈ **wire the UI to auth that already exists**, not build a
 backend. The server is ~done; the gap is the client-side wiring + runtime (DB/env/migrations).
@@ -78,13 +79,13 @@ Built as **layers**, each with one responsibility, so only the transport layer c
 migration:
 
 ```
-UI (presentational)         packages/ui/components/form/*  ·  apps/web/components/auth/*(forms)
+UI (presentational)         packages/ui/src/components/form/*  ·  apps/web/features/auth/components/*(forms)
    ▲ injected onSubmit
-Feature wiring (thin)       apps/web/components/auth/*-step.tsx   (guard, nav, inject)
+Feature wiring (thin)       apps/web/features/auth/components/*-step.tsx   (guard, nav, inject)
    ▲ calls
-Data-access seam  ◄── SWAP  apps/web/lib/auth/*                  (the ONLY module that knows the transport)
+Data-access seam  ◄── SWAP  apps/web/features/auth/actions.ts                  (the ONLY module that knows the transport)
    ▲ uses
-Transport         ◄── SWAP  apps/web/lib/auth-client.ts  +  app/api/auth/[...all]/route.ts
+Transport         ◄── SWAP  apps/web/features/auth/lib/auth-client.ts  +  app/api/auth/[...all]/route.ts
    ▲ mounts
 Core (neutral)              packages/auth  ·  packages/db  ·  packages/email   (UNCHANGED on migration)
 ```

@@ -13,7 +13,7 @@ The shared **design system** — shadcn/ui on Base UI, Tailwind v4, OKLCH tokens
 | `@workspace/ui/globals.css` · `./postcss.config` | Tailwind entry + PostCSS config                         |
 
 Atoms + agnostic molecules live here (component placement — ADR 0016). See ADRs
-[0021](../../docs/decisions/0021-base-ui-selection-and-adoption.md) /
+[0024](../../docs/decisions/0024-storybook-and-component-testing.md) (Storybook) /
 [0021](../../docs/decisions/0021-base-ui-selection-and-adoption.md) (Base UI),
 [0020](../../docs/decisions/0020-ui-foundations-layout-responsiveness-accessibility.md) (a11y),
 [0022](../../docs/decisions/0022-forms-rhf-submission-and-pending.md) (forms).

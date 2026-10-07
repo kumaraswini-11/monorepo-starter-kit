@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-07 — the root `.eslintrc.js` mentioned below was deleted (ESLint 10 cannot read eslintrc files); the methodology itself is unchanged. See [0033](0033-toolchain-version-policy-and-2026-10-modernization.md).
 
 ## Context
 

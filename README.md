@@ -1,213 +1,153 @@
 # monorepo-starter-kit
 
-> An enterprise-grade, **fullstack** monorepo starter — Next.js 16, React 19,
-> Tailwind CSS v4, and shadcn/ui (Base UI), with a self-hosted **Better Auth**
-> foundation (PostgreSQL + Drizzle + transactional email), wired together with
-> Turborepo and pnpm.
+> An enterprise-grade, **fullstack** monorepo foundation — Next.js 16, React 19, Tailwind CSS v4,
+> shadcn/ui on Base UI, a self-hosted **Better Auth** backend (PostgreSQL + Drizzle +
+> transactional email), wired together with Turborepo and pnpm — built to be reused as the
+> starting point for the next serious application, not just this one.
 
 [![CI](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/codeql.yml/badge.svg)](https://github.com/kumaraswini-11/monorepo-starter-kit/actions/workflows/codeql.yml)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-149ECA?style=flat-square&logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Turborepo](https://img.shields.io/badge/Turborepo-2-0096FF?style=flat-square&logo=turborepo&logoColor=white)
 ![License](https://img.shields.io/badge/license-Proprietary-red?style=flat-square)
 
-## About
+## What you get
 
-**monorepo-starter-kit** is a batteries-included, **auth-ready** foundation for
-building scalable products. It ships:
+- **A working, wired auth product slice**: identifier-first sign-in / sign-up / forgot / reset,
+  email verification, Google OAuth (opt-in), new-device emails — UI in `apps/web`, a
+  framework-neutral Better Auth server in `packages/auth`, PostgreSQL + Drizzle in `packages/db`,
+  React Email + an SMTP port in `packages/email`, a validated env contract in `packages/env`.
+- **A design system** (`packages/ui`, shadcn/ui on Base UI) with a Storybook workspace whose
+  story tests double as an accessibility gate.
+- **A foundation that enforces its own rules**: single-version dependency catalog, source-only
+  packages with `exports` boundaries + Turborepo Boundaries tags, type-aware ESLint 10, Prettier,
+  Vitest 5 / Testcontainers / Playwright tiers, affected-only CI with blocking supply-chain gates,
+  git hooks, and a package generator — every decision recorded as an ADR.
 
-- a shared, themeable **UI library** (shadcn/ui on Base UI) with a **Storybook**
-  workspace;
-- a complete, **presentational auth flow** — sign-in / sign-up / forgot / reset,
-  identifier-first, accessible (WCAG-minded), and responsive (mobile → TV);
-- a framework-neutral **Better Auth** backend (self-hosted, own-DB) with
-  **PostgreSQL + Drizzle** and a **transactional email** port;
-- centralized ESLint & TypeScript configs and a cached Turborepo task pipeline —
-  so every app starts consistent and stays maintainable as the codebase grows.
+## Tech stack
 
-> **The auth UI is built; the backend is set up but intentionally _not yet wired_
-> to the UI.** The seam is explicit (each form takes an injected `onSubmit`), so
-> you clone this and wire auth per project. See
-> **[ADR 0017](docs/decisions/0017-backend-architecture-and-migration.md)**
-> for the fullstack decision, the step-by-step wiring plan, and a separate-backend
-> migration playbook.
+| Tool                                 | Version                          | Notes                                                                      |
+| ------------------------------------ | -------------------------------- | -------------------------------------------------------------------------- |
+| Node.js                              | 24.21.0 (pinned)                 | `devEngines.runtime` — pnpm downloads and runs it; `.nvmrc` for editors/CI |
+| pnpm                                 | 11 (pinned via `packageManager`) | self-managed; catalog + supply-chain settings in `pnpm-workspace.yaml`     |
+| Turborepo                            | 2.11                             | task graph with transit nodes, Boundaries tags, affected CI                |
+| TypeScript                           | 6                                | bridge to 7; `verbatimModuleSyntax`, `erasableSyntaxOnly`                  |
+| Next.js                              | 16                               | App Router, Turbopack, Cache Components, React Compiler, typed routes      |
+| React                                | 19                               |                                                                            |
+| Tailwind CSS                         | 4                                | CSS-first config                                                           |
+| shadcn/ui                            | 4 (CLI)                          | Base UI primitives — `@base-ui/react` (ADR 0021)                           |
+| Better Auth                          | 1.7                              | self-hosted, framework-neutral (ADR 0011)                                  |
+| PostgreSQL / Drizzle                 | 17 / 0.45                        | local via `docker compose` (ADR 0012)                                      |
+| ESLint / Prettier                    | 10 / 3                           | flat config, type-aware; Prettier owns formatting                          |
+| Vitest / Playwright / Testcontainers | 5 / 1.63 / 12                    | unit+component, e2e, real-Postgres integration (ADR 0025)                  |
 
-## Tech Stack
-
-| Tool         | Version | Notes                                                |
-| ------------ | ------- | ---------------------------------------------------- |
-| Next.js      | 16      | App Router, Turbopack                                |
-| React        | 19      |                                                      |
-| TypeScript   | 5       | Strict, `noUncheckedIndexedAccess`                   |
-| Tailwind CSS | 4       | CSS-first config, `tw-animate-css`                   |
-| shadcn/ui    | latest  | Base UI primitives — default `@base-ui/react`        |
-| Better Auth  | latest  | Self-hosted, framework-neutral auth (ADR 0011)       |
-| PostgreSQL   | 17      | Local via `docker-compose` (ADR 0012)                |
-| Drizzle ORM  | latest  | TS-first schema + migrations (ADR 0012)              |
-| React Email  | latest  | Templated email behind a `sendEmail` port (ADR 0014) |
-| Turborepo    | 2       | Task orchestration & caching                         |
-| pnpm         | 10      | Workspaces, pinned via `packageManager`              |
-| ESLint       | 9       | Flat config                                          |
-| Prettier     | 3       | With Tailwind class sorting                          |
-
-## Repository Structure
+## Repository structure
 
 ```text
 .
 ├── apps/
-│   ├── web/         # Next.js 16 application — auth UI, dashboard
-│   └── storybook/   # Storybook for the shared UI library
-├── packages/
-│   ├── ui/                  # Shared components (shadcn/ui + Base UI) — source-only
-│   ├── auth/                # Better Auth server + client (framework-neutral)  — ADR 0011
-│   ├── db/                  # PostgreSQL + Drizzle schema & client              — ADR 0012
-│   ├── email/               # React Email templates + `sendEmail` port          — ADR 0014
-│   ├── env/                 # Validated environment contract (fail-fast)        — ADR 0013
-│   ├── eslint-config/       # Shared ESLint flat configs
-│   └── typescript-config/   # Shared tsconfig presets
-└── docs/                    # Architecture decisions (ADRs), references, future work
+│   ├── web/                 Next.js application — auth, dashboard
+│   └── storybook/           Storybook for the design system (+ browser-mode story tests)
+├── packages/                all @workspace/*, source-only
+│   ├── ui/                  design system (shadcn/ui + Base UI)
+│   ├── auth/ db/ email/ env/   Better Auth · Postgres + Drizzle · React Email · validated env
+│   ├── utils/               pure, isomorphic helpers (the dependency-free leaf)
+│   ├── e2e/                 Playwright end-to-end harness
+│   └── eslint-config/ typescript-config/ vitest-config/   shared presets
+├── turbo/generators/        `pnpm gen package` scaffold
+└── docs/                    decisions/ (ADRs) · guides/ (how-to) · audits/ · future-improvements.md
 ```
 
-## Getting Started
+Full map and placement rules: [docs/guides/repository-structure.md](docs/guides/repository-structure.md).
+
+## Getting started
 
 ### Prerequisites
 
-- **Node.js** 24+ (LTS) — matches `.nvmrc` (`pnpm install` is `engine-strict`)
-- **pnpm** via [Corepack](https://nodejs.org/api/corepack.html) — run
-  `corepack enable`
-- **Docker** — only needed to run PostgreSQL locally when you wire/run auth
+- **pnpm 11** — install once with the standalone script (`https://pnpm.io/installation`);
+  from then on pnpm downloads the exact version this repo pins, and the exact Node.js runtime
+  too (`devEngines.runtime`). No nvm/Corepack required. Inside the repo use `pnpm` and
+  `pnpm dlx`, never `npm`/`npx`.
+- **Docker** — only for the local PostgreSQL and the integration tests.
 
-### 1. Install
-
-```bash
-pnpm install
-```
-
-### 2. Configure environment
+### Install, configure, run
 
 ```bash
+pnpm install                               # also installs the git hooks
 cp apps/web/.env.example apps/web/.env.local
-# then set BETTER_AUTH_SECRET — generate one with:  openssl rand -base64 32
+# set BETTER_AUTH_SECRET:  openssl rand -base64 32
+docker compose up -d                       # PostgreSQL 17 at localhost:5432
+pnpm --filter @workspace/db db:migrate     # apply the schema
+pnpm dev                                   # web at http://localhost:3000
 ```
-
-### 3. Database (only needed for auth)
-
-```bash
-docker compose up -d            # PostgreSQL 17 at localhost:5432 (matches .env.example)
-# apply the schema with drizzle-kit (see packages/db for the exact script)
-```
-
-### 4. Develop
-
-```bash
-pnpm dev                        # web at http://localhost:3000
-```
-
-> The auth **UI runs without a database** — it's presentational. The database and
-> secret are only required once you **wire** the auth calls (see below).
-
-## Backend / Auth
-
-The auth screens are complete and **presentational** (ADR 0025): each form takes an
-injected `onSubmit`, decoupling the UI from any backend. The Better Auth server
-(`packages/auth`) is configured and **framework-neutral** (it mounts under Next.js
-today via a ~3-line route handler, or under a standalone Node service unchanged).
-
-To make auth **functional**, wire the UI to it. The recommended seam, the
-step-by-step wiring, the identifier-first existence-check nuance, and — if you later
-outgrow fullstack — the separate-backend migration are all documented in
-**[ADR 0017](docs/decisions/0017-backend-architecture-and-migration.md)**.
-Wiring points are marked in code with `// Wiring:` comments in
-`apps/web/components/auth/*-step.tsx`.
 
 ## Commands
 
-Run from the repo root.
+Run from the repo root (Turborepo, cached, affected-aware).
 
-| Command           | Description                                           |
-| ----------------- | ----------------------------------------------------- |
-| `pnpm dev`        | Start all dev servers (web → <http://localhost:3000>) |
-| `pnpm build`      | Build everything                                      |
-| `pnpm lint`       | Lint the workspace (fails on any warning)             |
-| `pnpm typecheck`  | Type-check the workspace                              |
-| `pnpm format`     | Format the whole repo                                 |
-| `pnpm deps:check` | Check for dependency updates (`taze`)                 |
+| Command                 | What it does                                     |
+| ----------------------- | ------------------------------------------------ |
+| `pnpm dev`              | start all dev servers                            |
+| `pnpm build`            | production build                                 |
+| `pnpm lint`             | ESLint, every package, zero warnings allowed     |
+| `pnpm typecheck`        | TypeScript, every package + root tooling         |
+| `pnpm format`           | Prettier (writes) — the only formatter           |
+| `pnpm test`             | unit + component tests                           |
+| `pnpm test:integration` | real-Postgres integration tests (Docker)         |
+| `pnpm test:e2e`         | Playwright journeys against the production build |
+| `pnpm knip`             | unused files / exports / dependencies            |
+| `pnpm gen package`      | scaffold a new workspace package                 |
+| `pnpm deps:check`       | preview outdated dependencies (taze)             |
 
-```bash
-# A single package (via Turbo, cached):
-pnpm exec turbo build --filter=web
-pnpm --filter web dev
-pnpm --filter storybook build:storybook
-
-# Format only part of the tree (Prettier is path-based, not per-package):
-pnpm exec prettier --write apps/web
-```
-
-Filterable names: `web`, `storybook`, `@workspace/ui`, `@workspace/auth`,
-`@workspace/db`, `@workspace/email`, `@workspace/env`,
-`@workspace/eslint-config`, `@workspace/typescript-config`.
-
-## Usage
-
-Add shadcn/ui components into the shared `ui` package, targeting the web app:
+The full local gate: `pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip`.
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
+pnpm exec turbo build --filter=web                       # one package
+pnpm --filter storybook storybook                        # Storybook dev server
+pnpm dlx shadcn@4.21.3 add button -c apps/web            # add a shadcn component into packages/ui
 ```
-
-Then import them anywhere:
-
-```tsx
-import { Button } from "@workspace/ui/components/button";
-```
-
-## Make it yours
-
-This starter ships with the author's defaults. When you clone it for a **new
-project**, update these spots:
-
-| What           | Where                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------------ |
-| App / brand    | `packages/ui/src/lib/brand.ts` (name + logo); page `metadata` in `apps/web/app`                              |
-| Package name   | root `package.json` `name`; this README's title + badges                                                     |
-| Repo URLs      | CI / CodeQL badge URLs above → your GitHub org/repo                                                          |
-| License holder | `LICENSE` and the [License](#license) section (© your org)                                                   |
-| Email product  | `packages/email/src/components/email-layout.tsx` (product-name TODO)                                         |
-| Auth config    | `BETTER_AUTH_URL` + trusted origins for your domain; a real email provider (dev is a console stub, ADR 0014) |
-| Legal pages    | `/terms` and `/privacy` are linked from the auth entry — add real pages before launch                        |
 
 ## Documentation
 
-- **[Architecture Decisions (ADRs)](docs/decisions/)** — the _why_ behind key
-  technical and process choices.
-- **[References](docs/references.md)** — curated tools, templates, and docs used
-  to build this repo.
-- **[Future improvements](docs/future-improvements.md)** — consciously deferred
-  items to revisit as the project grows.
+- **[Guides](docs/guides/)** — how to add a package or an app, manage dependencies, environment,
+  testing, CI/CD, releases.
+- **[Architecture decisions (ADRs)](docs/decisions/)** — the _why_ behind every convention.
+- **[Audits](docs/audits/)** — periodic re-evaluations of the foundation against current
+  official documentation.
+- **[Future improvements](docs/future-improvements.md)** — deliberately deferred work, each item
+  with a trigger.
+- **[References](docs/references.md)** — sources used to build this repo.
 
-## Contributing
+## Make it yours
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, conventions, and the pull
-request process. Please also review our [Code of Conduct](CODE_OF_CONDUCT.md).
+| What                 | Where                                                                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Product name / brand | `packages/utils/src/product.ts` (name), `packages/ui/src/lib/brand.ts`, `packages/ui/src/components/brand/`                       |
+| Repo name & badges   | root `package.json` `name`; this README; `.github/ISSUE_TEMPLATE/config.yml` links                                                |
+| Code owners          | `.github/CODEOWNERS` (replace the placeholder with teams)                                                                         |
+| Licence holder       | `LICENSE`, the [Licence](#licence) section                                                                                        |
+| Email product copy   | `packages/email/src/components/email-layout.tsx`                                                                                  |
+| Auth config          | `BETTER_AUTH_URL`, trusted origins, a real SMTP provider (ADR 0014), Google OAuth (opt-in)                                        |
+| Legal pages          | `/terms` and `/privacy` links in `packages/ui/src/lib/brand.ts`                                                                   |
+| GitHub settings      | import `.github/rulesets/main.json`; enable Dependabot alerts; squash-merge default — see the [CI/CD guide](docs/guides/ci-cd.md) |
 
-## Security
+## Contributing & security
 
-Found a vulnerability? Please follow the process in [SECURITY.md](SECURITY.md) —
-**do not** open a public issue.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [SECURITY.md](SECURITY.md) for
+reporting vulnerabilities (never in a public issue). Agents read [AGENTS.md](AGENTS.md).
 
-## License
+## Licence
 
-**Proprietary — © 2026 Aswini. All rights reserved.** This source is available
-for reference only; see [LICENSE](LICENSE). It is not licensed for reuse,
-redistribution, or commercial use without prior written permission.
+**Proprietary — © 2026 Aswini. All rights reserved.** Source-available for reference only; see
+[LICENSE](LICENSE). Not licensed for reuse, redistribution, or commercial use without prior
+written permission.
 
 ## Acknowledgments
 
-Built on the excellent work of [shadcn/ui](https://ui.shadcn.com),
-[Turborepo](https://turborepo.dev), [Next.js](https://nextjs.org),
-[Base UI](https://base-ui.com), [Tailwind CSS](https://tailwindcss.com), and
-[Better Auth](https://better-auth.com).
+Built on the excellent work of [shadcn/ui](https://ui.shadcn.com), [Base UI](https://base-ui.com),
+[Turborepo](https://turborepo.dev), [pnpm](https://pnpm.io), [Next.js](https://nextjs.org),
+[Tailwind CSS](https://tailwindcss.com), and [Better Auth](https://better-auth.com).

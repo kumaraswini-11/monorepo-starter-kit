@@ -1,155 +1,64 @@
-# Contributing to monorepo-starter-kit
+# Contributing
 
-First off, thank you for taking the time to contribute! 🎉
+This is a private, proprietary repository (ADR [0002](docs/decisions/0002-proprietary-license-and-package-posture.md)).
+Contributions come from people with write access; the workflow below is the engineering
+standard for every change, large or small. Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-This guide explains how to contribute to **monorepo-starter-kit**. Following it
-keeps the project consistent, makes reviews faster, and respects everyone's time.
+## Before you start
 
-We welcome several kinds of contributions:
+- Read [AGENTS.md](AGENTS.md) (the lean handbook — it applies to humans too) and the guide for
+  what you are doing in [docs/guides/](docs/guides/).
+- A change that alters a convention, a tool, or a boundary needs an **ADR** in
+  [docs/decisions/](docs/decisions/) (copy the latest record's format; add an index row). Open
+  an issue (feature form) first if the decision is not obvious — align before building.
+- Trivial fixes (typos, comments) can go straight to a pull request.
 
-- 🐛 Bug reports and fixes
-- ✨ Features and enhancements
-- 📝 Documentation improvements
-- 🧪 Tests
-- 💡 Ideas and feedback
-
-## Code of Conduct
-
-This project and everyone participating in it is governed by our
-[Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to
-uphold it. Please report unacceptable behavior as described there.
-
-## Ground Rules
-
-- Be respectful and constructive.
-- Open an issue to discuss significant changes **before** starting work, so no
-  effort is wasted.
-- Keep pull requests focused — one logical change per PR.
-- Make sure the full check suite passes before requesting review (see below).
-- Add or update tests and documentation when your change warrants it.
-
-## Your First Contribution
-
-Not sure where to start? Look for issues labeled `good first issue` or
-`help wanted` — they're scoped to be approachable.
-
-New to open source? These resources help:
-
-- [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
-- [Making a Pull Request](https://makeapullrequest.com/)
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** 24 or newer (LTS) — matches `.nvmrc` (`pnpm install` is `engine-strict`)
-- **pnpm** via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`
-
-### Set up the project
+## Setup
 
 ```bash
-# Fork and clone the repo, then:
-pnpm install
-pnpm dev        # starts the app at http://localhost:3000
+pnpm install          # pnpm 11 pins itself and the Node runtime; installs the git hooks
+cp apps/web/.env.example apps/web/.env.local && docker compose up -d
+pnpm dev
 ```
 
-### Project layout
+Inside the repo use `pnpm` / `pnpm dlx` only (never `npm` / `npx`).
 
-| Path                         | Description                                     |
-| ---------------------------- | ----------------------------------------------- |
-| `apps/web`                   | Next.js 16 application (auth UI, dashboard)     |
-| `apps/storybook`             | Storybook for the shared UI library             |
-| `packages/ui`                | Shared component library (shadcn/ui + Base UI)  |
-| `packages/auth`              | Better Auth server + client (framework-neutral) |
-| `packages/db`                | PostgreSQL + Drizzle schema & client            |
-| `packages/email`             | React Email templates + `sendEmail` port        |
-| `packages/env`               | Validated environment contract                  |
-| `packages/eslint-config`     | Shared ESLint flat configs                      |
-| `packages/typescript-config` | Shared `tsconfig` presets                       |
+## The loop
 
-### Make your change
-
-1. Create a branch: `git checkout -b feat/short-description`
-2. Make your change (add a UI component with
-   `pnpm dlx shadcn@latest add <name> -c apps/web`).
-3. Run the full check suite and make sure it passes:
+1. **Branch** from `main`: `type/short-description` (e.g. `feat/user-settings`, `fix/button-focus`).
+2. **Change** the smallest thing that is complete. New package → `pnpm gen package`. New
+   dependency → `pnpm add --filter <pkg> --catalog <dep>` and read its docs (ADR 0034).
+3. **Gate locally** (the hooks format and lint staged files on commit; the full gate is yours):
 
    ```bash
-   pnpm format      # auto-format with Prettier
-   pnpm lint        # ESLint (must pass with zero warnings)
-   pnpm typecheck   # TypeScript
-   pnpm build       # production build
+   pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip
    ```
 
-4. Commit using [Conventional Commits](#commit-code--branch-conventions).
-5. Push your branch and open a pull request against `main`, describing **what**
-   changed and **why**.
+   Plus `pnpm test:integration` / `pnpm test:e2e` / `pnpm --filter storybook build:storybook test`
+   when you touched what they cover (CI runs them anyway).
 
-### Small or obvious fixes
+4. **Audit your diff** before committing (AGENTS.md "Audit before every commit"): standards,
+   DRY/SOLID, compatibility with the involved libraries' official docs, error paths, cleanup,
+   security.
+5. **Commit** with [Conventional Commits](https://www.conventionalcommits.org/) — enforced by
+   the `commit-msg` hook: `feat(auth): add passkey step`, `build(deps): bump drizzle-orm`.
+   One logical change per commit.
+6. **Pull request** against `main`: fill the template; the title must be a Conventional
+   Commit (it becomes the squash commit). CI must be green: format, lint, typecheck, build,
+   knip, audit, tests, Storybook, CodeQL, dependency review, PR title.
+7. **Review & merge**: squash only, linear history (ruleset). Resolve every conversation.
 
-Typo fixes, comment tweaks, and other trivial changes can go straight to a pull
-request without opening an issue first.
+## Reporting
 
-## How to Report a Bug
+- **Bugs / proposals**: GitHub issues via the forms (`bug`, `feature`).
+- **Security**: never a public issue — follow [SECURITY.md](SECURITY.md).
 
-### Security issues come first
+## Where things go
 
-**If you find a security vulnerability, do _not_ open a public issue.** Follow
-the private disclosure process in [SECURITY.md](SECURITY.md) instead.
-
-### Filing a (non-security) bug
-
-Open an issue and include:
-
-- What you expected to happen, and what actually happened
-- Clear steps to reproduce (a minimal reproduction is ideal)
-- Your environment: OS, Node version, pnpm version, and browser (if relevant)
-- Relevant logs, screenshots, or error output
-
-## How to Suggest a Feature or Enhancement
-
-Open an issue that describes:
-
-- The problem you're trying to solve (the "why")
-- Your proposed solution, and any alternatives you considered
-- Rough scope or size, if you have a sense of it
-
-Let's align on the approach in the issue before significant implementation work
-begins.
-
-## Code Review Process
-
-- A maintainer will review your pull request and may request changes.
-- Keep discussion in the PR thread and push follow-up commits as needed.
-- Once it's approved and all checks pass, a maintainer will merge it.
-- We aim to give initial feedback within a few days — feel free to ping the PR
-  if it goes quiet.
-
-## Community
-
-Questions and discussion happen in GitHub Issues (and Discussions, if enabled).
-Provide context so others can help you effectively.
-
-## Commit, Code & Branch Conventions
-
-### Commit messages — Conventional Commits
-
-Use [Conventional Commits](https://www.conventionalcommits.org/):
-`<type>: <description>` — for example, `feat: add user settings page` or
-`fix: correct button focus ring`. Common types: `feat`, `fix`, `docs`, `style`,
-`refactor`, `test`, `chore`.
-
-### Code style
-
-Formatting and linting are enforced by Prettier and ESLint — run `pnpm format`
-and `pnpm lint` before pushing. Keep shared, reusable UI in `packages/ui`, and
-keep app-specific code in `apps/*`.
-
-### Branch naming
-
-`type/short-description` — for example, `feat/user-settings` or
-`fix/button-focus`.
-
----
-
-Thank you again for contributing! 🙌
+| Question                                    | Answer                                                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Shared, generic UI?                         | `packages/ui` (ADR 0016/0026); feature UI stays in `apps/web/features/<name>/` (ADR 0028)               |
+| Server-side capability (data, auth, email)? | its own `packages/<name>` with `server-only`, behind a port (ADR 0012/0014/0016)                        |
+| Configuration / secrets?                    | `@workspace/env` schema + `apps/<app>/.env.example` (ADR 0013)                                          |
+| Tests?                                      | co-located with the code; tiers and runners in the [testing guide](docs/guides/testing.md)              |
+| A decision?                                 | an ADR; deferred work goes to [docs/future-improvements.md](docs/future-improvements.md) with a trigger |

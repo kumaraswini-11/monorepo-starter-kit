@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-09
+- **Amended:** 2026-10-07 — `@workspace/utils` exists (the trigger below fired); the brand mark and name live in `packages/ui/src/components/brand/` and `packages/ui/src/lib/brand.ts` (name sourced from `@workspace/utils/product`); the dependency direction is now also enforced by Turborepo Boundaries tags and `paths` aliases are banned — see [0036](0036-package-boundaries-dead-code-and-scaffolding.md).
 
 ## Context
 
