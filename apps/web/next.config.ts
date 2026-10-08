@@ -45,14 +45,6 @@ const nextConfig: NextConfig = {
   //     formats: ["image/avif", "image/webp"],
   //     remotePatterns: [{ protocol: "https", hostname: "images.example.com" }],
   //   },
-  transpilePackages: [
-    "@workspace/ui",
-    "@workspace/auth",
-    "@workspace/db",
-    "@workspace/email",
-    "@workspace/env",
-    "@workspace/utils",
-  ],
   headers() {
     return Promise.resolve([{ source: "/(.*)", headers: securityHeaders }]);
   },
