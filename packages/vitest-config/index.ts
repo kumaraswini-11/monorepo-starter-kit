@@ -75,6 +75,11 @@ export const dom = mergeConfig(
       include: ["src/**/*.test.{ts,tsx}"],
       setupFiles: ["@workspace/vitest-config/setup"],
       globals: true,
+      // Component tests drive real user-event typing in jsdom. Under the full local gate (Next
+      // build + type-aware lint + typecheck in parallel) they run ~4x slower (2.5s vs 0.6s
+      // measured), which crossed the 5s default twice. CI runs tests in their own job; this
+      // only removes false failures from the concurrent local run.
+      testTimeout: 15_000,
     },
   })
 );
