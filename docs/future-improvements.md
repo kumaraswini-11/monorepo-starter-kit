@@ -27,6 +27,10 @@ for the last full re-evaluation.
 Routine minor/patch refreshes (`pnpm deps:check`; Dependabot monthly once its template switch is
 on) are not tracked here.
 
+- **`cn` (class merging) re-evaluation** — ADR 0027 keeps `clsx` + `tailwind-merge`. **Trigger:**
+  `cn` reaches a stable 1.x with a maintenance track record and Tailwind v4 parity, past the
+  cooldown — then re-evaluate on the merits (manual swap + gate).
+
 ## CI / CD
 
 - **Turbo remote caching** — shares the task cache across CI runs and machines. **Trigger:** a
@@ -50,6 +54,11 @@ on) are not tracked here.
   public. **Trigger:** a derived private repo → license GitHub Code Security or delete those
   workflows (each header says so).
 
+- **Merge queue** — `ci.yml` and `codeql.yml` already run on `merge_group`; `dependency-review`
+  and `pr-title` cannot (PR-only events) yet are required checks in the ruleset. **Trigger:**
+  enabling a merge queue — add an always-pass job with the same `name:` on `merge_group` in
+  those two workflows (GitHub's documented workaround) or drop them from the required list.
+
 ## Testing (ADR 0025)
 
 - **Shared contract package** — a zod/OpenAPI contract feeding MSW handlers and provider
@@ -66,6 +75,16 @@ on) are not tracked here.
   `FormTextField`/`FormPasswordField`, `PasswordInput`, `PasswordStrength`, `Logo`) — the shadcn
   atoms have stories; the molecules do not. **Trigger:** the next change to any of them (write
   the story then; RHF-bound ones need a `useForm` wrapper).
+- **Integration suites ADR 0025 §3 lists but the tree lacks** — password reset asserting that
+  `revokeSessionsOnPasswordReset` cleared the other sessions and that the reset / password-changed
+  emails fire; the account-exists rate limit (must go through `auth.handler(new Request(...))`
+  with `rateLimit.enabled: true` — `auth.api.*` bypasses the limiter); the sign-in failure
+  pinned to `401` / `INVALID_EMAIL_OR_PASSWORD` (the seam relies on it); `getUserById`; and
+  account linking (ADR 0011's security decision). **Trigger:** the next change to `packages/auth`
+  or before production launch, whichever is first — they need Docker (Testcontainers) to run.
+- **Page-level accessibility** — axe in Playwright on the authed shell and the auth flow
+  (component level is covered by Storybook's addon-a11y, ADR 0024). **Trigger:** the first
+  e2e change after the settings surface lands.
 
 ## Repository governance (owner actions)
 
@@ -136,10 +155,22 @@ Remaining, **deferred with triggers**:
   before the sign-in response returns. Harmless with the console stub; **when a real transport is
   wired**, move the send off the response path (queue/background worker — framework `after()` is
   not reachable from the framework-neutral package).
-- **Cookie/proxy hardening (deployment-dependent):** `advanced.useSecureCookies: true` in
-  production; once the trusted proxy is known, `advanced.ipAddress.trustedProxyHeaders: true` with
-  an `ipv6Subnet` (the leftmost `x-forwarded-for` is client-spoofable until strictly behind a
-  trusted proxy). Fold into the deploy checklist with Redis (ADR 0018) and the email transport.
+- **Cookie/proxy hardening (deployment-dependent — a deploy-gate item):** `advanced.useSecureCookies:
+true` in production; once the proxy is known, `advanced.ipAddress.trustedProxies: [<proxy
+CIDRs>]` and the edge's own header first in `ipAddressHeaders` (`cf-connecting-ip` /
+  `x-vercel-forwarded-for`). Today's list is only correct behind a single proxy that overwrites
+  `x-forwarded-for`: without `trustedProxies` Better Auth trusts single-value headers only, so a
+  client-supplied multi-value header resolves to no IP and the limiter falls back to one shared
+  bucket (a DoS lever), while a directly reachable origin can be given a spoofed single value
+  (a bypass). Fold into the deploy checklist with Redis (ADR 0018) and the email transport.
+- **Route guard → Data Access Layer** (ADR 0032 Decision 2) and the `apps/web/lib/session.ts` →
+  `features/auth/lib/` move (ADR 0028). The interim is `requireSession()` on every authed page.
+  **Trigger:** the first data-reading page beyond the dashboard placeholder (the DAL then has
+  real reads to own) — schedule before the next auth change.
+- **Unused email templates** — `sendAccountUnlockedEmail` / `sendInviteEmail` (and their
+  templates) have no consumer; knip cannot see it because they are re-exported from an
+  `exports` entry. **Trigger:** the lockout and invitation features (ADR 0011 roadmap) — wire
+  them then, or delete them at the production-readiness review if still unused.
 - **Audit logging (compliance):** durable audit events (sign-in, email change, password reset) via
   Better Auth `databaseHooks`. **Trigger:** the compliance programme defines the event set.
 
@@ -155,6 +186,20 @@ Remaining, **deferred with triggers**:
   terms), (b) switch to `bowser` (MIT), or (c) a dependency-free family table. **Trigger:** the
   legal/compliance review before production launch — must be resolved before shipping. The gate
   (`pnpm licenses:check`) prints this exception on every run.
+- **Timestamps with time zone.** Every `timestamp` column is `without time zone`: drizzle reads
+  and writes them as UTC, but `defaultNow()` is Postgres `now()` rendered in the session time
+  zone, so a database whose `TimeZone` is not UTC drifts. Prefer `{ withTimezone: true }` for
+  new tables and migrate the auth tables in one step. **Trigger:** before the first production
+  data (a migration on live rows is the costly path); note the trade-off in ADR 0029.
+
+## Agent tooling (ADR 0008, 0009)
+
+- **Nested agent rules** — Claude Code auto-loads nested `CLAUDE.md` (not nested `AGENTS.md`)
+  and path-scoped rules from `.claude/rules/`. **Trigger:** a package or app needs rules that do
+  not belong in the root handbook (the root AGENTS.md is kept lean on purpose).
+- **Playwright MCP server** — browser automation for agents. **Trigger:** e2e authoring friction
+  (agents writing or debugging Playwright specs by hand); vet the server and pin it like the
+  others in `.mcp.json`.
 
 - Error monitoring (e.g. Sentry), analytics, structured logging. **Trigger:** the observability
   decision.

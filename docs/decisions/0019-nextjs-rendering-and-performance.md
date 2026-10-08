@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-14
+- **Amended:** 2026-10-08 — both revisit triggers below fired: all auth routes exist and `typedRoutes: true` is on; `partialPrefetching: true` is enabled alongside `cacheComponents` (the documented Next 16.4 pairing — verified against the installed docs, closing [0032](0032-instant-navigation-page-transitions-and-route-guards.md)'s follow-up).
 
 ## Context
 
@@ -25,7 +26,7 @@ These are the bulk of the "faster" story and we already get them:
 - **Turbopack** — the default bundler for **`dev` and `build`** in Next 16.
 - **Disk caching** (default in 16.3) + `dev`/`build` no longer conflict (`.next/dev`).
 - **Instant Navigations / layout deduplication** (16.3) — shared route-group layouts
-  download once; this rewards our `(auth)` / `(app)` layouts.
+  download once; this rewards our `auth/` / `(app)` layouts.
 - **RSC by default + code-splitting + prefetching**; client islands only for forms.
 - **`optimizePackageImports`** already covers `lucide-react`, `date-fns`, `recharts`
   **by default** — our icon/date/chart imports are tree-shaken with no config.

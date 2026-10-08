@@ -18,7 +18,7 @@ history that any future changelog or release tooling would read.
 husky`, `HUSKY=0` in CI) runs:
    - `pre-commit` → lint-staged: `eslint --max-warnings 0 --no-warn-ignored --fix` then
      `prettier --write` on staged package sources, `prettier --write --ignore-unknown` on
-     everything else (sequential per file; no overlapping globs).
+     everything else (each file matches exactly one glob, so the two writers never race).
    - `commit-msg` → commitlint with `@commitlint/config-conventional`.
      Hooks are bypassable (`--no-verify`); that is acceptable because every check also runs in CI.
 2. **PR titles are validated** by `amannn/action-semantic-pull-request` (types mirror the

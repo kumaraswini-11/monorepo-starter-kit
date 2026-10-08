@@ -100,10 +100,11 @@ Run from the repo root (Turborepo, cached, affected-aware).
 | `pnpm test:integration` | real-Postgres integration tests (Docker)         |
 | `pnpm test:e2e`         | Playwright journeys against the production build |
 | `pnpm knip`             | unused files / exports / dependencies            |
+| `pnpm licenses:check`   | licence policy on production dependencies        |
 | `pnpm gen package`      | scaffold a new workspace package                 |
 | `pnpm deps:check`       | preview outdated dependencies (taze)             |
 
-The full local gate: `pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip`.
+The full local gate: `pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check`.
 
 ```bash
 pnpm exec turbo build --filter=web                       # one package

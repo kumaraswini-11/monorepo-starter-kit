@@ -373,7 +373,7 @@ packages/
   ui/src/components/**/         # *.test.tsx (component, jsdom)
 apps/
   web/  components|lib/**/*.test.tsx   # feature-component + seam tests (MSW, §9)
-  e2e/                          # NEW dedicated workspace
+  (e2e lives in packages/e2e/ since ADR 0036 — a test harness, not a deployable)
     playwright.config.ts        # webServer as an ARRAY (one entry now)
     tests/*.spec.ts  tests/auth.setup.ts   # journeys + the storageState setup project
     support/auth.ts  support/db.ts          # shared flow helpers + the DB-URL default
@@ -502,12 +502,12 @@ than later, and the example tests double as documentation. Implemented with the 
 teardown) lives in `packages/db/test/` and is **exported as `@workspace/db/testing/*`** —
 consumed by both `packages/db` and `packages/auth`'s integration suites (two consumers), so the
 extraction is done. Split it into a standalone test-support package only if a **non-db** consumer
-ever appears. Tracked in `future-improvements.md`.
+ever appears (no item is logged until that trigger fires).
 
 ### Q4 — How do we MSW-test the auth seam without mocking the client? (2026-08-23)
 
 **Decided: intercept real HTTP; import the seam _after_ MSW starts.** The seam
-(`apps/web/lib/auth/actions.ts`) is the sole owner of the Better Auth transport (ADR 0017 §1),
+(`apps/web/features/auth/actions.ts`) is the sole owner of the Better Auth transport (ADR 0017 §1),
 so its contract test (`actions.test.ts`) drives the **real** `actions.ts` + the **real** shared
 `authClient` and lets **MSW** intercept `/api/auth/*`, asserting the status→user-safe-error
 mapping (401→"Invalid email or password.", 422→"already exists", 429→rate-limit copy, etc.). We
@@ -595,7 +595,7 @@ confirmed when Phase 1/2 land.
   [task config / caching](https://turborepo.dev/docs/reference/configuration)
 - **Repo evidence:** `packages/auth/vitest.config.ts` + `device.test.ts`,
   `apps/storybook/vitest.config.ts`, `pnpm-workspace.yaml` (catalog), `turbo.json`,
-  `.github/workflows/ci.yml`, `docker-compose.yml`, `apps/web/lib/{auth,session}.ts`.
+  `.github/workflows/ci.yml`, `docker-compose.yml`, `apps/web/features/auth/actions.ts`, `apps/web/lib/session.ts`.
 
 ## Relationship to other ADRs
 

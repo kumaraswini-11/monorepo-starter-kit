@@ -87,7 +87,9 @@ float to a newer patch. The Node version was not actually pinned anywhere.
   jsx-a11y runs on ESLint 10 ahead of its declared peer range (`peerDependencyRules` documents
   it with a removal trigger).
 - **Dependabot:** majors for TypeScript (7), `@types/node` and `jsdom` stay ignored with named
-  triggers; everything else flows monthly.
+  triggers; everything else flows monthly once version updates are switched on (template
+  switch, [0037](0037-git-hooks-commit-governance-and-pr-gates.md) §6) — until then the catalog
+  is refreshed by hand with `pnpm deps:check`.
 
 ## Revisit triggers
 

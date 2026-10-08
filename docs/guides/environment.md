@@ -6,12 +6,12 @@ validated contract, secrets), [0035](../decisions/0035-task-graph-correctness-an
 
 ## Where values live
 
-| Context              | Source                                | Notes                                                                                                    |
-| -------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Local dev            | `apps/<app>/.env.local` (git-ignored) | copy from `apps/<app>/.env.example`; never at the repo root                                              |
-| Tests                | set by the harness                    | integration: `@workspace/db/testing` injects the container URL; e2e: `packages/e2e/playwright.config.ts` |
-| CI                   | none                                  | `SKIP_ENV_VALIDATION=1`; real runtimes still fail fast at startup                                        |
-| Staging / production | the platform's secret store           | injected into `process.env`; never a file                                                                |
+| Context              | Source                                | Notes                                                                                                      |
+| -------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Local dev            | `apps/<app>/.env.local` (git-ignored) | copy from `apps/<app>/.env.example`; never at the repo root                                                |
+| Tests                | set by the harness                    | integration: `@workspace/db/testing/*` injects the container URL; e2e: `packages/e2e/playwright.config.ts` |
+| CI                   | none                                  | `SKIP_ENV_VALIDATION=1`; real runtimes still fail fast at startup                                          |
+| Staging / production | the platform's secret store           | injected into `process.env`; never a file                                                                  |
 
 ## Reading a value
 
@@ -36,3 +36,8 @@ directly and are exempt via file patterns in the ESLint configs.
 
 Keep `@workspace/env` as the shared contract and compose app-specific presets with t3-env
 `extends` (the documented monorepo pattern) rather than a second env package.
+
+Known coupling: `packages/db/drizzle.config.ts` loads `apps/web/.env.local` so drizzle-kit (a
+separate dev process) sees `DATABASE_URL` (ADR 0013 §1). **Trigger:** a second app with its own
+database settings — then give drizzle-kit its own source (an exported `DATABASE_URL` or a
+tooling-only env file) and record the choice.

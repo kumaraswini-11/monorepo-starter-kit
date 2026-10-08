@@ -53,7 +53,7 @@ registries out; reputable, hash-pinned, first-party/known-author skill sets in.*
 
 Every skill under `.agents/skills/` is a **committed file**, so a clone/template
 already has it — nothing "installs" it. `skills-lock.json` is a **manifest of the
-external source** each vendored skill came from; `npx skills experimental_install`
+external source** each vendored skill came from; `pnpm dlx skills@<version> experimental_install`
 _restores_ those and `skills update` re-fetches them. The CLI has **no prune step** —
 install/update/sync never delete a skill (removal is only the explicit `skills remove`).
 Re-vendor with `skills add --copy` so skills stay real committed files, not

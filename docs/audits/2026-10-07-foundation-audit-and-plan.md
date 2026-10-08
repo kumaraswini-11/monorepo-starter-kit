@@ -4,10 +4,14 @@
 decisions, `docs/guides/` the resulting workflows). Deviations from the plan as written: no
 editor-specific directory was committed (editor-agnostic by request); the CI audit gate uses
 `--audit-level=high` with explicit `auditConfig.ignoreGhsas` entries instead of
-`--ignore-unfixable`, which turned out to be a silent write mode that exits 0; Next.js 16.4 +
-React 19.3 wait for the release-age gate (trigger recorded); and an in-range dependency refresh
-was included to clear a critical Next.js advisory the audit surfaced. Everything else below was
-implemented as described.
+`--ignore-unfixable`, which turned out to be a silent write mode that exits 0; an in-range
+dependency refresh was included to clear a critical Next.js advisory the audit surfaced; Next.js
+16.4 + React 19.3 were adopted on 2026-10-08 once past the release-age gate; D11 and T6 were
+KEPT rather than removed (the root lints and typechecks its own tooling — ADR 0036 §5); a
+`scripts/` directory exists after all, for the licence-policy gate only (ADR 0037); Dependabot
+version updates ship as `.github/dependabot.yml.template` (a template switch, AGENTS.md); the
+knip config is `knip.ts`; ADRs run to 0038; and the B7 / R10 notes were written into the
+environment and CI guides on 2026-10-08. Everything else below was implemented as described.
 
 **Scope:** the monorepo _foundation_ only — package manager, workspace, task graph, TypeScript,
 lint/format, testing architecture, CI/CD, security & supply chain, env management, git hygiene,

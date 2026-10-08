@@ -7,12 +7,12 @@ Governing decisions: [0007](../decisions/0007-github-automation-governance-and-b
 
 ## Workflows
 
-| Workflow                | Trigger                                             | Jobs / purpose                                                                                                                               |
-| ----------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`                | push to `main`, PRs, merge queue                    | `check` (format, dedupe, lint + typecheck + build, knip, Boundaries advisory, blocking audit) · `test` · `integration` · `e2e` · `storybook` |
-| `codeql.yml`            | push/PR to `main`, weekly                           | static security + quality analysis                                                                                                           |
-| `dependency-review.yml` | PRs                                                 | new vulnerable deps / copyleft licences block the PR                                                                                         |
-| `pr-title.yml`          | PRs (`pull_request_target`, read-only, no checkout) | Conventional Commit title (becomes the squash commit)                                                                                        |
+| Workflow                | Trigger                                             | Jobs / purpose                                                                                                                                               |
+| ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ci.yml`                | push to `main`, PRs, merge queue                    | `check` (format, dedupe, lint + typecheck + build, knip, Boundaries advisory, licence policy, blocking audit) · `test` · `integration` · `e2e` · `storybook` |
+| `codeql.yml`            | push/PR to `main`, weekly                           | static security + quality analysis                                                                                                                           |
+| `dependency-review.yml` | PRs                                                 | new vulnerable deps / copyleft licences block the PR                                                                                                         |
+| `pr-title.yml`          | PRs (`pull_request_target`, read-only, no checkout) | Conventional Commit title (becomes the squash commit)                                                                                                        |
 
 Every job starts with `./.github/actions/setup` (pnpm from `packageManager`, Node from
 `devEngines.runtime`, store cache, frozen install). On pull requests Turborepo runs only
@@ -21,7 +21,7 @@ Every job starts with `./.github/actions/setup` (pnpm from `packageManager`, Nod
 ## Local equivalent of the gate
 
 ```bash
-pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip
+pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check
 pnpm exec turbo boundaries
 ```
 
@@ -34,6 +34,11 @@ Git hooks run lint-staged (format + lint on staged files) and commitlint; CI rem
   the SHAs by hand on the monthly routine. Enable the repository policy "require actions to be pinned to a
   full-length commit SHA".
 - `permissions` are the minimum per job; `persist-credentials: false` on every checkout.
+- `TURBO_TELEMETRY_DISABLED` / `NEXT_TELEMETRY_DISABLED` are set in CI (no anonymous usage
+  telemetry; Storybook's is off in its config). Set them on dev machines too if the policy
+  requires it.
+- Turborepo flags deprecated for 3.0 are not used and must not be introduced: `--parallel`,
+  `turbo-ignore`, the daemon, `--graph` image output (ADR 0035 §6).
 - `SKIP_ENV_VALIDATION=1` and `HUSKY=0` at workflow level.
 - Job **names** are the required status checks in `.github/rulesets/main.json` — rename a job
   and the ruleset must follow.

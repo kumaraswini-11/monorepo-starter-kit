@@ -119,7 +119,11 @@ data?_ **No.**
   `localStorage` / JS memory is exfiltratable by any XSS. Cookies + our CSRF defenses
   (Origin + `SameSite` + Fetch-Metadata) are the stronger posture.
 - **Instant revocation.** Because the session lives in our DB, we can kill it
-  immediately — sign-out-everywhere, password reset, admin ban. Stateless JWTs stay
+  immediately — sign-out-everywhere, password reset, admin ban. _(Amended 2026-10-08: with the
+  5-minute `cookieCache` enabled for performance, a device holding a still-valid signed cookie
+  is served from it for up to 5 minutes before the DB is consulted, so revocation is immediate
+  for the current device and ≤ 5 min for others; sensitive server reads bypass the cache with
+  `disableCookieCache`. The password-changed email says so.)_ Stateless JWTs stay
   valid until expiry unless you bolt on a denylist, which reintroduces the very DB
   lookup JWTs exist to avoid. Revocation was **verified live** (2026-08-13): a
   password reset invalidated the prior sessions and the old credentials returned
@@ -217,7 +221,7 @@ the same config pattern adds GitHub/others later.
   **account-takeover** vector, since progressive verification (ADR 0011) lets email/password
   accounts stay unverified. Google's `email_verified` makes new Google users verified, so
   same-email linking happens only once the pre-existing account is verified.
-- **Seam unchanged in shape:** `signInWithGoogle()` in `lib/auth/actions.ts` calls
+- **Seam unchanged in shape:** `signInWithGoogle()` in `features/auth/actions.ts` calls
   `authClient.signIn.social({ provider: "google", callbackURL, errorCallbackURL })` behind the
   same enumeration-safe wrapper (ADR 0017 §1); the `/auth` page stays a static shell with the
   button as a hydrated **client island** (ADR 0019/0023). Covered by an MSW seam test.

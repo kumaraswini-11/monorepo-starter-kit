@@ -18,7 +18,7 @@
 │   ├── guides/                these files — the how
 │   ├── audits/                periodic foundation re-evaluations
 │   └── specs/ · future-improvements.md · references.md · bookmarks.md
-├── .github/                   CI workflows, composite setup action, Dependabot, CODEOWNERS,
+├── .github/                   CI workflows, composite setup action, Dependabot (template switch), CODEOWNERS,
 │                              issue/PR templates, importable ruleset
 ├── .husky/                    git hooks (ADR 0037)
 ├── .agents/skills/ · skills-lock.json    vendored agent skills (ADR 0010)

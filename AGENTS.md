@@ -52,9 +52,9 @@ self-installed (`packageManager`, `devEngines.runtime`); no nvm/Corepack.
 | Boundaries (advisory while experimental) | `pnpm exec turbo boundaries`   |
 
 Before treating a change as done, run
-`pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip`. CI runs the
-same gate (plus integration, e2e, Storybook, audit, dependency review, CodeQL) on only the
-affected packages per PR, and fails on any error **or warning**.
+`pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check`.
+CI runs the same gate (plus dedupe, integration, e2e, Storybook, audit, dependency review,
+CodeQL, PR title) on only the affected packages per PR, and fails on any error **or warning**.
 
 **Audit before every commit.** The gate is necessary but not sufficient — beyond it,
 self-review the diff against: coding standards & best practices; **DRY / SOLID**;
@@ -79,7 +79,7 @@ convenience, not the gate.
   (Playwright harness), `eslint-config` / `typescript-config` / `vitest-config` (presets)
 - `turbo/generators/` — the package scaffold · `scripts/` — repo-management scripts only ·
   `docs/` — `decisions/` (ADRs), `guides/` (how-to),
-  `audits/`, `future-improvements.md`, `references.md`
+  `audits/`, `specs/`, `future-improvements.md`, `references.md`, `bookmarks.md`
 - Full map + placement rules: `docs/guides/repository-structure.md`
 
 ## Conventions
@@ -109,7 +109,9 @@ convenience, not the gate.
   instead), keep the direction `utils` → domain → `ui` → apps (Boundaries tags in each
   `turbo.json`). Server modules start with `import "server-only"`. Read config only via
   `@workspace/env` (ADR 0013); a build-time variable goes in the task's `env` in `turbo.json`
-  (ADR 0035).
+  (ADR 0035). In `apps/web`, import a feature only through its barrel (`@/features/<name>`);
+  only `features/auth/lib/auth-client.ts` may touch the auth client (both lint-enforced,
+  ADR 0017/0028). Type imports are separate `import type` statements (auto-fixed).
 - **New package = `pnpm gen package`** (then `pnpm install`). Never copy a sibling by hand.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`. These are
   **vendored source we own** — never blind `shadcn add --overwrite` (it silently restores upstream

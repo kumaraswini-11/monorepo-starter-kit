@@ -3,6 +3,7 @@
 - **Status:** Proposed — page-transitions decision is settled (no code needed);
   the **route-guard revision is a recommendation pending decision + implementation**
 - **Date:** 2026-09-07
+- **Amended:** 2026-10-08 — the dev-bypass never shipped, so the sequencing note below is moot. Interim guard landed: `requireSession()` in `apps/web/lib/session.ts` is called by every authed page (the Next 16 guide's warning that a layout check does not re-run on navigation), with the layout read kept for chrome. Decision 2 (a Data Access Layer) and the `lib/session.ts` → `features/auth/lib/` move remain open — tracked in `docs/future-improvements.md` with a trigger. Partial prefetching follow-up: done ([0019](0019-nextjs-rendering-and-performance.md) amendment).
 - **Implementation:** none yet. §Page transitions endorses the status quo (instant
   navigation + `loading.tsx` skeletons — no code change). §Route protection **proposes**
   moving the auth guard out of `(app)/layout.tsx` into a Data Access Layer; that is a
@@ -135,10 +136,8 @@ DAL guard), not on the bypass-laden file.
 
 ## Follow-ups (surfaced by the R&D)
 
-- **Verify + likely enable partial prefetching** — the two research passes disagreed on
-  whether 16.3 prefetches a per-route App Shell by default vs behind a flag; **verify against
-  the installed 16.3.4 docs before touching `next.config.ts`**. This is the real "make
-  navigation instant" lever — higher-leverage than any animation.
+- ~~**Verify + likely enable partial prefetching**~~ — done 2026-10-08: `partialPrefetching:
+true` in `next.config.ts`, verified against the installed 16.4 docs (see the amendment).
 - **`instant()` Playwright assertion** (`@next/playwright`) — assert what's visible without
   waiting on the network, on hard loads + client navs, and lock instant-nav in CI
   ([0025](0025-testing-strategy.md)). Route animation has no equivalent objective gate.

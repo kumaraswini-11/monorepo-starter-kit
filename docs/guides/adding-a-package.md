@@ -23,7 +23,8 @@ Tags (Boundaries, dependency direction): `leaf` → `domain` → `ui` → apps; 
 
 The generator emits: `package.json` (`@workspace/<name>`, `private`, `UNLICENSED`, source-only
 `exports`, `catalog:`/`workspace:` deps), `tsconfig.json`, `eslint.config.js`,
-`vitest.config.ts`, `turbo.json` (tag), `README.md`, `src/index.ts`, `src/index.test.ts`.
+`vitest.config.ts`, `turbo.json` (tag), `README.md`, `src/index.ts`, `src/index.test.ts`
+(plus `vitest.d.ts` for the `react` kind).
 
 ## 3. Wire it
 

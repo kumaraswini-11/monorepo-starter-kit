@@ -31,7 +31,7 @@ Inside the repo use `pnpm` / `pnpm dlx` only (never `npm` / `npx`).
 3. **Gate locally** (the hooks format and lint staged files on commit; the full gate is yours):
 
    ```bash
-   pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip
+   pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check
    ```
 
    Plus `pnpm test:integration` / `pnpm test:e2e` / `pnpm exec turbo run build:storybook test --filter=storybook`
@@ -45,7 +45,7 @@ Inside the repo use `pnpm` / `pnpm dlx` only (never `npm` / `npx`).
    One logical change per commit.
 6. **Pull request** against `main`: fill the template; the title must be a Conventional
    Commit (it becomes the squash commit). CI must be green: format, lint, typecheck, build,
-   knip, audit, tests, Storybook, CodeQL, dependency review, PR title.
+   knip, licence policy, audit, tests, Storybook, CodeQL, dependency review, PR title.
 7. **Review & merge**: squash only, linear history (ruleset). Resolve every conversation.
 
 ## Reporting

@@ -234,7 +234,9 @@ context lands. A tenant-aware repository base is the natural extension when B2B
 multi-tenancy arrives. (The `account.issuer` column + unique `(issuer, accountId)`
 index added for Better Auth 1.7 — see [0011](0011-authentication-strategy.md)'s
 2026-08-22 update — is a schema/migration change **owned by this data layer**, applied
-via Drizzle Kit in `packages/db`.)
+via Drizzle Kit in `packages/db`; it was removed again by migration 0002 when 1.7.3
+dropped the requirement, and 0003 adds the secondary indexes Better Auth's core schema
+declares on `session.userId`, `account.userId` and `verification.identifier`.)
 
 ## Scaling to millions
 

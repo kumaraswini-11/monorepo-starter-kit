@@ -58,7 +58,7 @@ selection / adoption / a11y enforcement) and
   padding (`p-6 md:p-10`).
 - **HTML5 landmarks on every screen:** a single **`<main>`** per page plus
   `<header>` / `<nav>` / `<footer>` / `<section>` as appropriate — the accessibility
-  skeleton, not `<div>` soup. (The `(auth)` layout renders `<main>`.)
+  skeleton, not `<div>` soup. (The `auth/` layout renders `<main>`.)
 - **Decorative background layers:** `absolute`, `-z-10`, `pointer-events-none`,
   `aria-hidden`, and guarded by `prefers-reduced-motion` for anything animated.
 
@@ -169,7 +169,7 @@ destructive; changed on review.)
 - Every screen gets: **`<main>` + landmarks**, **`min-h-svh`**, **native scroll**
   (no page `overflow-hidden`), **capped + centered** content, **mobile-first**
   responsiveness that holds from phone to TV, and **real headings**.
-- The `(auth)` layout and entry screen already apply this baseline (`min-h-svh`,
+- The `auth/` layout and entry screen already apply this baseline (`min-h-svh`,
   `<main>`, no `overflow-hidden`, `max-w-sm` column, a real `<h1>`, and `currentColor`
   brand/icons sized by the caller).
 - Base UI's a11y is **trusted at the primitive level**; our composition is **linted**
@@ -187,8 +187,9 @@ destructive; changed on review.)
 - **A genuinely huge-screen product** (kiosk / native TV app) → add a breakpoint
   beyond Tailwind `2xl` or a dedicated container-query scale (content caps handle
   today's range without it).
-- **Automated a11y testing** (axe-core / Playwright) → add to CI (testing backlog in
-  [../future-improvements.md](../future-improvements.md)).
+- **Automated a11y testing** — component level is covered: Storybook's addon-a11y runs axe in
+  error mode in CI ([0024](0024-storybook-and-component-testing.md)). Page-level axe in Playwright is
+  a backlog item (testing section of [../future-improvements.md](../future-improvements.md)).
 
 ## Addendum — avatar image & full-width banners
 

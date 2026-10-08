@@ -50,5 +50,5 @@ body:
     attributes:
       label: Before filing
       options:
-        - label: I ran `pnpm install` and the full gate (`pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip`) on a clean checkout.
+        - label: I ran `pnpm install` and the full gate (`pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check`) on a clean checkout.
           required: true

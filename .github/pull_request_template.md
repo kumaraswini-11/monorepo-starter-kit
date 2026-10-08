@@ -22,7 +22,7 @@
 
 ## Checklist
 
-- [ ] The full gate is green locally: `pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip`
+- [ ] The full gate is green locally: `pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check`
 - [ ] Dependency changes: added via the catalog (`pnpm add --filter <pkg> --catalog <dep>`), changelog read, not blind-merged
 - [ ] Added or updated tests where it makes sense
 - [ ] Docs updated: an ADR in `docs/decisions/` if a decision changed; `docs/guides/` if a workflow changed
