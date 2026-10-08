@@ -2,6 +2,7 @@
 
 - **Status:** Accepted (amends the `turbo.json` guidance in [0013](0013-env-and-secrets-management.md) and [0025](0025-testing-strategy.md))
 - **Date:** 2026-10-07
+- **Amended:** 2026-10-08 — `build.env` also declares `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: the static `/auth` shell bakes in whether "Continue with Google" renders, so a build with and without the provider must not share a cache entry. The e2e job sets placeholders for the build (the harness sets the same for the server).
 
 ## Context
 

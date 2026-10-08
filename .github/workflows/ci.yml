@@ -133,6 +133,12 @@ jobs:
       # The `db` setup project resets + migrates this and the app writes user/account/session
       # to it; a throwaway service DB is exactly right. (ADR 0025)
       DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/app
+      # "Continue with Google" is baked in at build time (static /auth shell, ADR 0019) and the
+      # build runs here before Playwright starts the server, so the placeholders the harness uses
+      # at runtime (packages/e2e/playwright.config.ts) must be present for the build too. The
+      # button is asserted, never clicked.
+      GOOGLE_CLIENT_ID: e2e-google-client-id
+      GOOGLE_CLIENT_SECRET: e2e-google-client-secret
     services:
       postgres:
         image: postgres:17

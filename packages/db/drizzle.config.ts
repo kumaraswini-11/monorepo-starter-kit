@@ -15,10 +15,15 @@ config({
   quiet: true,
 });
 
-// Fail fast with a clear message (ADR 0013) instead of drizzle-kit's opaque connection error.
-// `generate` works from the snapshots alone, so only the DB-touching commands need the URL.
+// Fail fast with a clear message (ADR 0013) instead of drizzle-kit's opaque connection error —
+// but only when drizzle-kit itself runs a DB-touching command. `generate` works from the
+// snapshots alone, and other tools load this file too (knip's drizzle plugin, in CI without a
+// database), so the module must stay importable without a URL.
 const url = process.env.DATABASE_URL;
-const needsDb = !process.argv.includes("generate");
+const invokedByDrizzleKit = process.argv.some((arg) =>
+  arg.includes("drizzle-kit")
+);
+const needsDb = invokedByDrizzleKit && !process.argv.includes("generate");
 if (needsDb && !url) {
   throw new Error(
     "DATABASE_URL is not set — export it or put it in apps/web/.env.local (ADR 0013)."

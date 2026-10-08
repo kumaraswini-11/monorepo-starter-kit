@@ -24,7 +24,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "env": ["BETTER_AUTH_URL"],
+      "env": ["BETTER_AUTH_URL", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "!**/*.stories.*", "!**/*.mdx"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
