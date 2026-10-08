@@ -40,6 +40,11 @@ husky`, `HUSKY=0` in CI) runs:
    action for the owner.
 5. **Templates**: issue forms (bug, feature) with blank issues disabled and a security contact
    link; the PR template lists the full gate including knip.
+6. **Dependabot version updates are a template switch** (amended 2026-10-08). The policy file
+   is committed as `.github/dependabot.yml.template` — complete and reviewed, but inactive —
+   because a repo derived from this template must not open dependency PRs before a team exists
+   to review them. Enabling is one rename, recorded in AGENTS.md "Template switches". Dependabot
+   alerts and security updates are repository settings, independent of the file, and stay on.
 
 ## Consequences
 

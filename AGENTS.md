@@ -143,6 +143,18 @@ convenience, not the gate.
   authoritative evidence, and write an ADR when you do. (ADR 0001)
 - **Editor-agnostic:** tool-native configs + `.editorconfig`; no editor-specific directory.
 
+## Template switches
+
+Features that are correct for a product repo but noisy for a fresh derivation are shipped
+**ready and off**. When this repo becomes (or spawns) a product repo, flip the switch and
+delete the line here; if the decision is "never", delete the switch instead.
+
+- **Dependabot version updates** — policy lives in `.github/dependabot.yml.template`
+  (inactive; GitHub reads only `dependabot.yml`). Enable: `git mv .github/dependabot.yml.template
+.github/dependabot.yml`. Independent of this file, Dependabot **alerts + security updates**
+  are repository settings and must be ON in every product repo. Until version updates are on,
+  refresh the catalog with `pnpm deps:check` and bump action SHAs by hand on the monthly routine.
+
 ## Don't
 
 - Don't open-source, add public license text, or set `publishConfig` — every package

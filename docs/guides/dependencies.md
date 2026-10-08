@@ -38,8 +38,9 @@ Then place the new catalog line in the right group with a comment, and run `pnpm
 4. A major that changes how we work gets an ADR; a deferred major gets a named trigger in
    `future-improvements.md` and a Dependabot `ignore` entry.
 
-`pnpm deps:check` (taze) previews what is outdated without writing. Dependabot opens grouped
-minor/patch PRs monthly and one PR per major; **verify, never blind-merge**.
+`pnpm deps:check` (taze) previews what is outdated without writing. Dependabot version updates
+are a template switch (`.github/dependabot.yml.template`, see AGENTS.md); once enabled they open
+grouped minor/patch PRs monthly and one PR per major; **verify, never blind-merge**.
 
 ## Remove
 

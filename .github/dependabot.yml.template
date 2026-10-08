@@ -1,3 +1,14 @@
+# TEMPLATE SWITCH — INACTIVE. GitHub only reads `.github/dependabot.yml`; this file is the
+# repository policy for Dependabot VERSION UPDATES, kept ready but switched off so that a repo
+# derived from this template does not open dependency PRs before a team is there to review them.
+#
+# Enable for a product repository (one step, then delete this header):
+#   git mv .github/dependabot.yml.template .github/dependabot.yml
+#
+# Independent of this file: Dependabot ALERTS and SECURITY UPDATES are repository settings and
+# should be ON in every product repo (Settings -> Advanced Security). While version updates are
+# off, refresh the catalog manually with `pnpm deps:check` (taze) on the monthly routine.
+#
 version: 2
 
 # Policy (ADR 0007, ADR 0033):

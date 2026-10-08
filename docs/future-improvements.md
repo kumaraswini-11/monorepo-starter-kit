@@ -25,7 +25,8 @@ for the last full re-evaluation.
 | **`@shadcn/lint` abandonment**      | no release for six months                                                                                                                  | remove the plugin; keep the usage policy in prose in the guides (ADR 0038)                                                                                                                                                                                                                                |
 | **Prettier experimental CLI**       | shipped unflagged (Prettier 4)                                                                                                             | re-check `--cache` semantics; nothing else changes                                                                                                                                                                                                                                                        |
 
-Routine minor/patch refreshes (`pnpm deps:check`, Dependabot monthly) are not tracked here.
+Routine minor/patch refreshes (`pnpm deps:check`; Dependabot monthly once its template switch is
+on) are not tracked here.
 
 ## CI / CD
 
@@ -69,6 +70,9 @@ Routine minor/patch refreshes (`pnpm deps:check`, Dependabot monthly) are not tr
 
 ## Repository governance (owner actions)
 
+- **Dependabot version updates** are a template switch (`.github/dependabot.yml.template`,
+  AGENTS.md). **Trigger:** the repo is a product repo with reviewers for dependency PRs → rename
+  the file and delete the AGENTS.md line.
 - Import `.github/rulesets/main.json`; enable Dependabot alerts + security updates and the
   dependency graph; squash-merge default + delete-branch-on-merge; Actions policy "require SHA
   pinning" and read-only workflow permissions (see the [CI/CD guide](guides/ci-cd.md)).

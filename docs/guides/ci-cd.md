@@ -30,7 +30,8 @@ Git hooks run lint-staged (format + lint on staged files) and commitlint; CI rem
 ## Conventions the pipeline relies on
 
 - Actions are pinned to a full commit SHA with the version in a trailing comment; Dependabot
-  (weekly) keeps them current. Enable the repository policy "require actions to be pinned to a
+  (weekly, once the template switch in AGENTS.md is on) keeps them current — until then, bump
+  the SHAs by hand on the monthly routine. Enable the repository policy "require actions to be pinned to a
   full-length commit SHA".
 - `permissions` are the minimum per job; `persist-credentials: false` on every checkout.
 - `SKIP_ENV_VALIDATION=1` and `HUSKY=0` at workflow level.
