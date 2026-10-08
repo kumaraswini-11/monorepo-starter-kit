@@ -12,6 +12,7 @@
 │   ├── e2e/                   Playwright harness; nothing depends on it — `test`
 │   └── eslint-config/  typescript-config/  vitest-config/   shared presets — `config`
 ├── turbo/generators/          `pnpm gen package` scaffold (ADR 0036)
+├── scripts/                   repo-management scripts only (licence policy check); linted, typed JS
 ├── docs/
 │   ├── decisions/             ADRs — the why
 │   ├── guides/                these files — the how
@@ -26,14 +27,14 @@
 ├── pnpm-workspace.yaml        workspaces · the dependency catalog (ADR 0034) · pnpm settings
 ├── turbo.json                 task graph + Boundaries tags (ADR 0035, 0036)
 ├── tsconfig.json              root tooling files only (generator, knip.ts)
-└── knip.ts · commitlint.config.js · taze.config.mjs · .prettierrc · .editorconfig · .gitattributes
+└── eslint.config.js (root tooling) · knip.ts · commitlint.config.js · taze.config.mjs · .prettierrc · .editorconfig · .gitattributes
 ```
 
 ## Rules of placement
 
 - **`apps/` means it deploys.** Anything else — libraries, harnesses, presets — is a package.
-  There are no `tooling/`, `configs/`, `scripts/` or `infra/` directories: they would be empty
-  or duplicate `packages/`.
+  There are no `tooling/`, `configs/` or `infra/` directories: they would be empty or duplicate
+  `packages/`. `scripts/` holds repo-management scripts only (never app code).
 - **A package has one purpose and one public surface** (its `exports` map). Consumers never
   import from `src/`; packages never alias each other with `paths` (ADR 0036).
 - **Dependency direction** is `utils` → domain packages → `ui` → apps, enforced by ESLint rules

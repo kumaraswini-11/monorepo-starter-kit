@@ -59,6 +59,19 @@
     },
     "//#typecheck:tooling": {
       "inputs": ["tsconfig.json", "turbo/generators/**", "knip.ts"]
+    },
+    "//#lint:tooling": {
+      "inputs": [
+        "eslint.config.js",
+        "scripts/**",
+        "turbo/generators/**",
+        "knip.ts",
+        "commitlint.config.js",
+        "taze.config.mjs"
+      ]
+    },
+    "//#licenses:check": {
+      "inputs": ["pnpm-lock.yaml", "scripts/check-licenses.mjs"]
     }
   },
   "boundaries": {

@@ -56,3 +56,20 @@ entry.
   patched version goes into `auditConfig.ignoreGhsas`, with a comment and a removal condition.
 - `peerDependencyRules.allowedVersions` only for peer ranges you have verified are merely
   stale; every entry names its removal trigger.
+
+## Licence policy (ADR 0002, ADR 0037)
+
+The product is proprietary. For anything that ships (production dependencies):
+
+- **Denied:** strong copyleft — GPL, AGPL (its network clause reaches a server that merely runs
+  the code), SSPL, EUPL, CC-BY-SA — and unknown licences.
+- **Accepted:** permissive (MIT, ISC, BSD, Apache-2.0, 0BSD, CC0, BlueOak) and weak copyleft
+  (LGPL, MPL, EPL) for libraries used unmodified, as-is (libvips reaches us through sharp this way).
+
+`pnpm licenses:check` applies the policy (local and CI); `pnpm licenses list -r --prod` is the
+inventory. Dev-only tooling is outside the policy but still reviewed on addition. A library that
+switches to a denied licence on a new major (it happens — `ua-parser-js` went AGPL in 2.x) is
+normally replaced, never pinned to its last permissive major. A deliberate exception is recorded
+in `scripts/check-licenses.mjs` (reason + review trigger), mirrored in the PR gate's
+`allow-dependencies-licenses`, and listed in `docs/future-improvements.md`; the check reports
+it on every run so it cannot be forgotten. Current exception: `ua-parser-js` (see there).

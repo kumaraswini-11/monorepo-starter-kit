@@ -145,6 +145,17 @@ Remaining, **deferred with triggers**:
 
 ## Production readiness (when this backs a real product)
 
+- **Licence exception to review: `ua-parser-js` 2.x (AGPL-3.0).** Used in `packages/auth` for
+  the new-device email's "Browser on OS" label. Decision 2026-10-08 (maintainer): keep it for
+  now and review later. Reason recorded at the time of the decision: _"ua-parser-js's free
+  edition is AGPL-licensed and barred by our policy, so I'm skipping it in favor of the
+  dependency-free device-label table (no license/supply-chain risk), noting bowser as the upgrade
+  path if richer detection is ever needed."_ — the maintainer overrode this and kept the library.
+  Resolutions when reviewed: (a) buy the ua-parser-js PRO licence (commercial use, permissive
+  terms), (b) switch to `bowser` (MIT), or (c) a dependency-free family table. **Trigger:** the
+  legal/compliance review before production launch — must be resolved before shipping. The gate
+  (`pnpm licenses:check`) prints this exception on every run.
+
 - Error monitoring (e.g. Sentry), analytics, structured logging. **Trigger:** the observability
   decision.
 - A "Safe Harbor" clause in `SECURITY.md`. **Trigger:** the legal review before launch.

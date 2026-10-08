@@ -25,8 +25,14 @@ husky`, `HUSKY=0` in CI) runs:
    commitlint config) on `pull_request_target` with read-only permissions and **no checkout** —
    the documented safe pattern; with squash merges the title is the commit on `main`.
 3. **Dependency review** (`actions/dependency-review-action`) blocks a PR that introduces a
-   high/critical vulnerability or a copyleft licence (AGPL/GPL/LGPL/SSPL — the product is
-   proprietary, [0002](0002-proprietary-license-and-package-posture.md)). `pnpm audit` in CI
+   high/critical vulnerability or a strong-copyleft licence (AGPL, GPL, SSPL, EUPL — the
+   product is proprietary, [0002](0002-proprietary-license-and-package-posture.md)); weak
+   copyleft (LGPL, MPL) is accepted for unmodified libraries (libvips via sharp). The same
+   policy runs plan-independently as `pnpm licenses:check` (`scripts/check-licenses.mjs`) in
+   the CI gate. Exceptions are explicit: the 2026-10-08 inventory found `ua-parser-js` 2.x
+   (AGPL) in production dependencies; the maintainer chose to keep it pending review, so it is
+   recorded in the script's exception list (reported on every run), in the PR gate's
+   `allow-dependencies-licenses`, and in `docs/future-improvements.md`. `pnpm audit` in CI
    now **blocks on high/critical** advisories in production dependencies; an advisory with no
    patched version is recorded explicitly (and commented) in `auditConfig.ignoreGhsas` rather
    than silenced with `--ignore-unfixable`, which writes ignores and exits 0 without reporting

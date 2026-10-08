@@ -12,8 +12,9 @@ const config: KnipConfig = {
   ignore: [".agents/**"],
   workspaces: {
     ".": {
-      // Tool configs knip has no plugin for (the turbo plugin covers turbo/generators).
-      entry: ["taze.config.mjs"],
+      // Tool configs knip has no plugin for (the turbo plugin covers turbo/generators), and
+      // repo scripts reached through a shell pipe in package.json (`pnpm licenses:check`).
+      entry: ["taze.config.mjs", "scripts/*.mjs"],
     },
     "apps/web": {
       // Resolved by PostCSS from the app directory (see packages/ui/postcss.config.mjs).

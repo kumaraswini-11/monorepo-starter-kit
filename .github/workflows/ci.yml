@@ -57,7 +57,7 @@ jobs:
       - name: Lint, typecheck, build
         # `--continue=dependencies-successful` keeps running unrelated tasks after a failure
         # so one red package doesn't hide the others.
-        run: pnpm exec turbo run lint typecheck typecheck:tooling build $TURBO_AFFECTED --continue=dependencies-successful
+        run: pnpm exec turbo run lint lint:tooling typecheck typecheck:tooling build $TURBO_AFFECTED --continue=dependencies-successful
 
       - name: Dead code and unused dependencies (knip)
         run: pnpm knip && pnpm knip:production
@@ -67,6 +67,12 @@ jobs:
         # boundary rules remain the hard gate.
         run: pnpm exec turbo boundaries
         continue-on-error: true
+
+      - name: Licence policy (production dependencies)
+        # Strong copyleft (GPL/AGPL/SSPL/EUPL) or unknown licences in anything we ship fail the
+        # gate; weak copyleft (LGPL/MPL) is accepted for unmodified libraries (ADR 0037). Runs
+        # here because the dependency-review PR gate needs GitHub Code Security on private repos.
+        run: pnpm licenses:check
 
       - name: Security audit (production dependencies)
         # Blocking on high/critical advisories in what we ship: a known vulnerability must

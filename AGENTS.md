@@ -47,6 +47,7 @@ self-installed (`packageManager`, `devEngines.runtime`); no nvm/Corepack.
 | E2E tests (Playwright)                   | `pnpm test:e2e`                |
 | Story tests (browser mode)               | `pnpm --filter storybook test` |
 | Dead code / unused deps                  | `pnpm knip`                    |
+| Licence policy (prod deps)               | `pnpm licenses:check`          |
 | New workspace package                    | `pnpm gen package`             |
 | Boundaries (advisory while experimental) | `pnpm exec turbo boundaries`   |
 
@@ -76,7 +77,8 @@ convenience, not the gate.
 - `packages/` — `@workspace/*`, **source-only** (no build step), consumed via `exports` maps:
   `ui` (design system), `auth` / `db` / `email` / `env` (domain), `utils` (leaf), `e2e`
   (Playwright harness), `eslint-config` / `typescript-config` / `vitest-config` (presets)
-- `turbo/generators/` — the package scaffold · `docs/` — `decisions/` (ADRs), `guides/` (how-to),
+- `turbo/generators/` — the package scaffold · `scripts/` — repo-management scripts only ·
+  `docs/` — `decisions/` (ADRs), `guides/` (how-to),
   `audits/`, `future-improvements.md`, `references.md`
 - Full map + placement rules: `docs/guides/repository-structure.md`
 
@@ -92,7 +94,10 @@ convenience, not the gate.
   React+Next) move together.
 - **Supply chain:** new versions wait 24h (`minimumReleaseAge`); lifecycle scripts only when
   allow-listed (`allowBuilds`); `pnpm dlx <pkg>@<version>`, never `@latest`. Don't disable any of
-  it; justify every new dependency by where it runs (ADR 0033).
+  it; justify every new dependency by where it runs (ADR 0033). **Licence policy:** strong
+  copyleft (GPL/AGPL/SSPL/EUPL) never ships; weak copyleft (LGPL/MPL) only for unmodified
+  libraries; `pnpm licenses:check` is part of the gate; exceptions are recorded in
+  `scripts/check-licenses.mjs` with a review trigger (ADR 0037).
 - **Dependency updates (Dependabot / taze / manual) — verify, never blind-merge.** Read the
   official changelog (mandatory for majors), run the full gate (+ Storybook build/test if
   UI-affecting), write an ADR for a major that changes how we work. Deferred majors carry a

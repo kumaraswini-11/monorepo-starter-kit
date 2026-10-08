@@ -7,7 +7,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
+    "lint": "turbo lint lint:tooling",
     "format": "prettier --write --cache .",
     "typecheck": "turbo typecheck typecheck:tooling",
     "test": "turbo test",
@@ -18,7 +18,9 @@
     "knip:production": "knip --production",
     "gen": "turbo gen",
     "typecheck:tooling": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:tooling": "eslint --max-warnings 0 . --ignore-pattern apps --ignore-pattern packages",
+    "licenses:check": "pnpm licenses list -r --prod --json | node scripts/check-licenses.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
@@ -26,6 +28,7 @@
     "@ianvs/prettier-plugin-sort-imports": "catalog:",
     "@turbo/gen": "catalog:",
     "@types/node": "catalog:",
+    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
     "husky": "catalog:",
@@ -49,10 +52,14 @@
     }
   },
   "lint-staged": {
-    "{apps,packages}/**/*.{js,mjs,cjs,ts,tsx}": [
+    "{apps,packages,scripts,turbo}/**/*.{js,mjs,cjs,ts,tsx}": [
       "eslint --max-warnings 0 --no-warn-ignored --fix",
       "prettier --write"
     ],
-    "!({apps,packages}/**/*.{js,mjs,cjs,ts,tsx})": "prettier --write --ignore-unknown"
+    "*.{js,mjs,cjs,ts}": [
+      "eslint --max-warnings 0 --no-warn-ignored --fix",
+      "prettier --write"
+    ],
+    "!({apps,packages,scripts,turbo}/**/*.{js,mjs,cjs,ts,tsx}|*.{js,mjs,cjs,ts})": "prettier --write --ignore-unknown"
   }
 }

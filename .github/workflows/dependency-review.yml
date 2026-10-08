@@ -34,8 +34,12 @@ jobs:
           # Known vulnerabilities: block high and critical (lower severities surface in the
           # summary and in Dependabot alerts).
           fail-on-severity: high
-          # Proprietary product (ADR 0002): copyleft licences that would reach the shipped
-          # bundle are not acceptable. Dev-only tooling is not exempt here on purpose — review
-          # and add an explicit allow if a tool with such a licence is ever needed.
-          deny-licenses: AGPL-1.0-only, AGPL-1.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later, GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only, LGPL-3.0-or-later, SSPL-1.0
+          # Proprietary product (ADR 0002, policy in ADR 0037): STRONG copyleft is denied —
+          # GPL, AGPL (network clause), SSPL, EUPL. Weak copyleft (LGPL, MPL) is accepted for
+          # unmodified libraries used as-is (e.g. libvips via sharp, Next.js's image optimizer),
+          # so it is deliberately NOT listed. `pnpm licenses:check` applies the same policy in CI.
+          deny-licenses: AGPL-1.0-only, AGPL-1.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later, GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, SSPL-1.0, EUPL-1.1, EUPL-1.2
+          # Reviewed licence exception (scripts/check-licenses.mjs, future-improvements): the
+          # AGPL ua-parser-js is tolerated by maintainer decision until the legal review.
+          allow-dependencies-licenses: pkg:npm/ua-parser-js
           comment-summary-in-pr: on-failure

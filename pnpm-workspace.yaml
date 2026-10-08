@@ -89,6 +89,8 @@ catalog:
   pg: ^8.23.1
   "@types/pg": ^8.23.1
   dotenv: ^17.4.2
+  # ua-parser-js 2.x is AGPL-3.0 (free edition): a REVIEWED LICENCE EXCEPTION, kept by
+  # maintainer decision 2026-10-08; see scripts/check-licenses.mjs and future-improvements.
   ua-parser-js: ^2.0.10
   server-only: ^0.0.1
   "@t3-oss/env-core": ^0.13.11

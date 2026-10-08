@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import turboPlugin from "eslint-plugin-turbo";
 import { defineConfig, globalIgnores } from "eslint/config";
+import globals from "globals";
 import tseslint from "typescript-eslint";
 
 /**
@@ -114,3 +115,8 @@ export const core = [
 
 /** Base config for non-React packages. Prettier last (ADR 0004). */
 export const config = defineConfig([...core, eslintConfigPrettier]);
+
+/** Node globals for plain JS tooling files (scripts, ESM configs) that no tsconfig covers. */
+export const nodeGlobals = {
+  languageOptions: { globals: { ...globals.node } },
+};
