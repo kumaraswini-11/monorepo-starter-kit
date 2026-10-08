@@ -73,8 +73,9 @@ float to a newer patch. The Node version was not actually pinned anywhere.
   shadcn tree relaxes React-19-idiom and `any`-typing rules only; our own code is fixed.
 - **Vitest 5.0.3** in lockstep with `@vitest/coverage-v8` and `@vitest/browser-playwright`
   (companions peer-pin the exact version), Storybook 10.6.1, turbo 2.11, Prettier 3.9.9,
-  Testcontainers 12.2. Next.js 16.4 + React 19.3 follow as soon as the 24h release-age gate
-  allows (a separate, verified bump).
+  Testcontainers 12.2. Next.js 16.4 + React 19.3 followed on 2026-10-08 once the 24h
+  release-age gate allowed it (in lockstep: react, react-dom, their types, next and its ESLint
+  plugin; `partialPrefetching: true` added per the 16.4 post).
 
 ## Consequences
 

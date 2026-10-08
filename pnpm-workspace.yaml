@@ -51,12 +51,12 @@ catalogMode: strict
 
 catalog:
   # React & framework (react + react-dom + next move together; @types/react tracks react)
-  react: 19.2.8
-  react-dom: 19.2.8
-  next: 16.3.8
+  react: 19.3.0
+  react-dom: 19.3.0
+  next: ^16.4.0
   next-themes: ^0.4.6
-  "@types/react": ^19.2.18
-  "@types/react-dom": ^19.2.7
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
   babel-plugin-react-compiler: ^1.0.0
 
   # Design system — shadcn/ui on Base UI (ADR 0021) and the primitives it vendors. `shadcn` is the
@@ -145,7 +145,7 @@ catalog:
   "@eslint-react/eslint-plugin": ^5.24.6
   "@shadcn/lint": ^0.2.0
   eslint-plugin-react-hooks: ^7.1.1
-  "@next/eslint-plugin-next": ^16.3.8
+  "@next/eslint-plugin-next": ^16.4.0
   eslint-plugin-turbo: ^2.11.7
   globals: ^17.13.0
   prettier: ^3.9.9

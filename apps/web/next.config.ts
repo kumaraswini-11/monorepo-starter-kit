@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
   // `use cache` opts data into caching. See ADR 0019. Dynamic access must sit under
   // a Suspense boundary (we provide segment `loading.tsx` files).
   cacheComponents: true,
+  // Partial Prefetching is part of the Cache Components model since 16.4 (the post that
+  // recommends it for every app); 16.4 warns when it is unset. (ADR 0019)
+  partialPrefetching: true,
   // Don't advertise the framework/version (small info-leak reduction).
   poweredByHeader: false,
   // Type-safe <Link> hrefs + router pushes — checked against real routes at build.
