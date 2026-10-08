@@ -57,6 +57,16 @@ export default defineConfig({
           process.env.BETTER_AUTH_SECRET ??
           "e2e-secret-at-least-32-characters-long-00",
         BETTER_AUTH_URL: baseURL,
+        // `next start` is NODE_ENV=production, where the email package refuses the console stub
+        // unless told so; this server is a test harness, not a deployment (ADR 0014).
+        EMAIL_TRANSPORT: "console",
+        // The chooser renders "Continue with Google" only when the provider is configured. The
+        // button is asserted, never clicked (real Google cannot be automated — see the OAuth
+        // mock-IdP item in docs/future-improvements.md), so placeholder credentials suffice.
+        GOOGLE_CLIENT_ID:
+          process.env.GOOGLE_CLIENT_ID ?? "e2e-google-client-id",
+        GOOGLE_CLIENT_SECRET:
+          process.env.GOOGLE_CLIENT_SECRET ?? "e2e-google-client-secret",
       },
     },
   ],

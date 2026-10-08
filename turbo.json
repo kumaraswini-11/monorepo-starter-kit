@@ -8,7 +8,7 @@
     "DATABASE_URL",
     "BETTER_AUTH_*",
     "SMTP_*",
-    "EMAIL_FROM",
+    "EMAIL_*",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "SKIP_ENV_VALIDATION",

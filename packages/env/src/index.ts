@@ -33,7 +33,9 @@ export const env = createEnv({
     // Email transport (ADR 0014). All optional: with none set, the console stub is used
     // (dev/test only — production refuses it, see packages/email); setting SMTP_HOST switches
     // `packages/email` to the Nodemailer/SMTP sender. Any SMTP provider works (Resend/SES/
-    // Postmark/…) — it's a credentials-only choice.
+    // Postmark/…) — it's a credentials-only choice. EMAIL_TRANSPORT forces one explicitly:
+    // "console" is how a production-mode test server (e2e: `next start`) opts into the stub.
+    EMAIL_TRANSPORT: z.enum(["smtp", "console"]).optional(),
     SMTP_HOST: z.string().min(1).optional(),
     SMTP_PORT: z.coerce.number().int().positive().optional(),
     // Explicit override; when unset the adapter derives it from the port (465/2465 → true).
