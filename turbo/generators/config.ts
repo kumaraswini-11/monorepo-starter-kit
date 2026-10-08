@@ -12,11 +12,25 @@ import type { PlopTypes } from "@turbo/gen";
  * Non-interactive use (CI / agents): positional answers in prompt order, e.g.
  *   pnpm gen package --args billing node domain "Billing domain logic"
  */
-const KINDS = ["node", "react"] as const;
-const TAGS = ["domain", "leaf", "ui", "config"] as const;
+// Single source of truth for the two choice prompts: the key is the answer value, the text is
+// the prompt label. Types derive from here so a new kind/tag cannot drift from its prompt.
+const KINDS = {
+  node: "node   — server / isomorphic TypeScript (base preset)",
+  react: "react  — React components (react-library preset, jsdom tests)",
+} as const;
+const TAGS = {
+  domain:
+    "domain — server-side capability (may use leaf + other domain packages)",
+  leaf: "leaf   — pure, dependency-free helpers",
+  ui: "ui     — design-system code (may use leaf only)",
+  config: "config — shared tooling configuration",
+} as const;
 
-type Kind = (typeof KINDS)[number];
-type Tag = (typeof TAGS)[number];
+type Kind = keyof typeof KINDS;
+type Tag = keyof typeof TAGS;
+
+const choices = (labels: Record<string, string>) =>
+  Object.entries(labels).map(([value, name]) => ({ name, value }));
 
 interface Answers {
   name: string;
@@ -44,34 +58,14 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         type: "list",
         name: "kind",
         message: "Kind:",
-        choices: [
-          {
-            name: "node   — server / isomorphic TypeScript (base preset)",
-            value: "node",
-          },
-          {
-            name: "react  — React components (react-library preset, jsdom tests)",
-            value: "react",
-          },
-        ],
+        choices: choices(KINDS),
       },
       {
         type: "list",
         name: "tag",
         message:
           "Boundaries tag (dependency direction: leaf → domain → ui → apps):",
-        choices: [
-          {
-            name: "domain — server-side capability (may use leaf + other domain packages)",
-            value: "domain",
-          },
-          { name: "leaf   — pure, dependency-free helpers", value: "leaf" },
-          {
-            name: "ui     — design-system code (may use leaf only)",
-            value: "ui",
-          },
-          { name: "config — shared tooling configuration", value: "config" },
-        ],
+        choices: choices(TAGS),
       },
       {
         type: "input",
