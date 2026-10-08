@@ -1,8 +1,9 @@
 /**
  * The e2e Postgres connection string default — the docker-compose `app` DB locally, a Postgres
- * service in CI. Both are loopback + disposable (global-setup wipes the schema each run). This is
- * only the default: an explicit `process.env.DATABASE_URL` still wins. Global-setup and the
- * Playwright `webServer` both resolve through it, so they can never disagree on which DB to use.
+ * service in CI. Both are loopback + disposable (the `db` setup project wipes the schema each run). This is
+ * only the default: an explicit `process.env.DATABASE_URL` still wins. The `db` setup project
+ * and the Playwright `webServer` both resolve through it, so they can never disagree on which DB
+ * to use.
  * (ADR 0025)
  */
 export const DEFAULT_DATABASE_URL =

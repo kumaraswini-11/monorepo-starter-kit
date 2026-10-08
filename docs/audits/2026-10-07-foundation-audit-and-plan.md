@@ -1,6 +1,6 @@
 # Foundation audit & modernization plan — 2026-10-07
 
-**Status:** EXECUTED on 2026-10-07 (branch `chore/foundation-2026-10`; ADRs 0033–0037 record the
+**Status:** EXECUTED on 2026-10-07 (branch `chore/foundation-2026-10`; ADRs 0033–0038 record the
 decisions, `docs/guides/` the resulting workflows). Deviations from the plan as written: no
 editor-specific directory was committed (editor-agnostic by request); the CI audit gate uses
 `--audit-level=high` with explicit `auditConfig.ignoreGhsas` entries instead of

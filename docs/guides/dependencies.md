@@ -34,7 +34,7 @@ Then place the new catalog line in the right group with a comment, and run `pnpm
    `@storybook/*`, Playwright test + driver, turbo + `@turbo/gen` + `eslint-plugin-turbo`,
    React + Next + `@types/react`). `pnpm install`, then `pnpm dedupe --check`.
 3. Run the full gate: `pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test`
-   (+ `pnpm --filter storybook build:storybook test` if UI-affecting).
+   (+ `pnpm exec turbo run build:storybook test --filter=storybook` if UI-affecting).
 4. A major that changes how we work gets an ADR; a deferred major gets a named trigger in
    `future-improvements.md` and a Dependabot `ignore` entry.
 

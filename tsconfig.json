@@ -1,7 +1,7 @@
 {
   // Root-level TypeScript tooling only: the package generator and the knip config. Every
   // workspace package has its own tsconfig (Turborepo guidance); this one must never widen to
-  // include them. Type-checked by the root `//#typecheck` task.
+  // include them. Type-checked by the root `//#typecheck:tooling` task.
   "extends": "@workspace/typescript-config/base.json",
   "include": ["turbo/generators/**/*.ts", "knip.ts"]
 }

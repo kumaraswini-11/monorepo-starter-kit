@@ -55,9 +55,10 @@ applies):
 
 1. Use what the component already offers (a variant or size — e.g. `variant="ghost"
 size="xs"`).
-2. Give the component the capability when the need is a design-system concept
-   (`EmptyState bordered`, the read-only state of `Input`, interactive hover on `Item` rows
-   rendered as buttons). One use does not justify a variant ([0026](0026-choosing-the-right-abstraction.md)); two or three do.
+2. Give the component the capability when the need is a design-system concept (the
+   read-only state of `Input`, interactive hover on `Item` rows rendered as buttons). Check
+   first that the override did anything: `border-0` on an `EmptyState` turned out to be a
+   no-op (`Empty` has no border width), so the right fix was deletion, not a prop. One use does not justify a variant ([0026](0026-choosing-the-right-abstraction.md)); two or three do.
 3. A deliberate per-place requirement keeps its `className` — the escape hatch
    [0026](0026-choosing-the-right-abstraction.md) names — and marks it:
    `// eslint-disable-next-line shadcn/no-restyle -- <reason>`. The rule does not ban the
@@ -93,9 +94,9 @@ the ladder so agents reach for variants first.
 ## Consequences
 
 - **Positive:** the design-system contract is enforced where drift happens (consumers), with
-  messages that name the fix; the first run converted ad-hoc overrides into variants, accepted
-  defaults and three small component capabilities; the policy is one object in the shared
-  config, so the model itself is template code.
+  messages that name the fix; the first run converted ad-hoc overrides into variants, reasoned
+  exceptions and two small component capabilities (and deleted one no-op); the policy is one
+  object in the shared config, so the model itself is template code.
 - **Negative / accepted:** the plugin is three weeks old and pre-1.0 (rule options may change);
   five reasoned exceptions exist in `apps/web` today (the audit command lists them) and must
   be reviewed when they multiply; lint reads `cva` and theme files, so it is slightly slower.

@@ -92,12 +92,16 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         "README.md",
         "src/index.ts",
         "src/index.test.ts",
+        ...(answers.kind === "react" ? ["vitest.d.ts"] : []),
       ];
       const actions: PlopTypes.ActionType[] = files.map((file) => ({
         type: "add",
         path: `${base}/${file}`,
         templateFile: `templates/package/${file}.hbs`,
-        data: { isReact: answers.kind === "react" },
+        data: {
+          isReact: answers.kind === "react",
+          isLeaf: answers.tag === "leaf",
+        },
       }));
       actions.push(
         `Package scaffolded at packages/${answers.name}. Next: pnpm install, then add it to the ` +

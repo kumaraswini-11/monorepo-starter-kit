@@ -34,7 +34,7 @@ Inside the repo use `pnpm` / `pnpm dlx` only (never `npm` / `npx`).
    pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip
    ```
 
-   Plus `pnpm test:integration` / `pnpm test:e2e` / `pnpm --filter storybook build:storybook test`
+   Plus `pnpm test:integration` / `pnpm test:e2e` / `pnpm exec turbo run build:storybook test --filter=storybook`
    when you touched what they cover (CI runs them anyway).
 
 4. **Audit your diff** before committing (AGENTS.md "Audit before every commit"): standards,

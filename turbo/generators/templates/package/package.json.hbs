@@ -5,7 +5,9 @@
   "type": "module",
   "private": true,
   "license": "UNLICENSED",
+{{#if isLeaf}}
   "sideEffects": false,
+{{/if}}
   "scripts": {
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",

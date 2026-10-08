@@ -45,6 +45,10 @@ Git hooks run lint-staged (format + lint on staged files) and commitlint; CI rem
 3. Default merge method **squash**, delete branch on merge.
 4. Actions: workflow permissions read-only; require SHA pinning.
 5. Raise required approvals to 1+ and enable Code-Owner review as the team forms.
+6. Before enabling a **merge queue**: every required check must also run on `merge_group`
+   (`ci.yml` and `codeql.yml` do). `Dependency review` and `PR title` are PR-time gates
+   with no merge-group equivalent — remove them from the ruleset's required checks first, or
+   queued PRs stall waiting for a check that never reports.
 
 ## Plan-dependent features
 

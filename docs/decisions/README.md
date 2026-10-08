@@ -60,8 +60,8 @@ correctness & affected CI, boundaries & scaffolding, hooks & PR gates; 0038 adds
 | [0034](0034-single-version-dependency-policy.md)                     | Single-version dependency policy — every third-party dependency in the pnpm catalog (`catalogMode: strict`)                                           | Accepted          | 2026-10-07 |
 | [0035](0035-task-graph-correctness-and-affected-ci.md)               | Task-graph correctness & affected CI — transit nodes, build-time env, `--affected`, composite setup                                                   | Accepted          | 2026-10-07 |
 | [0036](0036-package-boundaries-dead-code-and-scaffolding.md)         | Package boundaries, dead-code hygiene & scaffolding — Boundaries tags, knip, `turbo gen package`, no `paths`                                          | Accepted          | 2026-10-07 |
-| [0038](0038-design-system-usage-linting.md)                          | Design-system usage linting — `@shadcn/lint` on consumers, contracts as the escape hatch                                                              | Accepted          | 2026-10-08 |
 | [0037](0037-git-hooks-commit-governance-and-pr-gates.md)             | Git hooks, commit governance & PR gates — husky + lint-staged + commitlint, PR-title check, dependency review, rulesets                               | Accepted          | 2026-10-07 |
+| [0038](0038-design-system-usage-linting.md)                          | Design-system usage linting — `@shadcn/lint` on consumers, contracts as the escape hatch                                                              | Accepted          | 2026-10-08 |
 
 See also [../references.md](../references.md) for the sources behind these
 decisions, and [../future-improvements.md](../future-improvements.md) for the

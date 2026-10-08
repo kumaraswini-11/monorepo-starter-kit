@@ -113,7 +113,6 @@ export function NotificationBell({
         {items.length === 0 ? (
           <EmptyState
             size="sm"
-            bordered={false}
             icon={<BellIcon aria-hidden="true" />}
             title="No notifications"
             description="You're all caught up."
