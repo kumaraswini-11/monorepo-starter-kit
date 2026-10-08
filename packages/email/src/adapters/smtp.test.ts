@@ -69,6 +69,7 @@ describe("smtpEmailAdapter", () => {
         host: "smtp.resend.com",
         port: 465,
         secure: true,
+        requireTLS: false,
         auth: { user: "resend", pass: "re_test_key" },
         pool: true,
         disableFileAccess: true,
@@ -77,13 +78,13 @@ describe("smtpEmailAdapter", () => {
     );
   });
 
-  it("uses STARTTLS (secure: false) on port 587", async () => {
+  it("uses mandatory STARTTLS (secure: false, requireTLS) on port 587", async () => {
     state.env = { ...BASE_ENV, SMTP_PORT: 587 };
     const send = await loadAdapter();
     await send(MESSAGE);
 
     expect(createTransport).toHaveBeenCalledWith(
-      expect.objectContaining({ port: 587, secure: false })
+      expect.objectContaining({ port: 587, secure: false, requireTLS: true })
     );
   });
 

@@ -26,7 +26,8 @@ export function SubmitButton<T extends FieldValues>({
     <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
       {isSubmitting ? (
         <>
-          <Spinner /> {pendingLabel}
+          <Spinner role={undefined} aria-label={undefined} aria-hidden="true" />{" "}
+          {pendingLabel}
         </>
       ) : (
         children

@@ -16,8 +16,10 @@ import { ResetPasswordForm } from "./reset-password-form";
  * Client wiring for `/auth/reset-password`. The reset token rides the URL (a signed,
  * single-use, short-lived token — the standard reset mechanism, not PII, so this is the
  * "resume via token" exception to the no-PII-in-URL rule). No token → an expired/invalid
- * state. On success we send the user to sign in with the new password (sessions are
- * revoked on reset — ADR 0011; not auto-logged-in, for security).
+ * state. On success the flow restarts at `/auth/email` — this screen opens from an email link
+ * (a fresh document), so the flow holds no email and the credential steps would bounce there
+ * anyway (ADR 0023 §4). Not auto-logged-in, for security; sessions are revoked on reset
+ * (ADR 0011).
  */
 export function ResetPasswordStep() {
   const router = useRouter();
@@ -54,7 +56,7 @@ export function ResetPasswordStep() {
             description: "Sign in with your new password.",
             type: "success",
           });
-          router.push("/auth/sign-in");
+          router.push("/auth/email");
         }}
       />
       {/*

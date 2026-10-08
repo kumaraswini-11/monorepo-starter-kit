@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 
+import { requireSession } from "@/lib/session";
+
 export const metadata: Metadata = { title: "Settings" };
 
 /**
  * Settings — placeholder for now (the real surface lands in a later phase; ADR 0011 roadmap).
  * Reachable from the sidebar so the navigation is complete; content is intentionally empty.
  */
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  await requireSession();
+
   return (
     <div className="mx-auto w-full max-w-2xl p-6">
       <h1 className="text-lg font-semibold tracking-tight">Settings</h1>

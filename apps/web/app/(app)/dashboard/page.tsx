@@ -9,7 +9,7 @@ import {
 } from "@workspace/ui/components/shadcn/card";
 import { firstWord } from "@workspace/utils/string";
 
-import { getSession } from "@/lib/session";
+import { requireSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -19,8 +19,7 @@ export const metadata: Metadata = { title: "Dashboard" };
  * which holds the theme control and sign-out) live in the shell header, not here.
  */
 export default async function DashboardPage() {
-  const session = await getSession();
-  const user = session?.user;
+  const { user } = await requireSession();
 
   return (
     <div className="mx-auto w-full max-w-2xl p-6">
@@ -28,15 +27,15 @@ export default async function DashboardPage() {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            Welcome{user?.name ? `, ${firstWord(user.name) ?? user.name}` : ""}
-            {user?.emailVerified ? (
+            Welcome{user.name ? `, ${firstWord(user.name) ?? user.name}` : ""}
+            {user.emailVerified ? (
               <Badge variant="secondary">Verified</Badge>
             ) : (
               <Badge variant="outline">Unverified</Badge>
             )}
           </CardTitle>
           <CardDescription>
-            You&apos;re signed in as {user?.email}.
+            You&apos;re signed in as {user.email}.
           </CardDescription>
         </CardHeader>
       </Card>

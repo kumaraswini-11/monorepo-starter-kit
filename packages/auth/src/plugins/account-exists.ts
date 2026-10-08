@@ -19,7 +19,8 @@ export const accountExists = () =>
         "/account-exists",
         {
           method: "POST",
-          body: z.object({ email: z.string().min(1) }),
+          // Public endpoint: validate shape and bound the size before touching the database.
+          body: z.object({ email: z.email().max(254) }),
         },
         async (ctx) => {
           // BA stores emails normalised; look up the same way.

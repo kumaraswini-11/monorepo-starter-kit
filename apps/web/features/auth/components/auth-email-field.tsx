@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useId } from "react";
 
 import {
   Field,
@@ -14,10 +15,13 @@ import { Input } from "@workspace/ui/components/shadcn/input";
  * field so password managers fill the split flow.
  */
 export function AuthEmailField({ email }: { email: string }) {
+  // Unique per instance (a docs page or a modal may mount two) — never a literal id.
+  const id = useId();
+  const hintId = `${id}-hint`;
   return (
     <Field>
       <div className="flex items-center justify-between">
-        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <FieldLabel htmlFor={id}>Email</FieldLabel>
         <Link
           href="/auth/email"
           className="text-sm text-muted-foreground underline-offset-4 hover:underline"
@@ -26,14 +30,14 @@ export function AuthEmailField({ email }: { email: string }) {
         </Link>
       </div>
       <Input
-        id="email"
+        id={id}
         type="email"
         value={email}
         readOnly
         autoComplete="username"
-        aria-describedby="email-hint"
+        aria-describedby={hintId}
       />
-      <FieldDescription id="email-hint">
+      <FieldDescription id={hintId}>
         Email is fixed for this step. Use Change to pick a different address.
       </FieldDescription>
     </Field>

@@ -1,27 +1,43 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { MailIcon } from "lucide-react";
 
+import { googleSignInEnabled } from "@workspace/auth";
 import { buttonVariants } from "@workspace/ui/components/shadcn/button";
 import { brand } from "@workspace/ui/lib/brand";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { AuthHeader, GoogleSignInButton } from "@/features/auth";
+import {
+  AuthHeader,
+  GoogleSignInButton,
+  OAuthErrorToast,
+} from "@/features/auth";
 
 export const metadata: Metadata = { title: "Authentication" };
 
 /**
  * Auth entry — the method chooser at `/auth`. Static Server Component shell (ADR 0019):
  * it reads no request data, so it prerenders and is edge-cacheable. `/` dispatches
- * visitors here (or to `/dashboard` when a session already exists).
+ * visitors here (or to `/dashboard` when a session already exists). "Continue with Google"
+ * renders only when the provider is configured (a build-time constant — the deploy decides,
+ * ADR 0011); a failed OAuth round-trip returns here with `?error=` and is surfaced by the
+ * toast island, which reads the query under Suspense so the shell stays static.
  */
 export default function AuthEntryPage() {
   return (
     <div className="flex flex-col gap-6">
       <AuthHeader
         title="Sign in or create an account"
-        description="Continue with Google, or use your email address."
+        description={
+          googleSignInEnabled
+            ? "Continue with Google, or use your email address."
+            : "Continue with your email address."
+        }
       />
+      <Suspense fallback={null}>
+        <OAuthErrorToast />
+      </Suspense>
 
       {/*
        * Each label sits in a shared `min-w-38` box so both icon+label groups are the
@@ -34,9 +50,9 @@ export default function AuthEntryPage() {
       <div className="flex flex-col gap-2">
         {/*
          * A client island (ADR 0019/0025): the page stays a static shell while just this button
-         * hydrates to start the Google OAuth redirect via the seam (lib/auth/actions.ts).
+         * hydrates to start the Google OAuth redirect via the seam (features/auth/actions.ts).
          */}
-        <GoogleSignInButton />
+        {googleSignInEnabled && <GoogleSignInButton />}
 
         <Link
           href="/auth/email"

@@ -10,13 +10,24 @@ import { defineConfig } from "drizzle-kit";
  */
 config({
   path: fileURLToPath(new URL("../../apps/web/.env.local", import.meta.url)),
+  // dotenv 17 logs an "injected env" tip on every run; the file may also be absent (CI, prod
+  // migrate), where the variable comes from the environment itself.
+  quiet: true,
 });
+
+// Fail fast with a clear message (ADR 0013) instead of drizzle-kit's opaque connection error.
+// `generate` works from the snapshots alone, so only the DB-touching commands need the URL.
+const url = process.env.DATABASE_URL;
+const needsDb = !process.argv.includes("generate");
+if (needsDb && !url) {
+  throw new Error(
+    "DATABASE_URL is not set — export it or put it in apps/web/.env.local (ADR 0013)."
+  );
+}
 
 export default defineConfig({
   schema: "./src/schema.ts",
   out: "./migrations",
   dialect: "postgresql",
-  dbCredentials: {
-    url: process.env.DATABASE_URL ?? "",
-  },
+  dbCredentials: { url: url ?? "" },
 });

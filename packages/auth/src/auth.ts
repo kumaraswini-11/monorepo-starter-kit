@@ -32,17 +32,15 @@ import { firstWord } from "@workspace/utils/string";
 /**
  * Google OAuth is enabled only when both credentials are present — a deploy-time choice
  * (ADR 0011), like the SMTP provider. Absent in dev / no-secret CI builds, so no social provider
- * is registered and the app still builds and runs.
+ * is registered and the app still builds and runs. `googleSignInEnabled` is the UI's switch for
+ * the "Continue with Google" button (the `/auth` page renders it only when true).
  */
-const socialProviders =
+const google =
   env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
-    ? {
-        google: {
-          clientId: env.GOOGLE_CLIENT_ID,
-          clientSecret: env.GOOGLE_CLIENT_SECRET,
-        },
-      }
-    : {};
+    ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
+    : undefined;
+export const googleSignInEnabled = google !== undefined;
+const socialProviders = google ? { google } : {};
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
@@ -71,6 +69,9 @@ export const auth = betterAuth({
     // confirmation/alert email. Covers the forgot-password flow; the settings
     // "change password" path gets its own hook when that UI lands.
     revokeSessionsOnPasswordReset: true,
+    // Keep in sync with the copy in packages/email/src/emails/reset-password.tsx ("30 minutes").
+    // Better Auth's default is 1h.
+    resetPasswordTokenExpiresIn: 30 * 60,
     onPasswordReset: async ({ user }) => {
       try {
         await sendPasswordChangedEmail({
@@ -88,6 +89,9 @@ export const auth = betterAuth({
     // Progressive verification (auth UI/UX spec): email on sign-up + show a banner,
     // but don't block access (requireEmailVerification stays false above).
     sendOnSignUp: true,
+    // Keep in sync with the copy in packages/email/src/emails/verify-email.tsx ("24 hours").
+    // Better Auth's default is 1h.
+    expiresIn: 60 * 60 * 24,
     sendVerificationEmail: async ({ user, url }) => {
       try {
         await sendVerifyEmail({
@@ -157,10 +161,18 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // refresh at most once per day
     freshAge: 60 * 60, // 1h — sensitive flows (change email/password, delete) need a fresh session
-    cookieCache: { enabled: true, maxAge: 5 * 60 }, // 5-min cookie cache (perf)
+    // 5-min cookie cache (perf): a request carrying a valid signed session cookie is served
+    // without a DB read for up to maxAge, so revocation (password reset, sign-out elsewhere)
+    // takes up to 5 min to bite on OTHER devices. Sensitive server reads can bypass it with
+    // `getSession({ headers, query: { disableCookieCache: true } })`. (ADR 0011)
+    cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
-  // Behind a proxy/CDN (Vercel/Cloudflare), read the client IP from forwarded headers so
-  // rate limiting keys per-IP rather than one shared bucket (security best-practices).
+  // Behind a proxy/CDN, read the client IP from forwarded headers so rate limiting keys per-IP
+  // rather than one shared bucket. Correct ONLY behind a single proxy that overwrites these
+  // headers: without `trustedProxies` Better Auth trusts single-value headers only, so a
+  // client-supplied multi-value x-forwarded-for resolves to no IP (shared bucket). Deploy-time
+  // follow-up in docs/future-improvements.md: set `trustedProxies` (proxy CIDRs) and put the
+  // edge's own header first (cf-connecting-ip / x-vercel-forwarded-for).
   advanced: {
     ipAddress: { ipAddressHeaders: ["x-forwarded-for", "x-real-ip"] },
   },

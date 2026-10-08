@@ -34,7 +34,8 @@ export async function signInWithGoogle(): Promise<void> {
   const { error } = await authClient.signIn.social({
     provider: "google",
     callbackURL: "/dashboard",
-    errorCallbackURL: "/auth?error=oauth",
+    // Better Auth appends `?error=<code>` itself; the `/auth` toast island surfaces it.
+    errorCallbackURL: "/auth",
   });
   if (error) {
     throw new FormSubmitError(
@@ -60,7 +61,8 @@ export async function signUpWithEmail(params: {
   if (error) {
     // The email step routed here because the account didn't exist; a race can still land
     // an "already exists" (safe to reveal at sign-up — the identifier-first trade-off).
-    if (error.status === 422) {
+    // 422 is also what a failed user INSERT returns — only the explicit code means "taken".
+    if (error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL") {
       throw new FormSubmitError(
         "An account with this email already exists. Sign in instead."
       );

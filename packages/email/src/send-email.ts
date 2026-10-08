@@ -14,9 +14,22 @@ import { env } from "@workspace/env";
  * through them `packages/auth` + future billing/notifications) never change — the provider is a
  * credentials-only, deploy-time choice.
  *
+ * **Production never falls back to the console stub:** it prints the message body — i.e. the
+ * verification / reset links, which are bearer tokens — to stdout, where a log aggregator would
+ * keep them. A production runtime without `SMTP_HOST` therefore fails every send loudly (the
+ * auth hooks catch and log it) instead of leaking tokens while users "check their inbox".
+ *
  * Kept in its own module (not `index.ts`) so `messages.tsx` can import the active sender without
  * a barrel import cycle.
  */
 export const sendEmail: SendEmail = env.SMTP_HOST
   ? smtpEmailAdapter
-  : consoleEmailAdapter;
+  : env.NODE_ENV === "production"
+    ? () =>
+        Promise.reject(
+          new Error(
+            "No email transport in production — set SMTP_HOST (+ SMTP_USER/SMTP_PASSWORD/" +
+              "EMAIL_FROM); the console adapter is dev/test only. (ADR 0014)"
+          )
+        )
+    : consoleEmailAdapter;
