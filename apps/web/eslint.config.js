@@ -1,4 +1,6 @@
-import { nextJsConfig } from "@workspace/eslint-config/next-js";
+import { defineConfig } from "eslint/config";
+
+import { nextJsConfig, typeAware } from "@workspace/eslint-config/next-js";
 
 /**
  * App-local import governance, layered on the shared config. Two boundaries:
@@ -37,9 +39,9 @@ const noCrossFeatureInternals = {
     "Import a feature through its public API (@/features/<name>), not its internals (ADR 0028). Inside a feature, use relative imports.",
 };
 
-/** @type {import("eslint").Linter.Config[]} */
-export default [
+export default defineConfig([
   ...nextJsConfig,
+  typeAware(import.meta.dirname),
   {
     rules: {
       "no-restricted-imports": [
@@ -75,4 +77,4 @@ export default [
       ],
     },
   },
-];
+]);

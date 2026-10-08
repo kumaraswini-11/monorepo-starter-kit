@@ -1,0 +1,64 @@
+# TEMPLATE SWITCH — INACTIVE. GitHub only reads `.github/dependabot.yml`; this file is the
+# repository policy for Dependabot VERSION UPDATES, kept ready but switched off so that a repo
+# derived from this template does not open dependency PRs before a team is there to review them.
+#
+# Enable for a product repository (one step, then delete this header):
+#   git mv .github/dependabot.yml.template .github/dependabot.yml
+#
+# Independent of this file: Dependabot ALERTS and SECURITY UPDATES are repository settings and
+# should be ON in every product repo (Settings -> Advanced Security). While version updates are
+# off, refresh the catalog manually with `pnpm deps:check` (taze) on the monthly routine.
+#
+version: 2
+
+# Policy (ADR 0007, ADR 0033):
+# - GROUP minor/patch bumps into one PR per ecosystem; MAJOR bumps stay ungrouped so each gets
+#   its own review — read the changelog, run the full gate, write an ADR if it changes how we
+#   work. Never blind-merge (AGENTS.md).
+# - COOLDOWN lets just-published versions age before a PR is opened — the same rationale as
+#   pnpm `minimumReleaseAge` (dependabot-core honours the larger of the two). Majors wait longest.
+# - Dependabot reads pnpm `catalog:` entries (pnpm-workspace.yaml), so the single-version
+#   catalog is the only place it edits for npm.
+# - Security updates are a separate mechanism (Dependabot alerts) and are not throttled here.
+updates:
+  # Keep the SHA-pinned GitHub Actions current (and patch action advisories).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      github-actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 3
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      npm-minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      # Deferred majors with a named trigger (docs/future-improvements.md):
+      # - TypeScript 7 (Go-native, no JS API yet) waits for typescript-eslint support.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # - @types/node tracks the Node line we run (devEngines.runtime); it moves with the
+      #   runtime bump (Node 26 LTS on 2026-10-28), not ahead of it.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # - jsdom majors move with the Node pin (engines floor), not independently.
+      - dependency-name: "jsdom"
+        update-types: ["version-update:semver-major"]

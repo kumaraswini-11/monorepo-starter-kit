@@ -32,10 +32,15 @@ export function Form<T extends FieldValues>({
   children: React.ReactNode;
 }) {
   const { isSubmitting } = useFormState({ control: form.control });
+  const submit = submitWithFormError(form, onSubmit);
 
   return (
     <form
-      onSubmit={submitWithFormError(form, onSubmit)}
+      // React does not await handlers; `void` makes the fire-and-forget explicit. Submission
+      // errors are routed to the form by `submitWithFormError` (ADR 0022).
+      onSubmit={(event) => {
+        void submit(event);
+      }}
       noValidate
       aria-busy={isSubmitting || undefined}
       className={cn("flex flex-col gap-6", className)}

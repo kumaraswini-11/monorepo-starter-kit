@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-04 · **Updated:** 2026-08-15 (§5 env validation implemented)
+- **Amended:** 2026-10-07 — a variable that changes **build output** (today `BETTER_AUTH_URL`, which feeds the prerendered `metadataBase`) is declared in the task's `env` so it is hashed; only runtime-only values stay in `globalPassThroughEnv` (which has grown to cover SMTP, OAuth, Docker and Testcontainers variables). See [0035](0035-task-graph-correctness-and-affected-ci.md) and the [environment guide](../guides/environment.md).
 
 ## Context
 

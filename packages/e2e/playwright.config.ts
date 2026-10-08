@@ -1,0 +1,98 @@
+import { defineConfig, devices } from "@playwright/test";
+
+import { STORAGE_STATE } from "./support/auth.js";
+import { DEFAULT_DATABASE_URL } from "./support/db.js";
+
+/**
+ * End-to-end tests for apps/web (ADR 0025). A dedicated workspace so `@playwright/test` +
+ * browsers never enter the app bundle. Runs against the production build (`next start`) for
+ * realistic behavior; `turbo test:e2e` builds `web` first (`dependsOn: ["^build"]`).
+ */
+const CI = !!process.env.CI;
+const PORT = 3100; // off the default 3000 so a running dev server doesn't clash
+const baseURL = `http://127.0.0.1:${PORT}`;
+
+export default defineConfig({
+  testDir: "./tests",
+  fullyParallel: true,
+  forbidOnly: CI,
+  retries: CI ? 2 : 0,
+  // Better Auth's scrypt hashing is synchronous and blocks the single `next start` event loop,
+  // so concurrent sign-ups serialize on the server anyway — parallelism buys no speed and only
+  // risks navigation timeouts under load. Run serially locally; cap CI (cleaner runners +
+  // retries below absorb the rest). (playwright-best-practices)
+  workers: CI ? "50%" : 1,
+  // `github` = inline PR annotations; `list` = console. Switch to `blob` + a merge job if/when
+  // we shard (blob alone, unmerged, isn't useful).
+  reporter: CI ? [["github"], ["list"]] : "list",
+  // Generous because auth journeys pay for real server-side scrypt (deliberately slow) + a DB
+  // round-trip + redirect; navigation must stay under the per-test budget.
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  use: {
+    baseURL,
+    // Bound action/navigation waits so a hung step fails fast instead of stalling to the
+    // global timeout (default actionTimeout is unbounded). navigation is generous for the
+    // scrypt-backed auth redirects above. (playwright-best-practices)
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
+  },
+  // An ARRAY from day one: when the backend splits out (ADR 0017) it becomes a second entry
+  // here, and the e2e suite boots both services unchanged.
+  webServer: [
+    {
+      command: `pnpm --filter web start --port ${PORT}`,
+      url: baseURL,
+      reuseExistingServer: !CI,
+      timeout: 120_000,
+      // Real Postgres for DB-backed journeys (sign-up hits the DB). `DATABASE_URL` is the
+      // docker-compose Postgres locally / a Postgres service in CI (defaulted to the compose
+      // creds); the `db` setup project resets + migrates it first. Throwaway auth secret — e2e signs up fresh users.
+      env: {
+        DATABASE_URL: process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
+        BETTER_AUTH_SECRET:
+          process.env.BETTER_AUTH_SECRET ??
+          "e2e-secret-at-least-32-characters-long-00",
+        BETTER_AUTH_URL: baseURL,
+        // `next start` is NODE_ENV=production, where the email package refuses the console stub
+        // unless told so; this server is a test harness, not a deployment (ADR 0014).
+        EMAIL_TRANSPORT: "console",
+        // The chooser renders "Continue with Google" only when the provider is configured. The
+        // button is asserted, never clicked (real Google cannot be automated — see the OAuth
+        // mock-IdP item in docs/future-improvements.md), so placeholder credentials suffice.
+        GOOGLE_CLIENT_ID:
+          process.env.GOOGLE_CLIENT_ID ?? "e2e-google-client-id",
+        GOOGLE_CLIENT_SECRET:
+          process.env.GOOGLE_CLIENT_SECRET ?? "e2e-google-client-secret",
+      },
+    },
+  ],
+  // Setup work runs as *projects with dependencies* rather than `globalSetup` — the form
+  // Playwright recommends (it shows up in the HTML report, traces and fixtures apply, and the
+  // ordering is explicit). Order: reset + migrate the disposable DB -> authenticate once ->
+  // the browser projects. Every browser project depends (transitively) on `db`, so no test can
+  // race the schema reset.
+  projects: [
+    // Drop + recreate the schema and apply the committed migrations (ADR 0025).
+    { name: "db", testMatch: /db\.setup\.ts$/ },
+    // Authenticate once; the authed project reuses the saved session (storageState).
+    { name: "setup", testMatch: /auth\.setup\.ts$/, dependencies: ["db"] },
+    {
+      // First-time-visitor journeys (sign-up, sign-out, redirects) — no stored session.
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+      dependencies: ["db"],
+      testIgnore: /\.authed\.spec\.ts$/,
+    },
+    {
+      // Returning-authenticated journeys — start signed-in from the setup project's session.
+      name: "chromium-authed",
+      use: { ...devices["Desktop Chrome"], storageState: STORAGE_STATE },
+      dependencies: ["setup"],
+      testMatch: /\.authed\.spec\.ts$/,
+    },
+  ],
+});

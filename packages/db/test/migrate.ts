@@ -7,7 +7,7 @@ import { Pool } from "pg";
  * Apply the committed Drizzle migrations to `connectionString` on a short-lived pool (always
  * closed). Standalone — imports `drizzle`/`pg` directly, NOT `@workspace/db/client`, so it
  * carries no `server-only` guard and runs in any test runner. Shared by the Vitest integration
- * harness and the Playwright e2e global-setup (ADR 0025).
+ * harness and the Playwright e2e `db` setup project (ADR 0025).
  */
 export async function applyMigrations(connectionString: string): Promise<void> {
   const pool = new Pool({ connectionString });

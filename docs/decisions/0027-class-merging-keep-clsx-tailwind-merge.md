@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-09-06
+- **Amended:** 2026-10-08 — pnpm 11 is adopted ([0033](0033-toolchain-version-policy-and-2026-10-modernization.md)); the cooldown policy is unchanged (`minimumReleaseAge`), so the calculus below does not shift. The `cn` re-evaluation is logged in `docs/future-improvements.md` with its trigger.
 
 ## Context
 

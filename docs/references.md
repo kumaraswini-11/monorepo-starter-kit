@@ -65,9 +65,9 @@ use case. Add new links under the relevant section (or make a new one).
 
 Not adopted now — revisit as the ecosystem matures.
 
-- **ESLint 10 & TypeScript 7** — deliberately deferred; see
-  [decisions/0006](decisions/0006-defer-typescript-7-and-eslint-10.md) for the revisit
-  triggers (plugin/ecosystem readiness).
+- **TypeScript 7** (and pnpm 12, Node 26) — deferred with dated triggers; see
+  [decisions/0033](decisions/0033-toolchain-version-policy-and-2026-10-modernization.md) and
+  [future-improvements.md](future-improvements.md). (ESLint 10 was adopted in 0033.)
 - **oxlint** (Oxc) — Rust linter, ~50–100× faster than ESLint (v1.0, Jun 2025);
   linting-only with fewer rules/plugins. Useful as a fast CI correctness pass
   _alongside_ ESLint — <https://oxc.rs/>

@@ -1,4 +1,5 @@
-import { config } from "@workspace/eslint-config/base";
+import { defineConfig } from "eslint/config";
 
-/** @type {import("eslint").Linter.Config[]} */
-export default [...config];
+import { config, typeAware } from "@workspace/eslint-config/base";
+
+export default defineConfig([...config, typeAware(import.meta.dirname)]);

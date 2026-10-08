@@ -32,11 +32,16 @@ function getTransporter(): Transporter {
   }
 
   const port = Number(SMTP_PORT ?? 465);
+  // Explicit override wins; otherwise implicit TLS on 465/2465, STARTTLS elsewhere.
+  const secure = SMTP_SECURE ?? IMPLICIT_TLS_PORTS.has(port);
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port,
-    // Explicit override wins; otherwise implicit TLS on 465/2465, STARTTLS elsewhere.
-    secure: SMTP_SECURE ?? IMPLICIT_TLS_PORTS.has(port),
+    secure,
+    // On a STARTTLS port Nodemailer only upgrades when the EHLO banner advertises it, so a
+    // man-in-the-middle that strips the capability would receive the credentials and the
+    // message in clear. `requireTLS` makes a missing STARTTLS a hard failure instead.
+    requireTLS: !secure,
     auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
     // Reuse connections across messages — Nodemailer's guidance for a long-lived server.
     pool: true,

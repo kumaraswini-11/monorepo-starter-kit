@@ -1,0 +1,5 @@
+import { defineConfig } from "eslint/config";
+
+import { config, typeAware } from "@workspace/eslint-config/{{#if isReact}}react-internal{{else}}base{{/if}}";
+
+export default defineConfig([...config, typeAware(import.meta.dirname)]);

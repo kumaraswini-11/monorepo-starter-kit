@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Reset your password" };
 export default function ForgotPasswordPage() {
   return (
     <div className="flex flex-col gap-6">
-      <AuthBackLink href="/auth/sign-in" />
+      <AuthBackLink href="/auth/email" />
       <ForgotPasswordStep />
     </div>
   );

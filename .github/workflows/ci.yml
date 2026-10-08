@@ -4,101 +4,106 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Required for a merge queue: without this trigger the required checks never run on the
+  # queue's merge-group commits (GitHub docs).
+  merge_group:
+    types: [checks_requested]
 
-# Cancel superseded runs on the same ref (saves CI minutes).
+# Cancel superseded runs on the same PR (saves CI minutes). Pushes to main are never cancelled:
+# every main commit keeps a complete CI record (audit trail).
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Least privilege: this workflow only needs to read the repository.
+# Least privilege: every job only reads the repository.
 permissions:
   contents: read
 
+env:
+  # @workspace/env validates at import, which runs during `next build`. CI has no secrets, so
+  # skip validation here — real runtimes still fail-fast at startup (ADR 0013).
+  SKIP_ENV_VALIDATION: "1"
+  # Git hooks are a local convenience; CI is the gate (ADR 0037).
+  HUSKY: "0"
+  # No anonymous usage telemetry from the build tools (private, compliance-bound product).
+  TURBO_TELEMETRY_DISABLED: "1"
+  NEXT_TELEMETRY_DISABLED: "1"
+  # On pull requests only the packages affected by the change (and their dependents) run;
+  # pushes to main and merge-queue commits run everything (Turborepo `--affected`, which
+  # compares against the PR base ref on GitHub Actions).
+  TURBO_AFFECTED: ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+  # Uncomment to enable Turborepo Remote Caching (Vercel, OIDC-based — see the CI guide):
+  # TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
 jobs:
-  ci:
+  check:
     name: Format, lint, typecheck, build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      # @workspace/env validates at import, which runs during `next build`. CI has no
-      # secrets, so skip validation here — real runtimes still fail-fast at startup
-      # (ADR 0013). lint/typecheck don't execute the module, so job-level is safe.
-      SKIP_ENV_VALIDATION: "1"
-      # Uncomment to enable Turborepo Remote Caching (Vercel):
-      # TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      # TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     steps:
       - name: Checkout
-        # Third-party actions are pinned to a full commit SHA (supply-chain
-        # hardening); the trailing comment tracks the human-readable version,
-        # and Dependabot (.github/dependabot.yml) keeps both current.
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # This job never pushes, so don't leave the token in .git/config.
+          # This job never pushes, so don't leave the token in the checkout.
           persist-credentials: false
-          # fetch-depth: 2 lets Turborepo compare against the previous commit
-          # (useful later for --filter=[HEAD^1] affected-package runs).
-          fetch-depth: 2
+          # Full history so `turbo --affected` can diff against the base ref.
+          fetch-depth: 0
 
-      - name: Install pnpm
-        # Reads the pinned pnpm version from the "packageManager" field.
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          # Single source of truth for the Node version — .nvmrc (Node 24 LTS).
-          # Keeps CI, local dev (nvm), and engines from drifting apart.
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Check formatting
         run: pnpm exec prettier --check .
 
+      - name: Check lockfile is deduplicated
+        run: pnpm dedupe --check
+
       - name: Lint, typecheck, build
-        run: pnpm exec turbo run lint typecheck build
+        # `--continue=dependencies-successful` keeps running unrelated tasks after a failure
+        # so one red package doesn't hide the others.
+        run: pnpm exec turbo run lint lint:tooling typecheck typecheck:tooling build $TURBO_AFFECTED --continue=dependencies-successful
+
+      - name: Dead code and unused dependencies (knip)
+        run: pnpm knip
+
+      - name: Package boundaries (Turborepo Boundaries)
+        # Experimental in Turborepo — advisory until it is stable (ADR 0036); the ESLint
+        # boundary rules remain the hard gate.
+        run: pnpm exec turbo boundaries
+        continue-on-error: true
+
+      - name: Licence policy (production dependencies)
+        # Strong copyleft (GPL/AGPL/SSPL/EUPL) or unknown licences in anything we ship fail the
+        # gate; weak copyleft (LGPL/MPL) is accepted for unmodified libraries (ADR 0037). Runs
+        # here because the dependency-review PR gate needs GitHub Code Security on private repos.
+        run: pnpm licenses:check
 
       - name: Security audit (production dependencies)
-        # Report-only: surfaces known advisories without failing CI on transitive
-        # vulnerabilities you cannot immediately fix. Review the run log.
-        run: pnpm audit --prod
-        continue-on-error: true
+        # Blocking on high/critical advisories in what we ship: a known vulnerability must
+        # force a decision — bump, pin via `overrides`, or (only when no patched version
+        # exists) an explicit, commented entry in `auditConfig.ignoreGhsas`
+        # (pnpm-workspace.yaml). Never `--ignore-unfixable`: it silently WRITES ignores and
+        # exits 0 without reporting the fixable ones.
+        run: pnpm audit --prod --audit-level=high
 
   test:
     name: Test (unit + component)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      # Some component tests may transitively pull @workspace/env; CI has no secrets, so
-      # skip validation (real runtimes still fail-fast — ADR 0013).
-      SKIP_ENV_VALIDATION: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Run unit + component tests (coverage, report-only)
-        # Storybook's browser-mode tests are excluded here — they need Playwright browser
-        # binaries and belong with the visual/e2e CI lane (ADR 0024/0029). Coverage is
-        # report-only for now; thresholds come later (ADR 0025).
-        run: pnpm exec turbo run test --filter='!storybook' -- --coverage
+        # Storybook's browser-mode tests run in their own job (they need a browser). Coverage
+        # is report-only; thresholds come once a baseline exists (ADR 0025).
+        run: pnpm exec turbo run test --filter='!storybook' $TURBO_AFFECTED -- --coverage
 
   integration:
     name: Test (integration — real Postgres)
@@ -109,39 +114,31 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Run integration tests (Testcontainers → real Postgres)
-        # Testcontainers manages an ephemeral postgres:17; the Docker daemon on ubuntu-latest
-        # runners is available out of the box, so no `services:` container is needed. The test
-        # env (DATABASE_URL from the container + throwaway secret) is set by the shared harness
-        # (@workspace/db/testing), so no CI secrets are required. (ADR 0025 §11)
-        run: pnpm exec turbo run test:integration
+        # Testcontainers manages an ephemeral postgres:17; Docker is available on
+        # ubuntu-latest out of the box. The test env (DATABASE_URL from the container + a
+        # throwaway secret) is set by the shared harness (@workspace/db/testing/*). (ADR 0025 §11)
+        run: pnpm exec turbo run test:integration $TURBO_AFFECTED
 
   e2e:
     name: Test (e2e — Playwright)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # `turbo test:e2e` builds apps/web first (dependsOn ^build); CI has no secrets, so skip
-      # env validation for that build (ADR 0013). The e2e server gets throwaway env from
-      # playwright.config; the DB-backed journeys (sign-up) run against the service below. (ADR 0025)
-      SKIP_ENV_VALIDATION: "1"
-      # global-setup migrates this and the app writes user/account/session to it; the schema is
-      # dropped + recreated each run, so a throwaway service DB is exactly right. (ADR 0025)
+      # The `db` setup project resets + migrates this and the app writes user/account/session
+      # to it; a throwaway service DB is exactly right. (ADR 0025)
       DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/app
+      # "Continue with Google" is baked in at build time (static /auth shell, ADR 0019) and the
+      # build runs here before Playwright starts the server, so the placeholders the harness uses
+      # at runtime (packages/e2e/playwright.config.ts) must be present for the build too. The
+      # button is asserted, never clicked.
+      GOOGLE_CLIENT_ID: e2e-google-client-id
+      GOOGLE_CLIENT_SECRET: e2e-google-client-secret
     services:
       postgres:
         image: postgres:17
@@ -151,7 +148,6 @@ jobs:
           POSTGRES_DB: app
         ports:
           - 5432:5432
-        # Gate the job's steps on the DB being ready to accept connections.
         options: >-
           --health-cmd "pg_isready -U postgres -d app"
           --health-interval 10s
@@ -162,34 +158,48 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Install Playwright browser (chromium)
-        run: pnpm --filter e2e exec playwright install --with-deps chromium
+        # Playwright advises against caching browser binaries (restore ≈ download).
+        run: pnpm --filter @workspace/e2e exec playwright install --with-deps chromium
 
       - name: Run e2e tests
-        run: pnpm exec turbo run test:e2e
+        # `turbo test:e2e` builds apps/web first (dependsOn ^build); skipped by `--affected`
+        # when nothing the app depends on changed.
+        run: pnpm exec turbo run test:e2e $TURBO_AFFECTED
 
-      # Upload the Playwright report + traces/screenshots/videos so a CI failure is debuggable
-      # beyond the inline annotations (config captures trace on-first-retry, media on failure).
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
           path: |
-            apps/e2e/playwright-report/
-            apps/e2e/test-results/
+            packages/e2e/playwright-report/
+            packages/e2e/test-results/
           retention-days: 7
+
+  storybook:
+    name: Storybook (build + browser tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+
+      - name: Install Playwright browser (chromium)
+        run: pnpm --filter storybook exec playwright install --with-deps chromium
+
+      - name: Build Storybook and run story tests
+        # The design-system gate: every story renders, interaction tests pass, and
+        # addon-a11y runs in `error` mode — an automated accessibility check (ADR 0024).
+        run: pnpm exec turbo run build:storybook test --filter=storybook $TURBO_AFFECTED

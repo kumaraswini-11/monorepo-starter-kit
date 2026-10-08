@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-07 — CI is now five jobs with a shared composite setup action and affected runs ([0035](0035-task-graph-correctness-and-affected-ci.md)); the ruleset is committed at `.github/rulesets/main.json`, PR titles and dependency changes are gated, and Dependabot version updates are a template switch, inactive until enabled ([0037](0037-git-hooks-commit-governance-and-pr-gates.md) §6; alerts + security updates stay on as repository settings).
 
 ## Context
 

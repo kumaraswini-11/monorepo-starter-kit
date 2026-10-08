@@ -89,15 +89,32 @@ describe("auth seam — sign-in", () => {
 });
 
 describe("auth seam — sign-up", () => {
-  it("maps a 422 race to the already-exists hint", async () => {
+  it("maps the already-exists code (a 422 race) to the sign-in hint", async () => {
     server.use(
       http.post("*/api/auth/sign-up/email", () =>
-        HttpResponse.json({ message: "exists" }, { status: 422 })
+        HttpResponse.json(
+          { code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL", message: "exists" },
+          { status: 422 }
+        )
       )
     );
     await expect(
       signUpWithEmail({ email: "taken@example.com", password: "a-password-10" })
     ).rejects.toThrow(/already exists/i);
+  });
+
+  it("does not read any other 422 as already-exists", async () => {
+    server.use(
+      http.post("*/api/auth/sign-up/email", () =>
+        HttpResponse.json(
+          { code: "FAILED_TO_CREATE_USER", message: "db" },
+          { status: 422 }
+        )
+      )
+    );
+    await expect(
+      signUpWithEmail({ email: "new@example.com", password: "a-password-10" })
+    ).rejects.toThrow(/could not create/i);
   });
 
   it("maps other failures to the generic sign-up error", async () => {

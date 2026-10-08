@@ -15,7 +15,7 @@ const { sendMail, createTransport, state } = vi.hoisted(() => {
     sendMail,
     createTransport: vi.fn(() => ({ sendMail })),
     // Mutable env read through a getter, so each test supplies its own values.
-    state: { env: {} as Record<string, unknown> },
+    state: { env: {} },
   };
 });
 
@@ -69,6 +69,7 @@ describe("smtpEmailAdapter", () => {
         host: "smtp.resend.com",
         port: 465,
         secure: true,
+        requireTLS: false,
         auth: { user: "resend", pass: "re_test_key" },
         pool: true,
         disableFileAccess: true,
@@ -77,13 +78,13 @@ describe("smtpEmailAdapter", () => {
     );
   });
 
-  it("uses STARTTLS (secure: false) on port 587", async () => {
+  it("uses mandatory STARTTLS (secure: false, requireTLS) on port 587", async () => {
     state.env = { ...BASE_ENV, SMTP_PORT: 587 };
     const send = await loadAdapter();
     await send(MESSAGE);
 
     expect(createTransport).toHaveBeenCalledWith(
-      expect.objectContaining({ port: 587, secure: false })
+      expect.objectContaining({ port: 587, secure: false, requireTLS: true })
     );
   });
 

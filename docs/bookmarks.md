@@ -15,7 +15,7 @@ _Newest first within each section. Run `pnpm format` to keep it tidy._
   [Skills collection](https://www.aihero.dev/skills) ships free, editable engineering
   **workflow** skills — `/grill-me`, `/domain-model`, `/to-prd`, `/to-issues`, `/tdd`,
   `/triage` (grouped Shaping / Upkeep / Productivity). **Adopted** — vendored + hash-pinned
-  via `npx skills add mattpocock/skills` (`skills-lock.json`), alongside the first-party
+  via `pnpm dlx skills@<version> add mattpocock/skills` (`skills-lock.json`), alongside the first-party
   better-auth / shadcn / vercel sets, per the refined policy in
   [decisions/0010](decisions/0010-agent-skills-vendoring.md) (reputable first-party/known-author
   skill sets in; unvetted community registries below stay browse-only).

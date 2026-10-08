@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-09
+- **Amended:** 2026-10-07 — `@workspace/utils` exists (the trigger below fired); the brand mark and name live in `packages/ui/src/components/brand/` and `packages/ui/src/lib/brand.ts` (name sourced from `@workspace/utils/product`); the dependency direction is now also enforced by Turborepo Boundaries tags and `paths` aliases are banned — see [0036](0036-package-boundaries-dead-code-and-scaffolding.md).
 
 ## Context
 
@@ -82,12 +83,12 @@ the _home_, but keep **reusability-tier packages + feature folders** — never l
 debates and navigation bloat; the 2026 consensus is a hybrid: atomic thinking for the shared
 library, **feature-based** grouping for app code).
 
-| Atomic level            | Example                                                                                                                      | Home                                              |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **Atoms**               | shadcn `Button`, `Input`, `Field`, `Alert`                                                                                   | `@workspace/ui`                                   |
-| **Molecules**           | `PasswordInput`, `PasswordStrength`, `FormTextField`, `FormPasswordField`, `Form`, `SubmitButton`, `FormError`, brand `Logo` | `@workspace/ui`                                   |
-| **Organisms** (feature) | `SignInForm`, `SignUpForm`, `AuthHeader`                                                                                     | `apps/web/components/<feature>` (feature-grouped) |
-| **Templates / Pages**   | the `/auth/*` routes                                                                                                         | `apps/web/app`                                    |
+| Atomic level            | Example                                                                                                                      | Home                                      |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Atoms**               | shadcn `Button`, `Input`, `Field`, `Alert`                                                                                   | `@workspace/ui`                           |
+| **Molecules**           | `PasswordInput`, `PasswordStrength`, `FormTextField`, `FormPasswordField`, `Form`, `SubmitButton`, `FormError`, brand `Logo` | `@workspace/ui`                           |
+| **Organisms** (feature) | `SignInForm`, `SignUpForm`, `AuthHeader`                                                                                     | `apps/web/features/<feature>/` (ADR 0028) |
+| **Templates / Pages**   | the `/auth/*` routes                                                                                                         | `apps/web/app`                            |
 
 **`@workspace/ui` is the single source of truth for atoms + molecules** — presentational
 _and_ form-bound. Reusable molecules go here **from the start**, not deferred to a
@@ -203,7 +204,7 @@ standard is unchanged._
    costlier than duplication.
 5. **Source-only** (no build step) — matches every other `@workspace/*` package.
 
-> **Created 2026-08-16**, seeded with `firstName` (`@workspace/utils/string`) — the first
+> **Created 2026-08-16**, seeded with `firstWord` (`@workspace/utils/string`) — the first
 > genuinely-generic helper to clear the entry bar (extracted from `packages/auth`, which now
 > consumes it). Zero runtime dependencies. Add further helpers per the rules above; one
 > concern per module.

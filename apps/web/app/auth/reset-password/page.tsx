@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Set a new password" };
 export default function ResetPasswordPage() {
   return (
     <div className="flex flex-col gap-6">
-      <AuthBackLink href="/auth/sign-in" />
+      <AuthBackLink href="/auth/email" />
       <Suspense fallback={<AuthStepSkeleton />}>
         <ResetPasswordStep />
       </Suspense>

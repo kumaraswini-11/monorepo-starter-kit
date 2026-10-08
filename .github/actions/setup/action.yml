@@ -1,0 +1,18 @@
+name: Setup toolchain
+description: >-
+  pnpm (version from package.json `packageManager`), Node (version from `devEngines.runtime`,
+  the same pin every dev box uses), the pnpm store cache, and a frozen-lockfile install.
+  One definition for every job; checkout happens in the calling job.
+
+runs:
+  using: composite
+  steps:
+    - name: Install pnpm, Node and dependencies
+      # pnpm's own action for pnpm >= 11: installs the self-contained pnpm binary, resolves the
+      # Node runtime from devEngines.runtime, restores the store cache, then runs `pnpm install`
+      # (frozen-lockfile is pnpm's default when CI=true). SHA-pinned; bumped by hand until the
+      # Dependabot template switch is on (AGENTS.md).
+      uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+      with:
+        cache: true
+        require-lockfile: true

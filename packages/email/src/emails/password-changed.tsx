@@ -21,7 +21,8 @@ export default function PasswordChanged({
       </Text>
       <Text style={styles.paragraph}>
         If this wasn't you, reset your password immediately and contact support.
-        For your security, we've signed you out of other devices.
+        For your security, your other devices are being signed out (this can
+        take a few minutes to apply everywhere).
       </Text>
     </EmailLayout>
   );

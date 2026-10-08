@@ -25,7 +25,7 @@
     "better-auth": "catalog:",
     "react": "catalog:",
     "server-only": "catalog:",
-    "ua-parser-js": "^2.0.10",
+    "ua-parser-js": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

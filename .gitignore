@@ -1,14 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# dependencies (pnpm only; no yarn/PnP artifacts exist in this repo)
 node_modules
-.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 # Claude Code — commit shared config (skills, agents, rules, settings.json),
 # ignore personal/local overrides
 .claude/*
@@ -19,6 +12,8 @@ node_modules
 
 # testing
 coverage
+# vitest 5 writes run artifacts here
+.vitest/
 
 # next.js
 .next/
@@ -40,9 +35,6 @@ storybook-static/
 *.pem
 
 # debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
@@ -62,7 +54,7 @@ apps/*/CLAUDE.md
 *.tsbuildinfo
 next-env.d.ts
 
-# playwright (apps/e2e) — reports, artifacts, and saved auth state (never commit sessions)
+# playwright (packages/e2e) — reports, artifacts, and saved auth state (never commit sessions)
 playwright-report/
 blob-report/
 test-results/

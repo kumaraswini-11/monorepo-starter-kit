@@ -1,0 +1,17 @@
+# @workspace/{{ name }}
+
+{{ description }}
+
+Source-only workspace package (no build step): consumers import it through its `exports`
+map, never from `src/` (ADR 0016). Boundaries tag: `{{ tag }}` (see `turbo.json`).
+
+## Scripts
+
+`lint` · `typecheck` · `test` — all run through `turbo` from the repo root and are cached.
+
+## Public API
+
+- `@workspace/{{ name }}` → `src/index.ts`
+
+Add a subpath to `exports` in `package.json` for every additional public entry; keep
+everything else private.

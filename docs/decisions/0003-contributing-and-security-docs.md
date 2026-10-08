@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-08 — `CONTRIBUTING.md` was rewritten (2026-10-07, foundation audit item G8) as the internal engineering workflow for write-access contributors (branch → gate → ADR → PR → squash); the community-oriented nayafia structure below no longer applies. `SECURITY.md` and the Code of Conduct are unchanged.
 
 ## Context
 

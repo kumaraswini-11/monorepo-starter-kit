@@ -1,0 +1,42 @@
+name: PR title
+
+# With squash merges the pull-request title becomes the commit on main, so it must be a valid
+# Conventional Commit (ADR 0037) even when local hooks were bypassed. `pull_request_target`
+# is used ONLY because the check must also run for forks; it never checks out PR code and
+# has read-only permissions, which is the documented safe pattern.
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  title:
+    name: PR title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate Conventional Commit title
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Mirrors @commitlint/config-conventional (commitlint.config.js).
+          types: |
+            build
+            chore
+            ci
+            docs
+            feat
+            fix
+            perf
+            refactor
+            revert
+            style
+            test
+          requireScope: false
+          # The subject must not start with an uppercase letter (same as commitlint).
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" must start with a lowercase letter (Conventional Commits).

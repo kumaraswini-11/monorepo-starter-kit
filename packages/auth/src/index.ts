@@ -1,6 +1,6 @@
-import { auth } from "@workspace/auth/auth";
+import { auth, googleSignInEnabled } from "@workspace/auth/auth";
 
-export { auth };
+export { auth, googleSignInEnabled };
 
 /** Inferred types for consumers (apps, server code). */
 export type Session = typeof auth.$Infer.Session;

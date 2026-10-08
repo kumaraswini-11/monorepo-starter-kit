@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-07 — the stdio servers now run `pnpm dlx <pkg>@<pinned version>` instead of `npx <pkg>@latest` — an unpinned `@latest` executes whatever the registry serves, which the repo's `minimumReleaseAge` exists to prevent ([0033](0033-toolchain-version-policy-and-2026-10-modernization.md)).
 
 ## Context
 

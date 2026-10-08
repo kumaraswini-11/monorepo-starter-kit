@@ -1,0 +1,35 @@
+name: Feature or change request
+description: Propose a capability, a tooling change, or an architectural decision.
+title: "feat: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is hard or impossible today, and who is affected? (The "why" first.)
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you change? Reference official docs where the proposal relies on a tool's behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including "do nothing". Trade-offs, lock-in, compliance and scale implications.
+  - type: dropdown
+    id: decision
+    attributes:
+      label: Does this need an ADR?
+      description: Notable decisions are recorded in docs/decisions/ (ADR 0001).
+      options:
+        - "Yes — it changes a convention, a tool, or a boundary"
+        - "No — it applies an existing decision"
+        - "Not sure"
+    validations:
+      required: true

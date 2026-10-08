@@ -2,6 +2,7 @@
 
 - **Status:** Accepted — Phases 0-2 done; Phase 3 (Chromatic) / Phase 4 (publish) deferred
 - **Date:** 2026-08-01
+- **Amended:** 2026-10-07 — the Node statements below are historical — the runtime is now pinned to Node 24.21.0 ([0033](0033-toolchain-version-policy-and-2026-10-modernization.md)); Storybook build + browser-mode story tests run in CI as their own job; the unused Chromatic addon was removed pending phase 3.
 
 ## Context
 

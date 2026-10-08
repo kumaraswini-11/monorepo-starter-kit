@@ -9,8 +9,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- END:nextjs-agent-rules -->
 
 Private, proprietary monorepo — the foundation for a product that will face
-compliance later. **License `UNLICENSED`; never open-source or publish any
-package.** Prefer minimal, well-evidenced changes over broad rewrites.
+compliance later, and the **reusable template** for the next one. **License `UNLICENSED`;
+never open-source or publish any package.** Prefer minimal, well-evidenced changes over broad
+rewrites.
 
 ## Build for the enterprise — and push back with evidence
 
@@ -29,114 +30,167 @@ clarity, lead with the R&D and reasoning, then decide together.
 
 ## Commands
 
-Run from the repo root. **This repo uses `pnpm` only** (enforced via
-`packageManager` + `engine-strict`) — never `npm` or `yarn`.
+Run from the repo root. **pnpm only** (`pnpm` / `pnpm dlx`; never `npm` / `npx` — the pinned
+runtime declaration makes npm refuse by design). pnpm 11 and Node 24.21.0 are pinned and
+self-installed (`packageManager`, `devEngines.runtime`); no nvm/Corepack.
 
-| Task                           | Command                 |
-| ------------------------------ | ----------------------- |
-| Install                        | `pnpm install`          |
-| Dev server                     | `pnpm dev`              |
-| Production build               | `pnpm build`            |
-| Lint (hard gate: 0 warnings)   | `pnpm lint`             |
-| Typecheck                      | `pnpm typecheck`        |
-| Format + sort imports (writes) | `pnpm format`           |
-| Unit + component tests         | `pnpm test`             |
-| Integration tests (real pg)    | `pnpm test:integration` |
-| E2E tests (Playwright)         | `pnpm test:e2e`         |
-
-(`test:integration` needs Docker running — Testcontainers spins up an ephemeral `postgres:17`;
-`test:e2e` needs a **disposable** Postgres via `DATABASE_URL` — the docker-compose `app` DB
-locally, a service in CI — which global-setup wipes each run. See ADR 0025.)
+| Task                                     | Command                        |
+| ---------------------------------------- | ------------------------------ |
+| Install                                  | `pnpm install`                 |
+| Dev server                               | `pnpm dev`                     |
+| Production build                         | `pnpm build`                   |
+| Lint (hard gate: 0 warnings)             | `pnpm lint`                    |
+| Typecheck (packages + root tooling)      | `pnpm typecheck`               |
+| Format + sort imports (writes)           | `pnpm format`                  |
+| Unit + component tests                   | `pnpm test`                    |
+| Integration tests (real pg, Docker)      | `pnpm test:integration`        |
+| E2E tests (Playwright)                   | `pnpm test:e2e`                |
+| Story tests (browser mode)               | `pnpm --filter storybook test` |
+| Dead code / unused deps                  | `pnpm knip`                    |
+| Licence policy (prod deps)               | `pnpm licenses:check`          |
+| New workspace package                    | `pnpm gen package`             |
+| Boundaries (advisory while experimental) | `pnpm exec turbo boundaries`   |
 
 Before treating a change as done, run
-`pnpm format && pnpm lint && pnpm typecheck && pnpm build`. CI runs
-`prettier --check .` and `turbo run lint typecheck build`, and fails on any error
-**or warning**.
+`pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm knip && pnpm licenses:check`.
+CI runs the same gate (plus dedupe, integration, e2e, Storybook, audit, dependency review,
+CodeQL, PR title) on only the affected packages per PR, and fails on any error **or warning**.
 
 **Audit before every commit.** The gate is necessary but not sufficient — beyond it,
 self-review the diff against: coding standards & best practices; **DRY / SOLID**;
 reusability, scalability, maintainability; **full compatibility with the involved
 libraries' official docs** and their best practices; and **enterprise concerns**
 (robustness, resource cleanup, error paths, CI, security). Fix what it surfaces, then
-commit. This is a private, compliance-bound, template-reusable monorepo — every commit is
-held to that bar. (Run tests too where they exist: `pnpm test` / `pnpm test:integration`.)
+commit. Git hooks format/lint staged files and check the commit message; they are a
+convenience, not the gate.
 
 ## Stack
 
-- **pnpm 10** workspaces + **Turborepo**; **Node ≥ 24** LTS (pnpm pinned via `packageManager`; Node via `.nvmrc`/`engines`)
+- **pnpm 11** workspaces + **Turborepo 2.11**; **Node 24.21.0** pinned (`.nvmrc`, `devEngines.runtime`)
 - **Next.js 16** (Turbopack) · **React 19** · **Tailwind CSS v4**
 - UI: **shadcn/ui** built on **Base UI** (`@base-ui/react`) — not Radix (ADR 0021)
-- **TypeScript 5** · **ESLint 9** (flat config) · **Prettier 3**
+- **TypeScript 6** · **ESLint 10** (flat, type-aware, `@shadcn/lint`) · **Prettier 3** · **Vitest 5** · **Playwright**
 
 ## Layout
 
-- `apps/web` — the Next.js application
-- `packages/ui` — shared components (`@workspace/ui`); **source-only** (no build
-  step), consumed directly via its `exports` map. Add components in `src/components/`.
-- `packages/eslint-config`, `packages/typescript-config` — shared configs
-- `docs/` — `decisions/` (ADRs), `future-improvements.md`, `references.md`, `bookmarks.md`
+- `apps/` — deployables only: `web` (Next.js), `storybook`
+- `packages/` — `@workspace/*`, **source-only** (no build step), consumed via `exports` maps:
+  `ui` (design system), `auth` / `db` / `email` / `env` (domain), `utils` (leaf), `e2e`
+  (Playwright harness), `eslint-config` / `typescript-config` / `vitest-config` (presets)
+- `turbo/generators/` — the package scaffold · `scripts/` — repo-management scripts only ·
+  `docs/` — `decisions/` (ADRs), `guides/` (how-to),
+  `audits/`, `specs/`, `future-improvements.md`, `references.md`, `bookmarks.md`
+- Full map + placement rules: `docs/guides/repository-structure.md`
 
 ## Conventions
 
 - **Prettier owns all formatting**, run once from the root. Import order is enforced
   by `@ianvs/prettier-plugin-sort-imports`; keep `prettier-plugin-tailwindcss`
   **last**. Never hand-format or add ESLint stylistic rules. (ADR 0004, 0010)
-- **Cross-package dependency versions go through pnpm catalogs**: use `catalog:` in
-  `package.json` and pin the version in `pnpm-workspace.yaml`. Package-only deps may
-  be inlined. Never inline a version for something two packages share.
-- **Supply chain:** new packages sit behind `minimumReleaseAge`; prefer widely-used,
-  maintained deps and justify additions. Don't disable the cooldown.
-- **Dependency weight:** judge a dep by _where it runs_. Dev tooling (devDeps)
-  never ships — weigh it on maintenance + supply-chain, not size. Client runtime
-  deps are the only place bundle size matters — prefer small/tree-shakeable, keep
-  server-only where possible, and lazy-load heavy ones (`next/dynamic`, e.g.
-  charts). Source components (shadcn) are free until imported; unused code costs
-  nothing (tree-shaking + per-route code-splitting). Keep the catalog fresh with
-  `pnpm deps:check` (taze) — Dependabot doesn't track catalog entries.
-- **Dependency updates (Dependabot / taze / manual) — verify, never blind-merge.**
-  Treat every version bump as a change to check, not trust. Before merging:
-  **(1)** confirm whether our code needs changes and that it's **compatible** — read
-  the package's **official changelog / release notes** for breaking changes
-  (mandatory for majors; minor/patch are SemVer-safe but still verified); **(2)** run
-  the full gate (`pnpm format && lint && typecheck && build`, plus
-  `pnpm --filter storybook build:storybook` if UI-affecting) — green is the
-  compatibility proof; **(3)** for a major, follow the migration guide and add an ADR
-  if it changes how we work. `taze` also reorders/tightens manifests — **audit its
-  diff** before committing.
+- **Single-version dependency policy (`catalogMode: strict`, ADR 0034):** every third-party
+  dependency is declared once in the `pnpm-workspace.yaml` catalog and referenced as `catalog:`
+  from manifests — never an inline version. Add with `pnpm add --filter <pkg> --catalog <dep>`;
+  group and comment the catalog entry. Lockstep families (Vitest, Storybook, Playwright, turbo,
+  React+Next) move together.
+- **Supply chain:** new versions wait 24h (`minimumReleaseAge`); lifecycle scripts only when
+  allow-listed (`allowBuilds`); `pnpm dlx <pkg>@<version>`, never `@latest`. Don't disable any of
+  it; justify every new dependency by where it runs (ADR 0033). **Licence policy:** strong
+  copyleft (GPL/AGPL/SSPL/EUPL) never ships; weak copyleft (LGPL/MPL) only for unmodified
+  libraries; `pnpm licenses:check` is part of the gate; exceptions are recorded in
+  `scripts/check-licenses.mjs` with a review trigger (ADR 0037).
+- **Dependency updates (Dependabot / taze / manual) — verify, never blind-merge.** Read the
+  official changelog (mandatory for majors), run the full gate (+ Storybook build/test if
+  UI-affecting), write an ADR for a major that changes how we work. Deferred majors carry a
+  named trigger in `docs/future-improvements.md` and a Dependabot `ignore`. (ADR 0033)
+- **Toolchain pins** (`packageManager`, `.nvmrc`, `devEngines.runtime`, action SHAs) are
+  exact and bumped deliberately; EOL is a hard upgrade trigger. (ADR 0033)
+- **Package boundaries (ADR 0016, 0036):** import a package only through its `exports`
+  (never `src/`), never add `paths` aliases for workspace packages (self-reference by name
+  instead), keep the direction `utils` → domain → `ui` → apps (Boundaries tags in each
+  `turbo.json`). Server modules start with `import "server-only"`. Read config only via
+  `@workspace/env` (ADR 0013); a build-time variable goes in the task's `env` in `turbo.json`
+  (ADR 0035). In `apps/web`, import a feature only through its barrel (`@/features/<name>`);
+  only `features/auth/lib/auth-client.ts` may touch the auth client (both lint-enforced,
+  ADR 0017/0028). Type imports are separate `import type` statements (auto-fixed).
+- **New package = `pnpm gen package`** (then `pnpm install`). Never copy a sibling by hand.
 - **UI components:** follow the existing shadcn + Base UI pattern in `packages/ui`. These are
   **vendored source we own** — never blind `shadcn add --overwrite` (it silently restores upstream
   keyframes/Radix attrs and wipes our deviations). To update or add one: review the upstream diff,
   re-apply our documented deviations (`grep -rn "Deviation\|ADR 00" packages/ui/src/components/shadcn`),
   and use our **CSS-transition** animation idiom (not `tw-animate-css` keyframes) — check first, then
-  gate incl. Storybook build. (ADR 0030)
+  gate incl. Storybook build. The vendored tree has a scoped lint exemption; our own code does not. (ADR 0030, 0033)
+- **Design-system usage is linted (`@shadcn/lint`, ADR 0038):** consumers style a component
+  through its variants/sizes, never `className` overrides beyond layout (width, height, margin,
+  flex); colors and values come from the theme, never the raw palette or `[arbitrary]` values.
+  The model: the component owns its identity (color, shape, type, own padding/gap); the
+  consumer owns placement and composition (arranging children of a container part). Need an
+  identity change? In order: an existing variant/size; a prop/variant on the component when two
+  or three uses justify it; otherwise keep the `className` and mark it
+  `// eslint-disable-next-line shadcn/no-restyle -- <reason>` (explicit, auditable:
+  `git grep -n "eslint-disable.*shadcn/" -- apps packages`). Never a wrapper element added only
+  to move the class, never a contract for an identity change, never a disable without a reason,
+  never repeat a class the component already applies (an accidental override in waiting), and
+  never change rendered UI to satisfy a lint rule — that is a design decision.
+  Placement/composition rules live in `designSystemPolicy`
+  (`packages/eslint-config/react-internal.js`).
 - **Component placement & shape (ADR 0016, 0026):** atomic-design as a _lens_ to pick the home
   — no literal `atoms/molecules/organisms` folders. **`@workspace/ui`** is the single design
   system (atoms + agnostic _and_ form-bound molecules; `react-hook-form` is a deliberate `ui`
   dep); **feature organisms** (e.g. `SignInForm`) live in the app under
-  `apps/*/components/<feature>/`. Proven-generic UI → `ui` from the start; _uncertain_ ones wait
-  for a 2nd consumer. **Shape:** generic inputs (a `name`, not a `user`) + a sensible default +
-  one escape hatch — no per-entity wrappers, no prop-explosion.
-- **Record notable decisions as ADRs** in `docs/decisions/` (copy the existing
-  `NNNN-title.md` format and update the index). Log deferred work in
-  `docs/future-improvements.md`.
-- **Conventional Commits**, one logical change per commit.
+  `apps/*/features/<feature>/` (ADR 0028). Proven-generic UI → `ui` from the start; _uncertain_
+  ones wait for a 2nd consumer. **Shape:** generic inputs (a `name`, not a `user`) + a sensible
+  default + one escape hatch — no per-entity wrappers, no prop-explosion.
+- **Record notable decisions as ADRs** in `docs/decisions/` (copy the latest `NNNN-title.md`
+  format and update the index); amend an old ADR with a dated note rather than rewriting it.
+  Log deferred work in `docs/future-improvements.md` **with a trigger**. Update `docs/guides/`
+  when a workflow changes.
+- **Conventional Commits**, one logical change per commit (enforced by commitlint and the PR
+  title check; squash merges). (ADR 0037)
 - Treat the **shadcn / create-turbo output as the baseline**; deviate only with
   authoritative evidence, and write an ADR when you do. (ADR 0001)
+- **Editor-agnostic:** tool-native configs + `.editorconfig`; no editor-specific directory.
+
+## Template switches
+
+Features that are correct for a product repo but noisy for a fresh derivation are shipped
+**ready and off**. When this repo becomes (or spawns) a product repo, flip the switch and
+delete the line here; if the decision is "never", delete the switch instead.
+
+- **Dependabot version updates** — policy lives in `.github/dependabot.yml.template`
+  (inactive; GitHub reads only `dependabot.yml`). Enable: `git mv .github/dependabot.yml.template
+.github/dependabot.yml`. Independent of this file, Dependabot **alerts + security updates**
+  are repository settings and must be ON in every product repo. Until version updates are on,
+  refresh the catalog with `pnpm deps:check` and bump action SHAs by hand on the monthly routine.
 
 ## Don't
 
 - Don't open-source, add public license text, or set `publishConfig` — every package
   is private / `UNLICENSED`. (ADR 0002, 0008)
-- Don't bypass the lint gate, disable Prettier, or commit with failing checks.
-- Don't major-upgrade tooling (pnpm 11, TypeScript 7, ESLint 10) without checking
-  `docs/future-improvements.md` first — several are deliberately deferred. (ADR 0006)
+- Don't bypass the lint gate, disable Prettier, skip hooks, or commit with failing checks.
+- Don't major-upgrade pnpm (12), TypeScript (7) or Node (26) without checking the named
+  trigger in `docs/future-improvements.md` first — each is deliberately dated. (ADR 0033)
+- Don't use `npm`/`npx`, inline dependency versions, `paths` aliases, or `@latest` in `dlx`.
 
 ## More
 
-Contribution flow: `CONTRIBUTING.md`. Security policy: `SECURITY.md`. The reasoning
-behind the rules above lives in `docs/decisions/`.
+Contribution flow: `CONTRIBUTING.md`. Security policy: `SECURITY.md`. How-to guides:
+`docs/guides/`. The reasoning behind the rules above lives in `docs/decisions/`; the latest
+foundation audit in `docs/audits/`.
 
 > **Editing this file:** it loads every session, so keep it a **lean handbook** — for each
 > line ask _"would removing this make an agent err?"_; if not, cut it. Push detail to an
-> ADR/skill and leave a pointer (a bloated file gets ignored). See
+> ADR/guide and leave a pointer (a bloated file gets ignored). The two managed blocks
+> (`nextjs-agent-rules`, `turborepo-agent-rules`) are written by `next dev` / `turbo` — keep
+> them committed, don't edit them. See
 > [Anthropic — Best practices for Claude Code](https://code.claude.com/docs/en/best-practices).
+
+<!-- BEGIN:turborepo-agent-rules -->
+
+# This is NOT the Turborepo you know
+
+Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
+
+Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
+
+This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+<!-- END:turborepo-agent-rules -->

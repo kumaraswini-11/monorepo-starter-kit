@@ -19,9 +19,25 @@ import { env } from "@workspace/env";
  * the repo's `no-restricted-syntax` env choke-point rule.)
  */
 const globalForDb = globalThis as unknown as { __workspaceDbPool?: Pool };
-const pool = (globalForDb.__workspaceDbPool ??= new Pool({
-  connectionString: env.DATABASE_URL,
-}));
+const pool = (globalForDb.__workspaceDbPool ??= createPool());
+
+function createPool(): Pool {
+  const created = new Pool({
+    connectionString: env.DATABASE_URL,
+    // Deliberate sizing (ADR 0012): one Next.js instance keeps at most 10 connections; scale
+    // horizontally through PgBouncer rather than by raising this. A connect attempt that hangs
+    // (DNS/firewall/overloaded server) fails after 5s instead of waiting forever (pg-pool default).
+    max: 10,
+    connectionTimeoutMillis: 5_000,
+  });
+  // pg-pool emits `error` for an IDLE client that fails (server restart, failover, network
+  // partition). Pool is an EventEmitter: with no listener that event is thrown and kills the
+  // process. Log it; the next query gets a fresh client (pg-pool README, "error" event).
+  created.on("error", (error) => {
+    console.error("[db] idle client error", error);
+  });
+  return created;
+}
 
 export const db = drizzle(pool, { schema });
 export { pool, schema };

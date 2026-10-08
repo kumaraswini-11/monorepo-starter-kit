@@ -19,7 +19,7 @@ both libraries (unless a component is Base-UI-only). `shadcn init -b radix` opts
 a project back onto Radix.
 
 This repo already reflects the new default — `components.json` uses a `base-*`
-style (`base-vega`), and `packages/ui/src/components/button.tsx` imports from
+style (`base-vega`), and `packages/ui/src/components/shadcn/button.tsx` imports from
 `@base-ui/react`.
 
 Selecting Base UI is one decision; **adopting it correctly is another**. Base UI
@@ -64,7 +64,10 @@ the default (Base UI), not `-b radix`.
   meta-package (which would have bundled `jsx-a11y`).
 - **Decision:** enabled in the **Next config only** (`apps/web`). Zero bundle cost
   (devDependency), per the dependency-weight rule in `AGENTS.md`.
-- **Why not `packages/ui`:** those components are vendored from shadcn/Base UI and
+- **Why not `packages/ui`:** _(Amended 2026-10-08: no longer true — `packages/ui` also holds
+  our own hand-written molecules, so jsx-a11y now runs on every React file we author through
+  the shared `react` config; only the vendored `components/shadcn/**` tree is exempt.)_ The original
+  reasoning: those components are vendored from shadcn/Base UI and
   already handle their own accessibility. Linting them would flag code we didn't
   author and fail the hard gate for no real gain — the same reasoning as the
   react-hooks exception ([0005](0005-lint-gate-and-vendored-exception.md)).

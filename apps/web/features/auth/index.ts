@@ -5,8 +5,8 @@
  * verify-email banner, the Google button, and the sign-out hook. Internals (forms, field, the flow
  * hooks, `actions.ts` seam, `validation`, `lib/auth-client`) stay private behind this entry.
  *
- * Note: the server session read still lives at `@/lib/session` (app-level session infra); it moves
- * to `features/auth/lib/session.ts` once the temporary dev-bypass is removed (ADR 0017 / 0028).
+ * Note: the server session read (`getSession` / `requireSession`) lives at `@/lib/session` as
+ * app-level infrastructure; it moves into the feature with the Data Access Layer (ADR 0032).
  */
 export { AuthBackLink } from "./components/auth-back-link";
 export { AuthFlowProvider } from "./components/auth-flow-provider";
@@ -15,6 +15,7 @@ export { AuthStepSkeleton } from "./components/auth-step-skeleton";
 export { EmailStep } from "./components/email-step";
 export { ForgotPasswordStep } from "./components/forgot-password-step";
 export { GoogleSignInButton } from "./components/google-sign-in-button";
+export { OAuthErrorToast } from "./components/oauth-error-toast";
 export { ResetPasswordStep } from "./components/reset-password-step";
 export { SignInStep } from "./components/sign-in-step";
 export { SignUpStep } from "./components/sign-up-step";

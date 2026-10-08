@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-08 — the posture now has an enforced inbound licence policy (strong copyleft never ships; weak copyleft only for unmodified libraries) via `pnpm licenses:check` and the dependency-review PR gate; see [0037](0037-git-hooks-commit-governance-and-pr-gates.md) and the [dependencies guide](../guides/dependencies.md). First finding: `ua-parser-js` 2.x (AGPL) in production dependencies — kept as a recorded exception by maintainer decision, to be reviewed before launch (`docs/future-improvements.md`).
 
 ## Context
 

@@ -42,9 +42,14 @@ export function GoogleSignInButton() {
       size="lg"
       className="w-full"
       disabled={pending}
-      onClick={onClick}
+      onClick={() => void onClick()}
     >
-      {pending ? <Spinner /> : <GoogleIcon data-icon="inline-start" />}
+      {pending ? (
+        // Decorative here: the button keeps its name; the pending state is conveyed by `disabled`.
+        <Spinner role={undefined} aria-label={undefined} aria-hidden="true" />
+      ) : (
+        <GoogleIcon data-icon="inline-start" />
+      )}
       <span className="min-w-38 text-start">Continue with Google</span>
     </Button>
   );

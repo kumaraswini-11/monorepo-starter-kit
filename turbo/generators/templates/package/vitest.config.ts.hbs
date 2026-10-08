@@ -1,0 +1,9 @@
+{{#if isReact}}
+// Component tests: jsdom + Testing Library via the shared `dom` preset (ADR 0025).
+// Co-located `src/**/*.test.{ts,tsx}`.
+export { dom as default } from "@workspace/vitest-config";
+{{else}}
+// Node-environment unit tests via the shared `base` preset (ADR 0025).
+// Co-located `src/**/*.test.ts`.
+export { base as default } from "@workspace/vitest-config";
+{{/if}}

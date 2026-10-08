@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-12
+- **Amended:** 2026-10-08 — the pre-commit hook this ADR deferred exists: husky + lint-staged run `eslint --fix` and `prettier --write` on staged files ([0037](0037-git-hooks-commit-governance-and-pr-gates.md)); the gate, not the hook, remains the source of truth.
 
 ## Context
 

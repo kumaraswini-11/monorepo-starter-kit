@@ -69,7 +69,7 @@ export function VerifyEmailBanner({ email }: { email: string }) {
           size="sm"
           className="ms-auto tabular-nums"
           disabled={pending || cooldown > 0}
-          onClick={resend}
+          onClick={() => void resend()}
         >
           {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend email"}
         </Button>

@@ -1,11 +1,14 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  "futureFlags": {
+    "githubActionsRemoteBaseRefFallback": true
+  },
   "globalPassThroughEnv": [
     "DATABASE_URL",
     "BETTER_AUTH_*",
     "SMTP_*",
-    "EMAIL_FROM",
+    "EMAIL_*",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "SKIP_ENV_VALIDATION",
@@ -16,25 +19,27 @@
     "TESTCONTAINERS_*"
   ],
   "tasks": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
     "build": {
       "dependsOn": ["^build"],
+      "env": ["BETTER_AUTH_URL", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "!**/*.stories.*", "!**/*.mdx"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "build:storybook": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["topo"],
       "outputs": ["storybook-static/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["topo"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
-    },
-    "//#format": {
-      "cache": false
+      "dependsOn": ["topo"]
     },
     "test": {
+      "dependsOn": ["topo"],
       "outputs": ["coverage/**"]
     },
     "test:integration": {
@@ -48,6 +53,50 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "//#format": {
+      "cache": false
+    },
+    "//#typecheck:tooling": {
+      "inputs": ["tsconfig.json", "turbo/generators/**", "knip.ts"]
+    },
+    "//#lint:tooling": {
+      "inputs": [
+        "eslint.config.js",
+        "tsconfig.json",
+        "scripts/**",
+        "turbo/generators/**",
+        "knip.ts",
+        "commitlint.config.js",
+        "taze.config.mjs"
+      ]
+    },
+    "//#licenses:check": {
+      "inputs": ["pnpm-lock.yaml", "scripts/check-licenses.mjs"]
+    }
+  },
+  "boundaries": {
+    "tags": {
+      "leaf": {
+        "dependencies": { "deny": ["domain", "ui", "app", "test"] }
+      },
+      "config": {
+        "dependencies": { "deny": ["leaf", "domain", "ui", "app", "test"] }
+      },
+      "domain": {
+        "dependencies": { "deny": ["ui", "app", "test"] }
+      },
+      "ui": {
+        "dependencies": { "deny": ["domain", "app", "test"] }
+      },
+      "app": {
+        "dependents": { "deny": ["leaf", "config", "domain", "ui", "app"] }
+      },
+      "test": {
+        "dependents": {
+          "deny": ["leaf", "config", "domain", "ui", "app", "test"]
+        }
+      }
     }
   }
 }

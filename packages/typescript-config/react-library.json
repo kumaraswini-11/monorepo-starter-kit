@@ -1,8 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "React Library",
+  "display": "React library (bundler-consumed)",
   "extends": "./base.json",
   "compilerOptions": {
+    "lib": ["es2024", "dom"],
     "jsx": "react-jsx"
   }
 }

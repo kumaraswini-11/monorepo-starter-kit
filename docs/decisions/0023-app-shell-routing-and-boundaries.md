@@ -259,7 +259,7 @@ _Added 2026-08-27 (UI review)._
   for the sidebar, breadcrumb, and palette).
 - **Theme lives in the account menu (done)** — a three-state Light / Dark / System `menuitemradio`
   submenu, not a standalone header toggle (the common account-menu pattern; keeps the header to
-  one avatar control). The public `(auth)` pages, which have no account menu, keep a standalone
+  one avatar control). The public `/auth/*` pages, which have no account menu, keep a standalone
   `ThemeToggle`. Three-state so the `system` default stays reachable.
 - **Command palette ⌘K (done).** `CommandPalette` (built on the vendored `cmdk` `command.tsx`) is
   the discoverable hub — navigation, theme, sign-out — with a header trigger showing a

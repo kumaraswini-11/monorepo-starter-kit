@@ -1,17 +1,21 @@
 name: CodeQL
 
-# Static security + quality analysis (CodeQL) — free for public repositories.
-# This is the free path to "code quality on every PR": the `security-and-quality`
-# query suite adds maintainability/reliability checks on top of the security set.
-# (The paid GitHub Code Quality product is deliberately deferred — see ADR 0007.)
+# Static security + quality analysis. Availability depends on the hosting plan (ADR 0007):
+# free on public repositories; a PRIVATE or internal repository needs the GitHub Code Security
+# product (Team / Enterprise) or this job fails with "Advanced Security must be enabled". A
+# derived private repo without that licence should delete this workflow rather than carry a
+# permanently red check.
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  # Required check -> must also run for merge-queue commits (see the CI/CD guide).
+  merge_group:
+    types: [checks_requested]
   schedule:
-    # Weekly re-scan catches newly published advisories in code that hasn't
-    # changed. Off-peak, off the top of the hour to dodge the scheduler rush.
+    # Weekly re-scan catches newly published queries/advisories in code that hasn't changed.
+    # Off-peak, off the top of the hour to dodge the scheduler rush.
     - cron: "27 4 * * 1"
 
 # Cancel superseded runs on the same ref (saves CI minutes).
@@ -24,30 +28,30 @@ jobs:
     name: Analyze (JavaScript/TypeScript)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Least privilege: CodeQL needs to read the code and write results to the
-    # Security tab; nothing else.
+    # Least privilege: CodeQL needs to read the code and write results to the Security tab.
     permissions:
       contents: read
       security-events: write
       actions: read
     steps:
       - name: Checkout
-        # SHA-pinned per repo convention (human version in the trailing comment);
-        # Dependabot (github-actions) keeps it current.
+        # SHA-pinned per repo convention (human version in the trailing comment); bumped by
+        # hand on the monthly routine until the Dependabot template switch is on (AGENTS.md).
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@fb4bfd79bfa826ce96c90727ff8833835ba8aad0 # v3
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         with:
-          # One language covers the whole TS/JS monorepo. No compiled languages
-          # here, so `build-mode: none` (CodeQL analyzes source directly).
+          # One language covers the whole TS/JS monorepo. No compiled languages here, so
+          # `build-mode: none` (CodeQL analyzes source directly). `security-and-quality`
+          # adds maintainability/reliability queries to the security set.
           languages: javascript-typescript
           build-mode: none
           queries: security-and-quality
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@fb4bfd79bfa826ce96c90727ff8833835ba8aad0 # v3
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         with:
           category: "/language:javascript-typescript"

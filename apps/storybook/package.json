@@ -3,33 +3,36 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@workspace/ui": "workspace:*",
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
-  },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.3.1",
-    "@storybook/addon-a11y": "^10.6.0",
-    "@storybook/addon-docs": "^10.6.0",
-    "@storybook/addon-mcp": "^10.6.0",
-    "@storybook/addon-vitest": "^10.6.0",
+    "@storybook/addon-a11y": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/addon-mcp": "catalog:",
+    "@storybook/addon-vitest": "catalog:",
     "@storybook/nextjs-vite": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint-plugin-storybook": "^10.6.0",
+    "@workspace/ui": "workspace:*",
+    "eslint": "catalog:",
+    "eslint-plugin-storybook": "catalog:",
+    "next": "catalog:",
     "playwright": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "storybook": "catalog:",
     "typescript": "catalog:",
-    "vite": "^8.2.2",
+    "vite": "catalog:",
     "vitest": "catalog:"
   },
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "test": "vitest run"
-  }
+    "test": "vitest run",
+    "lint": "eslint --max-warnings 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "UNLICENSED"
 }
