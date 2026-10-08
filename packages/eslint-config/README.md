@@ -4,11 +4,11 @@ Shared ESLint 10 flat configs for every workspace package (ADR
 [0005](../../docs/decisions/0005-lint-gate-and-vendored-exception.md),
 [0033](../../docs/decisions/0033-toolchain-version-policy-and-2026-10-modernization.md)).
 
-| Entry                                     | Export                                   | For                                        |
-| ----------------------------------------- | ---------------------------------------- | ------------------------------------------ |
-| `@workspace/eslint-config/base`           | `config`, `core`, `ignores`, `typeAware` | Node / isomorphic packages                 |
-| `@workspace/eslint-config/react-internal` | `config`, `react`, `typeAware`           | React libraries (`packages/ui`, Storybook) |
-| `@workspace/eslint-config/next-js`        | `nextJsConfig`, `typeAware`              | Next.js apps                               |
+| Entry                                     | Export                                                  | For                                        |
+| ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------ |
+| `@workspace/eslint-config/base`           | `config`, `core`, `ignores`, `typeAware`, `nodeGlobals` | Node / isomorphic packages, root tooling   |
+| `@workspace/eslint-config/react-internal` | `config`, `react`, `typeAware`                          | React libraries (`packages/ui`, Storybook) |
+| `@workspace/eslint-config/next-js`        | `nextJsConfig`, `typeAware`                             | Next.js apps                               |
 
 Each exported `config` ends with `eslint-config-prettier/flat` (Prettier owns formatting — ADR
 0004); `core` / `react` are the same rule sets without it, for layering. Consumers:

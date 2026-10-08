@@ -35,8 +35,8 @@ jobs:
       actions: read
     steps:
       - name: Checkout
-        # SHA-pinned per repo convention (human version in the trailing comment);
-        # Dependabot (github-actions) keeps it current.
+        # SHA-pinned per repo convention (human version in the trailing comment); bumped by
+        # hand on the monthly routine until the Dependabot template switch is on (AGENTS.md).
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false

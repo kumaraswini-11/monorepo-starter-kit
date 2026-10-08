@@ -52,7 +52,12 @@
     "./globals.css": "./src/styles/globals.css",
     "./postcss.config": "./postcss.config.mjs",
     "./lib/*": "./src/lib/*.ts",
+    "./components/*.stories": null,
+    "./components/*.test": null,
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.ts"
-  }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
 }

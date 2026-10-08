@@ -10,7 +10,8 @@ runs:
     - name: Install pnpm, Node and dependencies
       # pnpm's own action for pnpm >= 11: installs the self-contained pnpm binary, resolves the
       # Node runtime from devEngines.runtime, restores the store cache, then runs `pnpm install`
-      # (frozen-lockfile is pnpm's default when CI=true). SHA-pinned; Dependabot keeps it current.
+      # (frozen-lockfile is pnpm's default when CI=true). SHA-pinned; bumped by hand until the
+      # Dependabot template switch is on (AGENTS.md).
       uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
       with:
         cache: true

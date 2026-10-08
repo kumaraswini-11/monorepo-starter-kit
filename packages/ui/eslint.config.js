@@ -37,12 +37,12 @@ export default defineConfig([
     //    uses arbitrary Tailwind values (`grid-rows-[auto_1fr]`), chart.tsx injects CSS
     //    variables via `<style>`/inline style, and a few upstream classes generate no CSS
     //    (`cn-input-otp`, drawer `origin-start/end`) — known, harmless, re-checked on updates.
-    // Correctness rules (hooks deps, purity, missing keys on dynamic lists, a11y, raw palette
-    // colors) stay on.
+    // Correctness rules (hooks deps, purity, missing keys on dynamic lists, raw palette colors)
+    // stay on; jsx-a11y is scoped out of this tree by the shared config (primitives trip rules
+    // written for application markup) and applies in full to our own molecules.
     files: ["src/components/shadcn/**/*.{ts,tsx}", "src/hooks/use-mobile.ts"],
     rules: {
       "react-hooks/set-state-in-effect": "off",
-      "@eslint-react/set-state-in-effect": "off",
       "@eslint-react/no-use-context": "off",
       "@eslint-react/no-context-provider": "off",
       "@eslint-react/use-state": "off",

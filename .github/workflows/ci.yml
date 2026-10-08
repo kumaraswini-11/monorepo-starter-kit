@@ -9,10 +9,11 @@ on:
   merge_group:
     types: [checks_requested]
 
-# Cancel superseded runs on the same ref (saves CI minutes).
+# Cancel superseded runs on the same PR (saves CI minutes). Pushes to main are never cancelled:
+# every main commit keeps a complete CI record (audit trail).
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Least privilege: every job only reads the repository.
 permissions:
@@ -24,6 +25,9 @@ env:
   SKIP_ENV_VALIDATION: "1"
   # Git hooks are a local convenience; CI is the gate (ADR 0037).
   HUSKY: "0"
+  # No anonymous usage telemetry from the build tools (private, compliance-bound product).
+  TURBO_TELEMETRY_DISABLED: "1"
+  NEXT_TELEMETRY_DISABLED: "1"
   # On pull requests only the packages affected by the change (and their dependents) run;
   # pushes to main and merge-queue commits run everything (Turborepo `--affected`, which
   # compares against the PR base ref on GitHub Actions).
@@ -60,7 +64,7 @@ jobs:
         run: pnpm exec turbo run lint lint:tooling typecheck typecheck:tooling build $TURBO_AFFECTED --continue=dependencies-successful
 
       - name: Dead code and unused dependencies (knip)
-        run: pnpm knip && pnpm knip:production
+        run: pnpm knip
 
       - name: Package boundaries (Turborepo Boundaries)
         # Experimental in Turborepo — advisory until it is stable (ADR 0036); the ESLint
@@ -118,7 +122,7 @@ jobs:
       - name: Run integration tests (Testcontainers → real Postgres)
         # Testcontainers manages an ephemeral postgres:17; Docker is available on
         # ubuntu-latest out of the box. The test env (DATABASE_URL from the container + a
-        # throwaway secret) is set by the shared harness (@workspace/db/testing). (ADR 0025 §11)
+        # throwaway secret) is set by the shared harness (@workspace/db/testing/*). (ADR 0025 §11)
         run: pnpm exec turbo run test:integration $TURBO_AFFECTED
 
   e2e:

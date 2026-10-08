@@ -1,6 +1,7 @@
 import eslintReact from "@eslint-react/eslint-plugin";
 import { plugin as shadcn } from "@shadcn/lint";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
@@ -14,7 +15,13 @@ import { core } from "./base.js";
  * - `@eslint-react` replaces `eslint-plugin-react` (no ESLint 10 support upstream — ADR 0033);
  *   its TypeScript preset drops the prop-types / JSX-scope rules the automatic JSX runtime
  *   makes redundant.
- * - `eslint-plugin-react-hooks` 7 ships the React Compiler rules in `flat.recommended`.
+ * - `eslint-plugin-react-hooks` 7 ships the React Compiler rules in `flat.recommended`; it is
+ *   the single owner of those rules — `@eslint-react`'s ports of the same nine rules are turned
+ *   off below so a violation is reported (and suppressed) exactly once.
+ * - `eslint-plugin-jsx-a11y` runs on every React file we author — the app and the design
+ *   system's own molecules (ADR 0020, 0021 amended). The vendored shadcn tree is exempt: it is
+ *   upstream code re-applied on every update (ADR 0005, 0030) and primitives such as a bare
+ *   `<Label>` or `<PaginationLink>` wrapper trip rules written for application markup.
  * - `@shadcn/lint` enforces design-system USAGE (ADR 0038): consumers style through a
  *   component's variants/sizes, not `className` overrides; colors and values come from the
  *   theme. It reads `components.json`, each component's `cva` variants and the `@theme`
@@ -62,6 +69,21 @@ export const designSystemPolicy = {
 export const react = [
   eslintReact.configs["recommended-typescript"],
   reactHooks.configs.flat.recommended,
+  {
+    // Duplicates of eslint-plugin-react-hooks 7 rules (same checks, different severities).
+    rules: {
+      "@eslint-react/rules-of-hooks": "off",
+      "@eslint-react/exhaustive-deps": "off",
+      "@eslint-react/set-state-in-effect": "off",
+      "@eslint-react/set-state-in-render": "off",
+      "@eslint-react/purity": "off",
+      "@eslint-react/static-components": "off",
+      "@eslint-react/use-memo": "off",
+      "@eslint-react/error-boundaries": "off",
+      "@eslint-react/unsupported-syntax": "off",
+    },
+  },
+  { ...jsxA11y.flatConfigs.recommended, ignores: ["**/components/shadcn/**"] },
   { languageOptions: { globals: { ...globals.browser } } },
   {
     plugins: { shadcn },

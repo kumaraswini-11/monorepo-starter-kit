@@ -63,6 +63,7 @@
     "//#lint:tooling": {
       "inputs": [
         "eslint.config.js",
+        "tsconfig.json",
         "scripts/**",
         "turbo/generators/**",
         "knip.ts",

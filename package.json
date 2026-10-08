@@ -14,8 +14,7 @@
     "test:integration": "turbo test:integration",
     "test:e2e": "turbo test:e2e",
     "deps:check": "taze -r",
-    "knip": "knip",
-    "knip:production": "knip --production",
+    "knip": "knip && knip --production",
     "gen": "turbo gen",
     "typecheck:tooling": "tsc --noEmit",
     "prepare": "husky",
@@ -56,10 +55,10 @@
       "eslint --max-warnings 0 --no-warn-ignored --fix",
       "prettier --write"
     ],
-    "*.{js,mjs,cjs,ts}": [
+    "./*.{js,mjs,cjs,ts}": [
       "eslint --max-warnings 0 --no-warn-ignored --fix",
       "prettier --write"
     ],
-    "!({apps,packages,scripts,turbo}/**/*.{js,mjs,cjs,ts,tsx}|*.{js,mjs,cjs,ts})": "prettier --write --ignore-unknown"
+    "!({apps,packages,scripts,turbo}/**/*.{js,mjs,cjs,ts,tsx}|./*.{js,mjs,cjs,ts})": "prettier --write --ignore-unknown"
   }
 }
