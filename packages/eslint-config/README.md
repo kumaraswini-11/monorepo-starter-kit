@@ -28,7 +28,9 @@ What is in `core`: `@eslint/js` recommended, typescript-eslint `recommendedTypeC
 (type-aware; `typeAware()` pins the project root), `eslint-plugin-turbo` (undeclared env vars
 are errors), type-only import discipline (`verbatimModuleSyntax`), the `process.env` choke-point
 rule (ADR 0013) and the `@workspace/*/src/**` deep-import ban (ADR 0016). `react` adds
-`@eslint-react` (`recommended-typescript`) and `eslint-plugin-react-hooks` (React Compiler
-rules); `next-js` adds the Next plugin (recommended + core-web-vitals) and jsx-a11y.
+`@eslint-react` (`recommended-typescript`), `eslint-plugin-react-hooks` (React Compiler
+rules) and `@shadcn/lint` (design-system usage: variants over `className` overrides, theme
+tokens over raw values — ADR 0038; the policy object `designSystemPolicy` holds the
+contracts); `next-js` adds the Next plugin (recommended + core-web-vitals) and jsx-a11y.
 
 Plugins are runtime `dependencies` of this package (consumers resolve them through it).

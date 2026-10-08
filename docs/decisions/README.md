@@ -19,7 +19,7 @@ abstraction & reuse method** (0026, pairs with 0016), **dependency evaluations**
 switching & toggle animation** (0031, extends 0030), **instant navigation,
 page transitions & route-guard placement** (0032, revisits 0023 §6), and the **2026-10 foundation
 modernization** (0033–0037: toolchain version policy, single-version dependencies, task-graph
-correctness & affected CI, boundaries & scaffolding, hooks & PR gates — see also
+correctness & affected CI, boundaries & scaffolding, hooks & PR gates; 0038 adds design-system usage linting — see also
 [`../audits/`](../audits/) and [`../guides/`](../guides/)).
 
 | #                                                                    | Decision                                                                                                                                              | Status            | Date       |
@@ -60,6 +60,7 @@ correctness & affected CI, boundaries & scaffolding, hooks & PR gates — see al
 | [0034](0034-single-version-dependency-policy.md)                     | Single-version dependency policy — every third-party dependency in the pnpm catalog (`catalogMode: strict`)                                           | Accepted          | 2026-10-07 |
 | [0035](0035-task-graph-correctness-and-affected-ci.md)               | Task-graph correctness & affected CI — transit nodes, build-time env, `--affected`, composite setup                                                   | Accepted          | 2026-10-07 |
 | [0036](0036-package-boundaries-dead-code-and-scaffolding.md)         | Package boundaries, dead-code hygiene & scaffolding — Boundaries tags, knip, `turbo gen package`, no `paths`                                          | Accepted          | 2026-10-07 |
+| [0038](0038-design-system-usage-linting.md)                          | Design-system usage linting — `@shadcn/lint` on consumers, contracts as the escape hatch                                                              | Accepted          | 2026-10-08 |
 | [0037](0037-git-hooks-commit-governance-and-pr-gates.md)             | Git hooks, commit governance & PR gates — husky + lint-staged + commitlint, PR-title check, dependency review, rulesets                               | Accepted          | 2026-10-07 |
 
 See also [../references.md](../references.md) for the sources behind these

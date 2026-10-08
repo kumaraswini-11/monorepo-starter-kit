@@ -70,6 +70,9 @@ export function CommandPalette() {
       <Button
         variant="outline"
         size="sm"
+        // Deliberate per-place exception (ADR 0038): the search affordance reads as quiet —
+        // muted text and a wider icon gap. Promote to a Button variant at the second use.
+        // eslint-disable-next-line shadcn/no-restyle -- quiet search affordance (product requirement)
         className="gap-2 text-muted-foreground"
         aria-label="Search"
         aria-keyshortcuts="Control+K Meta+K"

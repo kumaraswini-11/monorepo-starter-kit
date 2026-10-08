@@ -4,24 +4,28 @@
   "type": "module",
   "private": true,
   "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint --max-warnings 0"
+  },
   "exports": {
     "./base": "./base.js",
     "./react-internal": "./react-internal.js",
     "./next-js": "./next.js"
   },
-  "devDependencies": {
-    "eslint": "catalog:",
-    "typescript": "catalog:"
-  },
   "dependencies": {
     "@eslint-react/eslint-plugin": "catalog:",
     "@eslint/js": "catalog:",
     "@next/eslint-plugin-next": "catalog:",
+    "@shadcn/lint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-jsx-a11y": "catalog:",
     "eslint-plugin-react-hooks": "catalog:",
     "eslint-plugin-turbo": "catalog:",
     "globals": "catalog:",
     "typescript-eslint": "catalog:"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "typescript": "catalog:"
   }
 }

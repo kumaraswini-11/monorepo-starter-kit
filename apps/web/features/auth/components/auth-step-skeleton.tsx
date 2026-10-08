@@ -16,7 +16,7 @@ export function AuthStepSkeleton() {
     <div className="flex flex-col gap-6" role="status" aria-busy="true">
       <span className="sr-only">Loading…</span>
       <div className="flex flex-col items-start gap-3" aria-hidden="true">
-        <Skeleton className="size-6 rounded-md" />
+        <Skeleton className="size-6" />
         <Skeleton className="h-6 w-2/3" />
         <Skeleton className="h-4 w-full" />
       </div>

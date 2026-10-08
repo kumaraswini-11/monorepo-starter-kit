@@ -84,12 +84,13 @@ export function NotificationBell({
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium">Notifications</p>
             {/* The precise count lives here, inside the panel, where it drives triage — the bell
-                itself only shows a dot. A compact pill: min-w so a single digit reads as a circle,
+                itself only shows a dot. A compact pill (Badge is already h-5 + centered): min-w so a single digit reads as a circle,
                 tabular-nums so multi-digit counts stay aligned. */}
             {unread > 0 && (
               <Badge
                 variant="secondary"
-                className="h-5 min-w-5 justify-center px-1.5 tabular-nums"
+                // eslint-disable-next-line shadcn/no-restyle -- tighter padding keeps a single digit circular (count pill)
+                className="min-w-5 px-1.5 tabular-nums"
               >
                 {unread}
               </Badge>
@@ -98,8 +99,9 @@ export function NotificationBell({
           {unread > 0 && (
             <Button
               variant="ghost"
-              size="sm"
-              className="h-auto gap-1.5 px-2 py-1 text-xs text-muted-foreground"
+              size="xs"
+              // eslint-disable-next-line shadcn/no-restyle -- secondary panel action reads muted next to the heading
+              className="text-muted-foreground"
               onClick={markAllRead}
             >
               <CheckCheckIcon aria-hidden="true" />
@@ -111,7 +113,7 @@ export function NotificationBell({
         {items.length === 0 ? (
           <EmptyState
             size="sm"
-            className="border-0"
+            bordered={false}
             icon={<BellIcon aria-hidden="true" />}
             title="No notifications"
             description="You're all caught up."
@@ -144,14 +146,18 @@ function NotificationItem({
   return (
     // shadcn `Item` (size sm) rendered as the row's interactive element — a Link when the
     // notification navigates, a button otherwise. The `default` variant is ghost (transparent,
-    // border-transparent); `hover:bg-muted` matches the ghost Button so all shell affordances
-    // hover alike. Focus ring is built into `Item`. `text-start` neutralizes the UA `<button>`
-    // default `text-align:center` (the non-navigating rows render as buttons) so the full-width
-    // <time> stays left-aligned like the anchor rows.
+    // border-transparent) and Item owns the interactive hover for both anchors and buttons.
+    // Focus ring is built into `Item`. `text-start` on the rendered <button> neutralizes the UA
+    // default `text-align:center` so the full-width <time> stays left-aligned like anchor rows.
     <Item
       size="sm"
-      className="text-start hover:bg-muted"
-      render={href ? <Link href={href} /> : <button type="button" />}
+      render={
+        href ? (
+          <Link href={href} />
+        ) : (
+          <button type="button" className="text-start" />
+        )
+      }
       onClick={() => onActivate(id)}
     >
       <ItemMedia>
@@ -163,12 +169,16 @@ function NotificationItem({
           )}
         />
       </ItemMedia>
+      {/* eslint-disable-next-line shadcn/no-restyle -- compact notification row: tighter line gap */}
       <ItemContent className="min-w-0 gap-0.5">
         <ItemTitle>
           {title}
           {!read && <span className="sr-only"> (unread)</span>}
         </ItemTitle>
-        {body && <ItemDescription className="text-xs">{body}</ItemDescription>}
+        {body && (
+          // eslint-disable-next-line shadcn/no-restyle -- body sits one step below the title in a compact row
+          <ItemDescription className="text-xs">{body}</ItemDescription>
+        )}
         {/* Rendered only inside the open (client-mounted) panel, so the clock-dependent output
             can't cause an SSR/hydration mismatch. */}
         <time dateTime={createdAt} className="text-xs text-muted-foreground/80">

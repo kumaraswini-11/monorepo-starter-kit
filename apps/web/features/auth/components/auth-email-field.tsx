@@ -32,7 +32,6 @@ export function AuthEmailField({ email }: { email: string }) {
         readOnly
         autoComplete="username"
         aria-describedby="email-hint"
-        className="text-muted-foreground"
       />
       <FieldDescription id="email-hint">
         Email is fixed for this step. Use Change to pick a different address.

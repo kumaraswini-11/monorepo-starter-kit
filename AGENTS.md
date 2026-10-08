@@ -68,7 +68,7 @@ convenience, not the gate.
 - **pnpm 11** workspaces + **Turborepo 2.11**; **Node 24.21.0** pinned (`.nvmrc`, `devEngines.runtime`)
 - **Next.js 16** (Turbopack) · **React 19** · **Tailwind CSS v4**
 - UI: **shadcn/ui** built on **Base UI** (`@base-ui/react`) — not Radix (ADR 0021)
-- **TypeScript 6** · **ESLint 10** (flat, type-aware) · **Prettier 3** · **Vitest 5** · **Playwright**
+- **TypeScript 6** · **ESLint 10** (flat, type-aware, `@shadcn/lint`) · **Prettier 3** · **Vitest 5** · **Playwright**
 
 ## Layout
 
@@ -112,6 +112,19 @@ convenience, not the gate.
   re-apply our documented deviations (`grep -rn "Deviation\|ADR 00" packages/ui/src/components/shadcn`),
   and use our **CSS-transition** animation idiom (not `tw-animate-css` keyframes) — check first, then
   gate incl. Storybook build. The vendored tree has a scoped lint exemption; our own code does not. (ADR 0030, 0033)
+- **Design-system usage is linted (`@shadcn/lint`, ADR 0038):** consumers style a component
+  through its variants/sizes, never `className` overrides beyond layout (width, height, margin,
+  flex); colors and values come from the theme, never the raw palette or `[arbitrary]` values.
+  The model: the component owns its identity (color, shape, type, own padding/gap); the
+  consumer owns placement and composition (arranging children of a container part). Need an
+  identity change? In order: an existing variant/size; a prop/variant on the component when two
+  or three uses justify it; otherwise keep the `className` and mark it
+  `// eslint-disable-next-line shadcn/no-restyle -- <reason>` (explicit, auditable:
+  `git grep -n "eslint-disable.*shadcn/" -- apps packages`). Never a wrapper element added only
+  to move the class, never a contract for an identity change, never a disable without a reason,
+  and never change rendered UI to satisfy a lint rule — that is a design decision.
+  Placement/composition rules live in `designSystemPolicy`
+  (`packages/eslint-config/react-internal.js`).
 - **Component placement & shape (ADR 0016, 0026):** atomic-design as a _lens_ to pick the home
   — no literal `atoms/molecules/organisms` folders. **`@workspace/ui`** is the single design
   system (atoms + agnostic _and_ form-bound molecules; `react-hook-form` is a deliberate `ui`

@@ -34,8 +34,10 @@ function ItemSeparator({
   );
 }
 
+// Deviation from stock shadcn (tracked — ADR 0038): the interactive hover also applies when an
+// Item renders as a <button> (upstream only styles [a]), so consumers never add hover classes.
 const itemVariants = cva(
-  "group/item flex w-full flex-wrap items-center rounded-md border text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors [a]:hover:bg-muted",
+  "group/item flex w-full flex-wrap items-center rounded-md border text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors [a]:hover:bg-muted [button]:transition-colors [button]:hover:bg-muted",
   {
     variants: {
       variant: {

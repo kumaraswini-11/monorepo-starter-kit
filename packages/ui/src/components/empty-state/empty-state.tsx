@@ -45,6 +45,7 @@ export function EmptyState({
   description,
   action,
   size = "default",
+  bordered = true,
   className,
   children,
   ...props
@@ -58,6 +59,9 @@ export function EmptyState({
   action?: ReactNode;
   /** `"default"` for a page/section empty state; `"sm"` for compact surfaces (popovers, cards). */
   size?: "default" | "sm";
+  /** `false` drops the dashed frame — for surfaces that already frame the content (a popover,
+      a card). Default `true`. */
+  bordered?: boolean;
   /** Escape hatch: custom content rendered inside the `Empty`, after the header. */
   children?: ReactNode;
 } & Omit<ComponentProps<typeof Empty>, "children" | "title">) {
@@ -69,7 +73,10 @@ export function EmptyState({
     sm && isValidElement<{ className?: string }>(icon) ? sizeIcon(icon) : icon;
 
   return (
-    <Empty className={cn(sm && "gap-3 p-8", className)} {...props}>
+    <Empty
+      className={cn(sm && "gap-3 p-8", !bordered && "border-0", className)}
+      {...props}
+    >
       <EmptyHeader>
         {icon != null && (
           <EmptyMedia variant="icon" className={cn(sm && "size-9")}>
