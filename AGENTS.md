@@ -122,7 +122,8 @@ convenience, not the gate.
   `// eslint-disable-next-line shadcn/no-restyle -- <reason>` (explicit, auditable:
   `git grep -n "eslint-disable.*shadcn/" -- apps packages`). Never a wrapper element added only
   to move the class, never a contract for an identity change, never a disable without a reason,
-  and never change rendered UI to satisfy a lint rule — that is a design decision.
+  never repeat a class the component already applies (an accidental override in waiting), and
+  never change rendered UI to satisfy a lint rule — that is a design decision.
   Placement/composition rules live in `designSystemPolicy`
   (`packages/eslint-config/react-internal.js`).
 - **Component placement & shape (ADR 0016, 0026):** atomic-design as a _lens_ to pick the home
