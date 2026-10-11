@@ -61,8 +61,8 @@ catalogs:
       specifier: ^9.39.5
       version: 9.39.5
     eslint-plugin-turbo:
-      specifier: ^2.10.12
-      version: 2.10.12
+      specifier: ^2.11.7
+      version: 2.11.7
     jsdom:
       specifier: ^30.0.1
       version: 30.0.1
@@ -553,7 +553,7 @@ importers:
         version: 7.1.1(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-turbo:
         specifier: 'catalog:'
-        version: 2.10.12(eslint@9.39.5(jiti@2.7.0))(turbo@2.10.12)
+        version: 2.11.7(eslint@9.39.5(jiti@2.7.0))(turbo@2.10.12)
       globals:
         specifier: ^17.12.0
         version: 17.12.0
@@ -4710,8 +4710,8 @@ packages:
     peerDependencies:
       eslint: '>=8'
 
-  eslint-plugin-turbo@2.10.12:
-    resolution: {integrity: sha512-QZ9u3sV3ky4bl3XUpsVG8Ehk11I0omsGV2K7dCDut6sGvaVErFvWbgd46oh5tsnLt/5i+KvuOWgKJneleMqk2Q==}
+  eslint-plugin-turbo@2.11.7:
+    resolution: {integrity: sha512-vFjI/0qxA9DFTMAOLhyVo7lFGh5kZ0wrWk+5tsQoafGPWqzTNmIMAjk7hsKLQGHOvLz42y8YIvrevHCbthFuZw==}
     peerDependencies:
       eslint: '>6.6.0'
       turbo: '>2.0.0'
@@ -11095,7 +11095,7 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-turbo@2.10.12(eslint@9.39.5(jiti@2.7.0))(turbo@2.10.12):
+  eslint-plugin-turbo@2.11.7(eslint@9.39.5(jiti@2.7.0))(turbo@2.10.12):
     dependencies:
       dotenv: 16.0.3
       eslint: 9.39.5(jiti@2.7.0)
