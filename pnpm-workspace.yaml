@@ -18,7 +18,7 @@ catalog:
   "@types/react": ^19.3.0
   "@types/react-dom": ^19.2.7
   # Shared libraries
-  lucide-react: ^1.41.0
+  lucide-react: ^1.53.0
   # zod — shared by packages/ui and apps/web (form validation)
   zod: ^4.6.5
   # React Hook Form — packages/ui form layer + apps/web auth forms
