@@ -28,7 +28,7 @@ catalog:
   # Vitest — unit test runner, shared by apps/storybook + packages/*. The @vitest/* family
   # must track vitest's exact version, so they live together in the catalog (drift-proof).
   vitest: ^4.1.11
-  "@vitest/coverage-v8": ^4.1.11
+  "@vitest/coverage-v8": ^5.0.3
   "@vitest/browser-playwright": ^4.1.11
   # Testcontainers — ephemeral real Postgres for integration tests (ADR 0025)
   "@testcontainers/postgresql": ^12.1.0
