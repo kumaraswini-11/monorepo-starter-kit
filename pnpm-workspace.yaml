@@ -43,7 +43,7 @@ catalog:
   # release; catalog keeps the three in lockstep across the three manifests (one bump-site).
   turbo: ^2.10.12
   "@turbo/gen": ^2.10.12
-  eslint-plugin-turbo: ^2.10.12
+  eslint-plugin-turbo: ^2.11.7
   # Testing Library — component testing (jsdom). jest-dom matchers live in the shared
   # vitest-config setup; react + user-event + jsdom are added by each DOM-testing package.
   # jest-dom v7 makes @testing-library/dom a REQUIRED (non-optional) peer, so it is pinned here and
